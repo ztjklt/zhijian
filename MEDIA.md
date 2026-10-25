@@ -4,6 +4,7 @@
 
 | 路径 | 内容与来源 |
 | --- | --- |
+| `media/poster-zhijian-online-20261025.png` | 用户于 2026-10-25 提供的「纸间」联机宣传海报，按原始 PNG 上传，包含网页版入口；保留既有海报。 |
 | `media/poster.png` | 基于已制作的 cover-v10 封面，仅替换展示标题为「指尖」；使用内置 imagegen 编辑。 |
 | `media/cover-original.png` | cover-v10 的原始「纸间」合成封面。 |
 | `media/cover-source/` | 原封面的八张独立 PNG：背景、两个标题字、三张菜单和左右课堂草稿；包含历史名称。 |

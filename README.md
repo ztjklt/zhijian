@@ -95,8 +95,15 @@
 
 ## 海报与素材
 
+### 「纸间」联机海报
+
+![纸间联机海报：火柴人在手绘桥上造物与交手，一起，把想象画出来](media/poster-zhijian-online-20261025.png)
+
+[查看原尺寸 PNG](media/poster-zhijian-online-20261025.png) · [打开网页版，和朋友一起玩](https://zhijian-web-production.up.railway.app/)
+
 | 内容 | 文件 |
 | :--- | :--- |
+| 「纸间」联机海报（2026-10-25） | [查看原尺寸 PNG](media/poster-zhijian-online-20261025.png) |
 | 「指尖」展示海报 | [查看原尺寸 PNG](media/poster.png) |
 | 历史「纸间」封面 | [查看原始封面 PNG](media/cover-original.png) |
 | 原封面分层素材 | [八张独立 PNG](media/cover-source/) |
