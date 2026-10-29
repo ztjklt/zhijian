@@ -7,18 +7,21 @@ import os
 import re
 import shutil
 import subprocess
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tests"))
+from runtime_tools import resolve_godot
 from prepare_client import prepare
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-DEFAULT_SOURCE = ROOT / "dist/纸间联机最新版-20261025-r7"
-DEFAULT_OUTPUT = ROOT / "dist/纸间网页版-20261025-r7"
+DEFAULT_SOURCE = HERE.parent
+DEFAULT_OUTPUT = ROOT / "dist/纸间网页候选-r22"
 PROTECTED_OUTPUTS = {ROOT / ("dist/纸间网页版-20261025-" + release)
-                     for release in ("flow", "perf", "latency", "ack")}
+                     for release in ("flow", "perf", "latency", "ack", "r7")}
 FONT_SHA256 = "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"
 
 
-def run(args):
+def prepare_project(args):
     source = args.source.resolve()
     output = args.output.resolve()
     if output in PROTECTED_OUTPUTS:
@@ -118,10 +121,17 @@ html/canvas_resize_policy=2
 html/focus_canvas_on_start=true
 progressive_web_app/enabled=false
 ''')
+    return project, site
+
+
+def run(args):
+    project, site = prepare_project(args)
+    source, output = args.source.resolve(), args.output.resolve()
+    godot = resolve_godot(getattr(args, "godot", None))
     log = output / "export.log"
     with log.open("w") as stream:
-        for command in ([args.godot, "--headless", "--path", str(project), "--editor", "--import", "--quit"],
-                        [args.godot, "--headless", "--path", str(project), "--export-release", "Web", str(site / "index.html")]):
+        for command in ([godot, "--headless", "--path", str(project), "--editor", "--import", "--quit"],
+                        [godot, "--headless", "--path", str(project), "--export-release", "Web", str(site / "index.html")]):
             result = subprocess.run(command, stdout=stream, stderr=subprocess.STDOUT, timeout=240)
             stream.flush()
             if result.returncode:
@@ -147,7 +157,7 @@ progressive_web_app/enabled=false
     files = {p.name: {"bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
              for p in sorted(site.iterdir()) if p.is_file()}
     protocol = int(re.search(r"const PROTOCOL := (\d+)", (source / "scripts/net/codec.gd").read_text()).group(1))
-    (output / "WEB_RELEASE.json").write_text(json.dumps({"source": str(source.relative_to(ROOT)), "protocol": protocol,
+    (output / "WEB_RELEASE.json").write_text(json.dumps({"source": str(source.relative_to(ROOT)) if source.is_relative_to(ROOT) else str(source), "protocol": protocol,
         "renderer": "gl_compatibility", "threads": False, "files": files}, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps({"site": str(site), "files": len(files), "bytes": sum(v["bytes"] for v in files.values())}, ensure_ascii=False))
 
@@ -156,5 +166,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
-    parser.add_argument("--godot", default=os.environ.get("GODOT_BIN", str(Path.home() / "Applications/Godot.app/Contents/MacOS/Godot")))
+    parser.add_argument("--godot", default=None)
     run(parser.parse_args())

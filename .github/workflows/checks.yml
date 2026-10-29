@@ -1,0 +1,29 @@
+name: Offline game checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Godot 4.6.3
+        shell: bash
+        run: |
+          curl -fL --retry 3 https://github.com/godotengine/godot-builds/releases/download/4.6.3-stable/Godot_v4.6.3-stable_linux.x86_64.zip -o /tmp/godot.zip
+          echo 'd0bc2113065e481c9c2c2b2c37daa4e8be3fe9e27f0ab9ab0b6096e9a37907f3  /tmp/godot.zip' > /tmp/godot.sha256
+          sha256sum --check /tmp/godot.sha256
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v4.6.3-stable_linux.x86_64
+          echo 'GODOT_BIN=/tmp/godot/Godot_v4.6.3-stable_linux.x86_64' >> "$GITHUB_ENV"
+      - name: Native, Python and adapted Web checks
+        run: python3 ZSCB/tests/run_checks.py --logs /tmp/zhijian-checks
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: check-logs
+          path: /tmp/zhijian-checks

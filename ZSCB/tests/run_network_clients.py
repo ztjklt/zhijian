@@ -1,3 +1,4 @@
+from runtime_tools import resolve_godot, user_data_path
 """Run a real authority and two full Godot game clients in isolated projects."""
 from pathlib import Path
 import os, re, shutil, socket, subprocess, tempfile, time, uuid
@@ -31,7 +32,7 @@ if not (support/'server').is_dir() or not (support/'tests').is_dir():
     manifest=source.parent/'WEB_RELEASE.json'
     if not manifest.is_file(): raise ValueError('Web project requires its release manifest or --support-source')
     support=Path(__file__).resolve().parents[2]/json.loads(manifest.read_text())['source']
-godot=Path.home()/'Applications/Godot.app/Contents/MacOS/Godot'
+godot=resolve_godot()
 def port():
     with socket.socket() as s:
         s.bind(('127.0.0.1',0)); return s.getsockname()[1]
@@ -111,5 +112,5 @@ with tempfile.TemporaryDirectory(prefix='paper-network-clients-') as temp:
             args.evidence_dir.mkdir(parents=True,exist_ok=True)
             for path in base.glob('*.log'): shutil.copy2(path,args.evidence_dir/f'{args.map}-{path.name}')
         for name in names:
-            data=Path.home()/'Library/Application Support/Godot/app_userdata'/name
+            data=user_data_path(name)
             if data.exists(): shutil.rmtree(data)

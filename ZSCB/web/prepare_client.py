@@ -56,7 +56,7 @@ def prepare_legacy_movement(text):
 
 def prepare(project:Path):
     protocol=int(re.search(r'const PROTOCOL := (\d+)',(project/'scripts/net/codec.gd').read_text()).group(1))
-    if protocol not in [2,6,7,8,9,10]:raise ValueError('Review Web adaptation for protocol '+str(protocol))
+    if protocol not in [2,6,7,8,9,10,11]:raise ValueError('Review Web adaptation for protocol '+str(protocol))
     prepare_authority(project)
     shutil.copytree(HERE/'client',project,dirs_exist_ok=True)
     prediction=project/'scripts/net/local_prediction.gd'
