@@ -32,4 +32,28 @@ func run()->void:
 				path.append(point);moved.append(point+Vector2(rng.randf_range(-.6,.6),rng.randf_range(-.6,.6)))
 			old.append(path);current.append(moved)
 		compare(world,old,current,offset if trial%2 else Vector2.INF,"unchanged exhaustive concave/time/grip result "+str(trial))
+	# Long strokes straddle several batch boundaries and first touch only
+	# after sample zero. Both sloped and concave solids use oblique rejection.
+	for trial in 16:
+		var offset:=Vector2(rng.randf_range(-5,180),rng.randf_range(-10,26))
+		var polygon:=PackedVector2Array([Vector2(0,2),Vector2(3,.2),Vector2(3,-3),Vector2(0,-3)])
+		if trial%2:polygon=PackedVector2Array([Vector2(0,2),Vector2(1,.5),Vector2(2,1.2),Vector2(3,.2),Vector2(3,-3),Vector2(0,-3)])
+		for i in polygon.size():polygon[i]+=offset
+		world.terrain.collision_geometry=[polygon,polygon.duplicate()]
+		var old:Array=[];var current:Array=[]
+		for stroke in 2:
+			var before:=PackedVector2Array();var after:=PackedVector2Array()
+			for vertex in 34:
+				var angle:=TAU*vertex/33.0
+				var point:=Vector2(cos(angle),sin(angle)*.8)+Vector2(stroke*.01,0)
+				before.append(offset+point+Vector2(1.5,4))
+				after.append(offset+point.rotated(.3)+Vector2(1.8,-.5))
+			old.append(before);current.append(after)
+		var expected:=exhaustive(old,current,world.terrain.collision_geometry,offset+Vector2(-2,2))
+		check(not expected.is_empty() and expected.time>0,"multi-batch oblique fixture has actual delayed contact "+str(trial))
+		compare(world,old,current,offset+Vector2(-2,2),"multi-batch sloped/concave nearest order "+str(trial))
+		if trial==0:
+			compare(world,[],current,offset,"multi-batch missing old paths retain current geometry")
+			old[0].remove_at(0)
+			compare(world,old,current,offset,"multi-batch changed path length retains current geometry")
 	world.free();print("MEDIEVAL SWEEP BOUNDS: ",checks," checks, ",failures.size()," failures");quit(0 if failures.is_empty() else 1)

@@ -1,6 +1,6 @@
 # 纸间 · 核心工程指引
 
-2026-10-30高延迟协作修正：600ms失败已定位为房主未Ready仍点击连接、界面误报待回执及夹具固定等待。未发送保留同步提示／锚点，Ready后显式重试；机器人核对版本及复制体收敛。专项13／0、相关5／5、原生／Web600ms双完整客户端通过；完整验证和当前提交CI均绿色后才按用户授权合并main。执行 `python3 tests/run_checks.py --stages cooperation --logs <目录>` 可重跑600ms双套客户端，CI已接入。Linux CI另暴露字体夹具／地图底边与剑模性能预算问题，已修正实际布局及保守扫掠计算，保留原断言／16.67ms预算；详情读docs/HIGH_LATENCY_COOPERATION_2026-10-30.md；旧失败记录保留，公网r7未变。
+2026-10-30高延迟协作修正：600ms失败已定位为房主未Ready仍点击连接、界面误报待回执及夹具固定等待。未发送保留同步提示／锚点，Ready后显式重试；机器人核对版本及复制体收敛。专项13／0、相关5／5、原生／Web600ms双完整客户端通过；完整验证和当前提交CI均绿色后才按用户授权合并main。执行 `python3 tests/run_checks.py --stages cooperation --logs <目录>` 可重跑600ms双套客户端，CI已接入。Linux CI另暴露字体夹具／地图底边与剑模性能预算问题，已修正实际布局及保守扫掠计算，后续CI剩余剑模性能项继续以有界分批／斜向投影及最近接触下界优化，穷举105／0，保留原断言／16.67ms预算；详情读docs/HIGH_LATENCY_COOPERATION_2026-10-30.md；旧失败记录保留，公网r7未变。
 
 
 2026-10-30当前候选：SPEC v0.55，r22／协议11。携物安全放下与生命周期集中于carry_placement.gd／carry_controller.gd，协议11 Web可准备及导出，新增next_steps.gd可选后续入口。统一离线验证使用 `python3 tests/run_checks.py --godot <可执行文件>`，只在副本／随机用户目录运行；可用--stages选择验证阶段，完整日志可用--logs指定。最终统一入口3／3通过：原生152／152、当前Web162／162、Python通过；旧会话专项另4／0。1项复核P2经RED→GREEN修正，Web字体布局首跑失败和夹具不匹配均保留。600ms Web共建仍有未通过项；实际结果与未验证边界以docs/SANDBOX_RELIABILITY_2026-10-30.md为准。公网仍r7／协议6，禁止把源码或GitHub更新说成已部署。
