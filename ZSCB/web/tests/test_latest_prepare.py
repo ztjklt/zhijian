@@ -1,6 +1,7 @@
 """Port the proven Web flow/prediction without downgrading current gameplay."""
 from pathlib import Path
 import shutil
+import os
 import sys
 import tempfile
 import unittest
@@ -10,6 +11,7 @@ from prepare_client import prepare
 
 ROOT = Path(__file__).resolve().parents[3]
 SOURCE = Path(__file__).resolve().parents[2]
+LEGACY_ROOT = Path(os.environ.get('PAPER_LEGACY_ROOT', str(ROOT)))
 
 
 class LatestPrepareTest(unittest.TestCase):
@@ -41,8 +43,20 @@ class LatestPrepareTest(unittest.TestCase):
                 self.assertIn(field, actor)
 
 
+    def test_r7_legacy_gameplay_survives_web_preparation(self):
+        source = LEGACY_ROOT / 'dist/纸间联机最新版-20261025-r7'
+        if not source.is_dir(): self.skipTest('Historical r7 bundle is optional')
+        with tempfile.TemporaryDirectory() as temp:
+            project = Path(temp)
+            shutil.copytree(source / 'scripts', project / 'scripts')
+            prepare(project)
+            for name in ['weapon_types.gd', 'object_damage.gd', 'combat_audio.gd']:
+                self.assertEqual((project / 'scripts' / name).read_bytes(), (source / 'scripts' / name).read_bytes())
+            self.assertIn('const PROTOCOL := 6', (project / 'scripts/net/codec.gd').read_text())
+            self.assertIn('flow_ui.session=self', (project / 'scripts/net/session.gd').read_text())
+
     def test_r13_gameplay_survives_legacy_movement_preparation(self):
-        source = ROOT / 'dist/纸间第一件作品候选-20261026-r13'
+        source = LEGACY_ROOT / 'dist/纸间第一件作品候选-20261026-r13'
         if not source.is_dir(): self.skipTest('Historical r13 bundle is optional; current-source preparation is tested separately')
         with tempfile.TemporaryDirectory() as temp:
             project = Path(temp)
