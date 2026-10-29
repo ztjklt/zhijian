@@ -104,6 +104,7 @@ var backpack_panel: Control = null
 var backpack_ui = null
 var onboarding := PaperOnboarding.new()
 var first_work
+var next_steps
 var character_visual: Node2D
 var experience: PaperExperience
 # Online presentation and authoritative rooms keep independent state.
@@ -222,6 +223,9 @@ func _ready() -> void:
 	cooperation_panel=preload("res://scripts/cooperation_panel.gd").new()
 	cooperation_panel.game=self
 	lab_layer.add_child(cooperation_panel)
+	next_steps=preload("res://scripts/next_steps.gd").new()
+	next_steps.game=self
+	lab_layer.add_child(next_steps)
 	map_controls = preload("res://scripts/medieval_controls.gd").new()
 	map_controls.game = self
 	ui_layer.add_child(map_controls)
@@ -248,7 +252,11 @@ func lab_open() -> bool:
 	return weapon_lab_panel != null and weapon_lab_panel.visible
 
 func personal_overlay_open() -> bool:
-	return cooperation_open() or lab_open() or (experience != null and experience.visible)
+	return next_steps_open() or cooperation_open() or lab_open() or (experience != null and experience.visible)
+
+func next_steps_open()->bool:return next_steps!=null and next_steps.visible
+func open_next_steps()->void:
+	if next_steps!=null:next_steps.open()
 
 func cooperation_open()->bool:return cooperation_panel!=null and cooperation_panel.visible
 func open_cooperation()->void:cooperation_panel.open()
@@ -300,7 +308,8 @@ func receive_cooperation(state:Dictionary)->void:
 		drag=null;selected=-1;connection_source.clear();message("协作许可或编辑者已变化，请重新选择部件")
 
 func close_personal_overlay() -> void:
-	if cooperation_open():cooperation_panel.close()
+	if next_steps_open():next_steps.close()
+	elif cooperation_open():cooperation_panel.close()
 	elif lab_open(): weapon_lab_panel.close()
 	elif experience != null: experience.close()
 
@@ -642,6 +651,7 @@ func restore(snap: Dictionary) -> void:
 	if saved_world.get("id", "paper") == "medieval-v1" and not preload("res://scripts/medieval_world.gd").validate_snapshot(saved_world):
 		message("作品状态或版本无效，当前世界已保留")
 		return
+	if saved_world.id != world_kind: carry_controller.clear()
 	map_workspaces = _clone(saved_world.get("maps", {}))
 	if saved_world.id != world_kind:
 		select_world(saved_world.id)
@@ -681,8 +691,8 @@ func restore(snap: Dictionary) -> void:
 	preview_paths = null
 	selected = -1
 	drag = null
-	carried_id = ""
-	carried_previous.clear()
+	# Undo/redo retain an extant held part by stable identity. Rebuild clears
+	# state itself if that part was removed by the restored snapshot.
 	_rebuild_objects()
 	structure_links.restore(saved_world.get("connections", []))
 	refresh_buttons()

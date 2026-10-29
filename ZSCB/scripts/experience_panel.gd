@@ -2,7 +2,7 @@ class_name PaperExperience
 extends Control
 ## A reviewable entry into the actual sandbox, sharing its map and combat code.
 
-const VERSION := "v0.54 · 携物交互改进"
+const VERSION := "v0.55 · 创作与携物改进"
 var game = null
 var panel: PanelContainer
 var scroll: ScrollContainer

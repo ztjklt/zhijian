@@ -67,7 +67,7 @@ func step(delta:float)->void:
 		if support_time>=.3:stage=3;notice="它真的承住了你。接下来保存作品。"
 func action_text()->String:
 	if stage==1 and game.draw_mode!=drawing_mode:return "回到刚才笔迹"
-	return ["1 画矮踏板","确认生成","4 亲手搬动","保存作品","继续自由创作"][stage]
+	return ["1 画矮踏板","确认生成","4 亲手搬动","保存作品","接下来做什么"][stage]
 func short_hint()->String:return ["画个矮踏板","按当前数字确认","跳上它或亲手搬动","最后保存作品","第一件作品完成！"][stage]
 func title()->String:return "%d/4 · %s"%[mini(stage+1,4),["画下你的踏板","让笔迹成为实体","让它真的派上用场","留下第一件作品","第一件作品完成"][stage]]
 func body_text()->String:
@@ -83,7 +83,7 @@ func action()->void:
 			else:game.generate()
 		2:game.set_draw_mode(4);game.set_connection_tool("move");game.message("按住标记的作品拖动至少一小段；也可用跳跃站上它。")
 		3:game.save_game()
-		4:dismiss()
+		4:dismiss();game.open_next_steps()
 func draw_world(canvas:Node2D)->void:
 	if not visible or stage not in [2,3] or game.bag_open or game.personal_overlay_open():return
 	var body=target()

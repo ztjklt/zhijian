@@ -3,7 +3,7 @@ extends RefCounted
 
 # Bump when authority rules, map geometry, or the wire contract changes.
 const PROTOCOL := 11
-const RELEASE := "20261028-r21 · 携物交互候选"
+const RELEASE := "20261030-r22 · 创作与携物候选"
 
 # One codec is shared by commands, chunked snapshots and persisted worlds. Never
 # use str_to_var/bytes_to_var on peer input: those formats can construct objects.
