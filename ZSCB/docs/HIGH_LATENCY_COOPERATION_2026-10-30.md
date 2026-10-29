@@ -29,7 +29,7 @@
 完整验证命令（全部在随机私有目录）：
 
 ```sh
-python3 ZSCB/tests/run_checks.py --stages native python web cooperation --logs /tmp/zhijian-600-final
+python3 ZSCB/tests/run_checks.py --stages native python web cooperation --logs /tmp/zhijian-600-final-current
 ```
 
 只重跑高延迟双客户端：
@@ -39,6 +39,16 @@ python3 ZSCB/tests/run_checks.py --stages cooperation --logs /tmp/zhijian-600-co
 ```
 
 GitHub CI使用固定Godot4.6.3 Linux，先执行原生／Python／当前Web完整行为，再执行相同600ms原生与Web双客户端。分支通过PR触发，主分支通过push触发；旧提交运行可取消，同一提交不重复执行push和PR两份。CI与合并状态以[PR #1检查页](https://github.com/ztjklt/zhijian/pull/1/checks)为准；只在本地验证及当前提交CI通过后合并，不以旧提交的绿色结果代替。
+
+## Linux CI发现与修正
+
+初次完整Linux CI原生150／152、当前Web160／162，Python通过。原始失败保留：出生安全测试写死的坐标未覆盖Linux字体下的诗词实体；844×390的Web地图面板因Noto字体高出窗口1像素；大型剑模中世纪扫掠最高19.053ms，超过原16.67ms预算。
+
+出生点夹具改用实际首诗路径中心，先断言真实碰撞体接触再测试安全分离，保留原有断言。半宽字体变异下原夹具13项／1失败，修正后15／0；移除生产安全分离的变异仍被原断言捕获。地图导航按布局完成后的真实高度保留底边8像素：使用Web实装字体先复现39项／1失败，修正后原生及Web各39／0，并保持工具按钮避让。
+
+Godot采样定位到中世纪剑模接触检查。减少逐采样点的临时数组／字典；只有首次采样无接触且仍有多个时刻待查时，才用四端点凸包的保守投影间隔剔除绝不可能接触的线段。完整笔迹、时间采样、原精确判定及接触排序不变，无跨帧缓存。原16.67ms预算保持。相同机器顺序对照的最慢关键场景12.860→10.724ms（墙钟11.510→9.342ms），不能换算为整体FPS。新增独立穷举对照覆盖凹多边形、切线、退化、握点、64组确定随机案例及保证延后接触的非退化扫掠。
+
+上述修正通过独立只读复核，无新增P0／P1／P2。最终完整验证在这些修正后的同一源码执行；具体CI结果以当前提交的检查页为准，不能引用先前本地绿色结果冒充修正后全量通过。
 
 ## 范围
 

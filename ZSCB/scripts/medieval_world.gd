@@ -366,6 +366,7 @@ func blade_contact(old: Array,current: Array,origin: Vector2 = Vector2.INF) -> D
 	# Large hollow weapons often surround a target's box while almost all their
 	# actual ink misses it. Do this conservative rejection once, before sampling,
 	# instead of revisiting every irrelevant segment at every instant.
+	var steps := clampi(ceili(Sweep.motion_distance(old,current)/Sweep.SAMPLE_SPACING),1,Sweep.MAX_SAMPLES)
 	for target in candidates:
 		var segments: Array[PackedVector2Array] = []
 		for path_index in current.size():
@@ -373,12 +374,23 @@ func blade_contact(old: Array,current: Array,origin: Vector2 = Vector2.INF) -> D
 			var before: PackedVector2Array = old[path_index] if old.size()==current.size() and old[path_index].size()==path.size() else path
 			for j in range(1,path.size()):
 				var box := Rect2(path[j-1],Vector2.ZERO).expand(path[j]).expand(before[j-1]).expand(before[j])
-				if box.intersects(target.bounds,true): segments.append(PackedVector2Array([before[j-1],before[j],path[j-1],path[j]]))
+				if not box.intersects(target.bounds,true): continue
+				var segment := PackedVector2Array([before[j-1],before[j],path[j-1],path[j]])
+				segments.append(segment)
 		target.segments = segments
 	candidates = candidates.filter(func(target: Dictionary) -> bool: return not target.segments.is_empty())
 	if candidates.is_empty(): return {}
-	var steps := clampi(ceili(Sweep.motion_distance(old,current)/Sweep.SAMPLE_SPACING),1,Sweep.MAX_SAMPLES)
 	for i in range(steps+1):
+		# Most touching swings finish at the initial sample. Only pay for the
+		# stronger moving-ink rejection when several later samples remain.
+		if i==1 and steps>4:
+			for target in candidates:
+				var retained: Array[PackedVector2Array] = []
+				for segment in target.segments:
+					if _swept_segment_may_touch(segment,target.polygon): retained.append(segment)
+				target.segments=retained
+			candidates=candidates.filter(func(target:Dictionary)->bool:return not target.segments.is_empty())
+			if candidates.is_empty(): return {}
 		var time := float(i)/steps
 		# The held grip only orders contacts that the actual sword already makes.
 		# It never creates an owner-to-target attack ray or fills a sword's gaps.
@@ -392,23 +404,60 @@ func blade_contact(old: Array,current: Array,origin: Vector2 = Vector2.INF) -> D
 				var b: Vector2 = segment[1].lerp(segment[3],time)
 				var segment_box := Rect2(a,Vector2.ZERO).expand(b)
 				if not segment_box.intersects(target.bounds,true): continue
-				var points := PackedVector2Array()
-				if Geometry2D.is_point_in_polygon(a,polygon): points.append(a)
-				if Geometry2D.is_point_in_polygon(b,polygon): points.append(b)
+				# Keep the exact ordered predicates, but accumulate the best point
+				# directly instead of allocating a buffer for each sampled segment.
+				var contact_point := Vector2.ZERO
+				var contact_distance := distance
+				var candidate_distance: float
+				if Geometry2D.is_point_in_polygon(a,polygon):
+					candidate_distance = reference.distance_squared_to(a)
+					if candidate_distance < contact_distance: contact_distance=candidate_distance;contact_point=a
+				if Geometry2D.is_point_in_polygon(b,polygon):
+					candidate_distance = reference.distance_squared_to(b)
+					if candidate_distance < contact_distance: contact_distance=candidate_distance;contact_point=b
 				var projected := Geometry2D.get_closest_point_to_segment(reference,a,b)
-				if Geometry2D.is_point_in_polygon(projected,polygon): points.append(projected)
+				if Geometry2D.is_point_in_polygon(projected,polygon):
+					candidate_distance = reference.distance_squared_to(projected)
+					if candidate_distance < contact_distance: contact_distance=candidate_distance;contact_point=projected
 				for edge in target.edges:
 					if not segment_box.intersects(edge.bounds,true): continue
 					var point = Geometry2D.segment_intersects_segment(a,b,edge.a,edge.b)
-					if point != null: points.append(point)
-				for point in points:
-					var candidate := reference.distance_squared_to(point)
-					if candidate < distance:
-						distance = candidate
-						nearest = {"position":point,"time":time,"index":-1 if target.entity==null else -2}
-						if target.entity!=null: nearest.entity=target.entity
+					if point != null:
+						candidate_distance = reference.distance_squared_to(point)
+						if candidate_distance < contact_distance: contact_distance=candidate_distance;contact_point=point
+				if contact_distance < distance:
+					distance = contact_distance
+					nearest = {"position":contact_point,"time":time,"index":-1 if target.entity==null else -2}
+					if target.entity!=null: nearest.entity=target.entity
 		if not nearest.is_empty(): return nearest
 	return {}
+
+
+func _swept_segment_may_touch(segment: PackedVector2Array, polygon: PackedVector2Array) -> bool:
+	# Every interpolated point lies inside the convex hull of these four ends.
+	# A separating projection can only reject; retained material still uses all
+	# original temporal samples and exact point/edge predicates below.
+	var hull := Geometry2D.convex_hull(segment)
+	if hull.size()<3: return true
+	var reference: Vector2 = hull[0]
+	for i in hull.size():
+		var edge: Vector2 = hull[(i+1)%hull.size()]-hull[i]
+		if edge.length_squared()<0.0000000001: continue
+		var axis := Vector2(-edge.y,edge.x)
+		var ink_min := 0.0
+		var ink_max := 0.0
+		for point in hull:
+			var value := axis.dot(point-reference)
+			ink_min=minf(ink_min,value);ink_max=maxf(ink_max,value)
+		var solid_min := INF
+		var solid_max := -INF
+		for point in polygon:
+			var value := axis.dot(point-reference)
+			solid_min=minf(solid_min,value);solid_max=maxf(solid_max,value)
+		# A small broad-phase rounding allowance preserves boundary-only contact.
+		var margin := BLADE_BOUNDS_MARGIN*4*axis.length()
+		if ink_min>solid_max+margin or solid_min>ink_max+margin: return false
+	return true
 
 func damage_entity(entity,amount: float,point: Vector2,impulse: Vector2,weapon_type: String = "") -> void:
 	if entity == null or not entities.has(entity) or not entity.alive: return

@@ -1,5 +1,7 @@
 extends SceneTree
 
+const Editorial := preload("res://scripts/semantic_layout.gd")
+
 var checks := 0
 var failures: Array[String] = []
 
@@ -66,12 +68,35 @@ func run() -> void:
 	game.knowledge_world.visit(1)
 	game.player.position = Vector2(28, 2)
 	for i in range(3): await physics_frame
-	var poem: Dictionary = DrawingRules.building([{"points": [Vector2(29.5,4.35),Vector2(30.5,4.35),Vector2(30.5,5.35),Vector2(29.5,5.35),Vector2(29.5,4.35)]}], "freehand")
-	body = game._drop_candidate(poem)
-	check(body != null, "a drawing through the real first poem line can generate")
-	if body != null:
-		check(body.get_meta("spawn_adjusted", false), "the actual poem overlap triggers automatic separation")
-		body.free()
+	# SystemFont changes line widths across platforms. Locate actual material,
+	# rather than assuming the first poem extends to a fixed world x coordinate.
+	var poem_line: Array = []
+	var poem_id: String = Editorial.poems()[0].id
+	for path in game.knowledge_world.paths:
+		if path.get("source", "") == poem_id:
+			poem_line = path.points
+			break
+	check(poem_line.size() >= 2, "the fixture locates the actual first poem line")
+	if poem_line.size() >= 2:
+		var poem_at: Vector2 = (poem_line[0] + poem_line[1]) * 0.5
+		var poem_points: Array = []
+		for corner in [Vector2(-0.5,-0.5),Vector2(0.5,-0.5),Vector2(0.5,0.5),Vector2(-0.5,0.5),Vector2(-0.5,-0.5)]:
+			poem_points.append(poem_at + corner)
+		var poem: Dictionary = DrawingRules.building([{"points": poem_points}], "freehand")
+		var probe := BuildObject.new()
+		probe.setup(poem)
+		var hits_poem := false
+		for hit in PaperSpawnClearance._contacts(game, probe, Vector2.ZERO):
+			# Loaded path fixtures are centred on their material's segment midpoint.
+			if hit.collider.get_parent().name.begins_with("InkChunk_") and hit.collider.global_position.is_equal_approx(poem_at):
+				hits_poem = true
+		check(hits_poem, "the unadjusted drawing physically overlaps the real first poem line")
+		probe.free()
+		body = game._drop_candidate(poem)
+		check(body != null, "a drawing through the real first poem line can generate")
+		if body != null:
+			check(body.get_meta("spawn_adjusted", false), "the actual poem overlap triggers automatic separation")
+			body.free()
 	var collected: Dictionary = BlueprintBag.add_entry(game.bag, DrawingRules.building([{"points": [Vector2(0,0),Vector2(0.7,0)]}], "freehand"))
 	game.placing_blueprint_id = collected.entry.id
 	game.place_blueprint(50, 12)

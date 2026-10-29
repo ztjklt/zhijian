@@ -98,6 +98,9 @@ func _process(_delta: float) -> void:
 	panel.reset_size()
 	if compact and size.y < 500 and not side_event:
 		panel.position.x = maxf(12,(size.x-panel.size.x)*.5)
+		# CJK font metrics change the wrapped note's height. Fit the measured
+		# panel after reset_size, rather than assuming it fits below the dock.
+		panel.position.y = minf(panel.position.y, size.y-panel.size.y-8)
 	PaperGuiScale.popup(regions.get_popup(), scale.x)
 
 func visit_trial() -> void:
