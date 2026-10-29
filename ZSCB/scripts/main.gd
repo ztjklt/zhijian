@@ -1851,20 +1851,23 @@ func connection_pointer(point: Vector2) -> void:
 	if source == null: connection_source.clear(); message("原部件已不存在，请重新选择"); return
 	var first: Vector2 = source.to_global(connection_source.point)
 	if first.distance_to(point) > .5: message("两个锚点相距太远，请选同一接缝附近"); return
-	connection_action({"action":"connect", "a":source_key, "b":key, "point":first.lerp(point,.5), "kind":connection_tool})
-	connection_source.clear()
+	if connection_action({"action":"connect", "a":source_key, "b":key, "point":first.lerp(point,.5), "kind":connection_tool}):
+		connection_source.clear()
 
-func connection_action(data: Dictionary) -> void:
+func connection_action(data: Dictionary) -> bool:
 	if network_session != null:
-		network_session.send_op("structure_link", data)
+		# A rejected send has no receipt to wait for. Keep its readiness notice
+		# and the unsent material anchor for an explicit retry after resync.
+		if network_session.send_op("structure_link", data) <= 0: return false
 		message("正在等待服务器确认连接…")
-		return
+		return true
 	var before := snapshot()
 	var result: Dictionary = structure_links.create(data.a,data.b,data.point,data.kind) if data.action == "connect" else structure_links.remove(data.id)
 	if result.ok:
 		record(before)
 		message("转轴已连接 · 部件可以绕接缝转动" if data.get("kind", "") == "hinge" else "连接已解除 · 部件仍保留" if data.action == "unlink" else "固定连接完成 · 部件一起受力")
 	else: message(result.error)
+	return true # Local attempt completed; retain the existing selection lifecycle.
 
 func retain_active_stroke() -> void:
 	# Modal UI and focus loss finish valid ink as a draft, never as a world object.

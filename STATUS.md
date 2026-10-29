@@ -18,3 +18,5 @@
 - [工程历史说明](ZSCB/README.md)
 - [携物交互验收记录](ZSCB/docs/CARRY_INTERACTION_2026-10-28.md)
 - [已发布网页版（r7）](https://zhijian-web-production.up.railway.app/)
+
+2026-10-30补充：此前600ms共建失败已定位并修正，保留同步提示与未提交锚点，测试按真实版本／Ready／复制位置推进。专项13／0、原生与Web600ms／256KiB/s双完整客户端通过；完整本地和当前提交CI结果见 [高延迟协作记录](ZSCB/docs/HIGH_LATENCY_COOPERATION_2026-10-30.md) 与 [PR检查](https://github.com/ztjklt/zhijian/pull/1/checks)。旧失败作为历史保留，未部署公网。

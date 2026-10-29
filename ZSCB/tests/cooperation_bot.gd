@@ -1,4 +1,14 @@
 extends "res://tests/network_duel_bot.gd"
+static func undo_visible(client:PaperNetSession,expected:Dictionary)->bool:
+	if not client.ready_to_play or client.syncing:return false
+	for i in client.game.objects.size():
+		var object:Dictionary=client.game.objects[i]
+		if str(object.id)!=str(expected.id):continue
+		if int(object.version)<int(expected.version) or not client.targets.has(str(object.id)):return false
+		var target:Dictionary=client.targets[str(object.id)]
+		var body:RigidBody2D=client.game.object_nodes[i]
+		return body.position.distance_to(target.position)<.025 and absf(angle_difference(body.rotation,float(target.angle)))<.01
+	return false
 func own_piece()->Dictionary:
 	for object in session.game.objects:
 		if object.author==session.player_id:return object
@@ -17,7 +27,9 @@ func lend(enabled:bool)->bool:
 	game.cooperation_panel.close();return true
 func run()->void:
 	session=PaperNetSession.new();root.add_child(session)
-	session.operation_finished.connect(func(result):results[int(result.get("seq",0))]=result)
+	session.operation_finished.connect(func(result):
+		results[int(result.get("seq",0))]=result
+		if result.get("op","")=="structure_link":print("COOP CONNECT RECEIPT ",result))
 	if role=="owner":session.connect_room(address,"create","","共建甲","paper")
 	else:
 		if not await wait_until(func():return marked("invite")):fail("invite missing");return
@@ -39,6 +51,7 @@ func run()->void:
 	phase="shared move"
 	if role=="guest":
 		var foreign:Dictionary=game.objects.filter(func(object):return object.author!=session.player_id)[0]
+		var expected_undo:Dictionary={"id":str(foreign.id),"version":int(foreign.version)+2}
 		var before:=Vector2(foreign.x,foreign.y);game.set_draw_mode(4);game.set_connection_tool("move")
 		var previous_seq:int=session.seq
 		game.pointer_down(game.world_to_screen(before));var lock_number:int=session.seq
@@ -53,15 +66,21 @@ func run()->void:
 		if not await wait_until(func():return session.ready_to_play):fail("move state not ready for undo");return
 		number=session.send_op("undo")
 		if not await wait_until(func():return results.has(number)) or not results[number].ok:fail("borrowed move undo denied");return
-		if not await wait_until(func():return session.ready_to_play):fail("move resync missing");return
-		mark("guest.moved")
+		if not await wait_until(func():return undo_visible(session,expected_undo)):fail("guest undo replica not current");return
+		# Publish the receipt only after its complete JSON is on disk.
+		mark("guest.moved.tmp",JSON.stringify(expected_undo))
+		if DirAccess.rename_absolute(folder.path_join("guest.moved.tmp"),folder.path_join("guest.moved"))!=OK:fail("undo coordination receipt could not be published");return
 	else:
 		if not await wait_until(func():return marked("guest.moved")):fail("partner move missing");return
-		await create_timer(.6).timeout
+		var expected_undo:Dictionary=JSON.parse_string(FileAccess.get_file_as_string(folder.path_join("guest.moved")))
+		if not await wait_until(func():return undo_visible(session,expected_undo)):fail("owner undo replica not current");return
+		print("COOP CONNECT BEGIN ready=",session.ready_to_play," seq=",session.seq," revision=",session.revision)
 		game.set_draw_mode(4);game.set_connection_tool("fixed")
 		for object in game.objects:
 			var point:Vector2=game.object_point(object,object.paths[0].points[-1] if object.author==session.player_id else object.paths[0].points[0])
+			var previous:int=session.seq
 			game.pointer_down(game.world_to_screen(point));game.pointer_up(game.world_to_screen(point))
+			print("COOP CONNECT CLICK ready=",session.ready_to_play," point=",point," source=",game.connection_source," seq=",previous,"->",session.seq," note=",game.toolbar.status_text)
 	if not await wait_until(func():return game.structure_links.records.size()==1 and session.ready_to_play):fail("cross-author real fixed joint missing");return
 	if not game.structure_links.joints.is_empty():fail("client created its own physics joints");return
 	mark(role+".connected")
@@ -92,7 +111,9 @@ func run()->void:
 	var credential:String=session.token;var saved_world:String=session.world_id;var original_id:String=session.player_id
 	game.queue_free();session.queue_free();await process_frame
 	session=PaperNetSession.new();root.add_child(session);results.clear()
-	session.operation_finished.connect(func(result):results[int(result.get("seq",0))]=result)
+	session.operation_finished.connect(func(result):
+		results[int(result.get("seq",0))]=result
+		if result.get("op","")=="structure_link":print("COOP CONNECT RECEIPT ",result))
 	if role=="owner":session.connect_room(address,"create","","共建甲","paper",credential,saved_world)
 	else:
 		if not await wait_until(func():return marked("invite2")):fail("reopen invite missing");return

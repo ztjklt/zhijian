@@ -75,3 +75,5 @@ python3 ZSCB/tests/run_checks.py --godot /path/to/godot --logs /tmp/zhijian-chec
 以上为首次源码同步时的结果；该提交当时没有修复这些失败。当前结果见上方修复后验证，原始失败记录保留。
 - `web` 中保留完整现有工具源码；其历史默认参数仍引用已排除的冻结 `dist` 包。协议11尚未被 Web 准备器接纳，因此本次不宣称最新版 Web 导出通过，不修改现有发布流程。
 - 部分历史截图工具含作者机器路径，历史说明可能引用未收录的截图、日志或固定包；主场景及运行资源不依赖这些外部文件。
+
+2026-10-30补充：此前600ms共建失败已定位并修正，保留同步提示与未提交锚点，测试按真实版本／Ready／复制位置推进。专项13／0、原生与Web600ms／256KiB/s双完整客户端通过；完整本地和当前提交CI结果见 [高延迟协作记录](ZSCB/docs/HIGH_LATENCY_COOPERATION_2026-10-30.md) 与 [PR检查](https://github.com/ztjklt/zhijian/pull/1/checks)。旧失败作为历史保留，未部署公网。

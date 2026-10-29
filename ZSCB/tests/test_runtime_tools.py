@@ -42,4 +42,12 @@ class RuntimeToolsTest(unittest.TestCase):
             self.assertIn('FAIL native', result.stdout)
             self.assertIn('intentional-runtime-failure', result.stdout)
 
+    def test_cooperation_stage_propagates_failed_runtime(self):
+        with tempfile.TemporaryDirectory() as folder:
+            binary = self.binary(folder, 'broken-godot', failing=True)
+            result = subprocess.run([sys.executable, str(Path(__file__).with_name('run_checks.py')), '--godot', str(binary), '--stages', 'cooperation'], capture_output=True, text=True, timeout=30)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('FAIL cooperation', result.stdout)
+            self.assertIn('intentional-runtime-failure', result.stdout)
+
 if __name__ == '__main__': unittest.main()
