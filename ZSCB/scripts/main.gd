@@ -349,24 +349,18 @@ func drop_carried() -> bool:
 	if index < 0 or index >= object_nodes.size(): carried_id = ""; carried_previous.clear(); return false
 	var object: Dictionary = objects[index]
 	var body: RigidBody2D = object_nodes[index]
-	var old_layer: int = int(carried_previous.get("layer", 1))
-	var old_mask: int = int(carried_previous.get("mask", 1))
-	body.collision_layer = old_layer
-	body.collision_mask = old_mask
 	var candidate := object.duplicate(true)
-	candidate.x = body.position.x + float(facing) * CARRY_DROP_OFFSET; candidate.y = body.position.y
-	body.collision_layer = 0
-	body.collision_mask = 0
-	var probe := _carry_probe(candidate)
-	if probe == null:
-		body.collision_layer = old_layer; body.collision_mask = old_mask
-		message("这里没有安全落点，仍在携带中")
+	candidate.x = body.position.x + float(facing) * CARRY_DROP_OFFSET
+	candidate.y = body.position.y
+	var placement := PaperCarryPlacement.resolve(self, candidate)
+	if not placement.ok:
+		# Rejection is still a carried state, including its collision suppression.
+		message(str(placement.error))
 		return false
-	probe.free()
-	body.collision_layer = old_layer
-	body.collision_mask = old_mask
-	object.x = candidate.x; object.y = candidate.y
+	object.x = placement.object.x; object.y = placement.object.y
 	body.position = Vector2(object.x, object.y)
+	body.collision_layer = int(carried_previous.get("layer", 1))
+	body.collision_mask = int(carried_previous.get("mask", 1))
 	body.freeze = bool(carried_previous.get("freeze", false))
 	body.linear_velocity = Vector2.ZERO
 	body.angular_velocity = 0
@@ -375,17 +369,6 @@ func drop_carried() -> bool:
 	message("已放下部件")
 	return true
 
-func _carry_probe(object: Dictionary) -> RigidBody2D:
-	var node: RigidBody2D = build_object_scene.instantiate()
-	node.setup(object)
-	if node.get_child_count() == 0:
-		node.free()
-		return null
-	var clearance := PaperSpawnClearance.resolve(self, node, object)
-	if not clearance.valid:
-		node.free()
-		return null
-	return node
 func cooperation_action(id:String,enabled:bool)->void:
 	if network_session==null:message("请先进入双人房间");return
 	for object in objects:

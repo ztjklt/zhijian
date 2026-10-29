@@ -183,6 +183,12 @@ func _release_carried(actor) -> void:
 	var index := _carry_index(actor)
 	if index >= 0 and index < world.object_nodes.size():
 		var body: RigidBody2D = world.object_nodes[index]
+		var candidate: Dictionary = world.objects[index].duplicate(true)
+		candidate.x = body.position.x; candidate.y = body.position.y
+		var placement := PaperCarryPlacement.resolve(world, candidate)
+		if placement.ok:
+			world.objects[index].x = placement.object.x; world.objects[index].y = placement.object.y
+			body.position = Vector2(placement.object.x, placement.object.y)
 		body.collision_layer = actor.carried_layer
 		body.collision_mask = actor.carried_mask
 		body.freeze = actor.carried_freeze
@@ -194,15 +200,10 @@ func _release_carried(actor) -> void:
 
 func _carry_probe(actor, candidate: Dictionary) -> bool:
 	if Vector2(candidate.x, candidate.y).distance_to(actor.player.position) > 12: return false
-	var node: RigidBody2D = world.build_object_scene.instantiate()
-	node.setup(candidate)
-	if node.get_child_count() == 0:
-		node.free()
-		return false
-	var clearance := PaperSpawnClearance.resolve(world, node, candidate)
-	var valid: bool = clearance.valid
-	node.free()
-	return valid
+	var placement := PaperCarryPlacement.resolve(world, candidate)
+	if not placement.ok: return false
+	candidate.x = placement.object.x; candidate.y = placement.object.y
+	return true
 
 func _carry(actor, msg: Dictionary) -> Dictionary:
 	var action := str(msg.get("action", ""))
@@ -234,6 +235,7 @@ func _carry(actor, msg: Dictionary) -> Dictionary:
 		var candidate: Dictionary = world.objects[index].duplicate(true)
 		candidate.x = body.position.x + float(actor.facing) * .42; candidate.y = body.position.y
 		if not _carry_probe(actor, candidate): return _failure("这里没有安全落点，仍在携带中")
+		body.position = Vector2(candidate.x, candidate.y)
 		body.collision_layer = actor.carried_layer; body.collision_mask = actor.carried_mask
 		body.freeze = actor.carried_freeze; body.linear_velocity = Vector2.ZERO; body.angular_velocity = 0
 		world.objects[index].x = candidate.x; world.objects[index].y = candidate.y; world.objects[index].version += 1
