@@ -50,6 +50,7 @@ var focus_active := true
 var profile: Dictionary = {}
 var profile_writable := true
 var profile_error := ""
+var carried_by_actor: Dictionary = {}
 var targets: Dictionary = {}
 var local_target := Vector2.ZERO
 var received_position := false
@@ -326,7 +327,9 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 	var cursor:=int(snapshot.get("event_cursor",0))
 	last_event=cursor if feedback_epoch!=epoch else maxi(last_event,cursor)
 	feedback_epoch=epoch
+	carried_by_actor.clear()
 	for state in snapshot.get("actors",[]): _actor(state)
+	_apply_carry_collisions()
 	game.backpack_ui.refresh()
 
 func apply_frame(frame: Dictionary) -> void:
@@ -355,7 +358,8 @@ func apply_frame(frame: Dictionary) -> void:
 		seen[state.id]=true
 		_actor(state)
 	for id in remotes.keys():
-		if not seen.has(id): remotes[id].queue_free(); remotes.erase(id);game.weapon_lab.others.erase(id)
+		if not seen.has(id): remotes[id].queue_free(); remotes.erase(id);game.weapon_lab.others.erase(id);carried_by_actor.erase(id)
+	_apply_carry_collisions()
 	if remotes.is_empty(): peer_status = "等待朋友加入 · 1/2"
 	_apply_feedback(frame.get("events",[]))
 	if game.medieval_world!=null:
@@ -376,7 +380,17 @@ func _body_motion(body: RigidBody2D, state: Dictionary) -> void:
 	body.linear_velocity = state.get("velocity",Vector2.ZERO)
 	body.angular_velocity = float(state.get("angular_velocity",0))
 
+func _apply_carry_collisions() -> void:
+	var held: Dictionary = {}
+	for id in carried_by_actor.values():
+		if str(id) != "": held[str(id)] = true
+	for body in game.object_nodes:
+		body.freeze = true
+		body.collision_mask = 0
+		body.collision_layer = 0 if held.has(str(body.data.get("id", ""))) else (8 if body.data.get("kind", "") in ["gate", "ladder"] else 1)
+
 func _actor(state: Dictionary) -> void:
+	if state.has("carried_id"): carried_by_actor[str(state.id)] = str(state.carried_id)
 	if state.has("weapon_lab"):
 		if state.id==player_id:game.weapon_lab.receive(state.weapon_lab)
 		else:game.weapon_lab.others[state.id]=state.weapon_lab.duplicate(true)

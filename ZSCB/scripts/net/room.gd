@@ -170,6 +170,7 @@ func _carry_step(actor) -> void:
 		_release_carried(actor)
 		return
 	var body: RigidBody2D = world.object_nodes[index]
+	body.freeze = true; body.collision_layer = 0; body.collision_mask = 0
 	var target := carry_position(actor)
 	body.position = target
 	body.rotation = float(world.objects[index].get("angle", 0.0))
@@ -258,7 +259,6 @@ func _physics_process(delta: float) -> void:
 		actor.network_peers=actors.values()
 		actor.simulate(delta)
 		if actor.dead_time > 0: _release_carried(actor)
-		else: _carry_step(actor)
 		if actor.connected and actor.ready_to_play: active = true
 		if not actor.connected and actor.disconnect_age >= 30:
 			if id == owner_id:
@@ -277,6 +277,7 @@ func _physics_process(delta: float) -> void:
 	PhysicsServer2D.space_set_active(world_2d.space,true)
 	if world.sync_objects(): revision += 1
 	world._update_world_chunks()
+	for actor in actors.values(): _carry_step(actor)
 	if world.medieval_world != null: world.medieval_world.step(delta)
 	_resolve_players(delta)
 	_step_shared_arrows(delta)
@@ -652,6 +653,8 @@ func _undo(actor) -> Dictionary:
 	return _success()
 
 func _remove(index: int) -> void:
+	for actor in actors.values():
+		if actor.carried_id == world.objects[index].id: actor.carried_id = ""
 	var key:String=world.objects[index].get("structure_id","")
 	for link in world.structure_links.records:
 		if key in [link.a,link.b]:cooperation.touch([link.a,link.b])
@@ -706,6 +709,7 @@ func _save() -> Dictionary:
 	return result
 
 func close_room(reason: String) -> Dictionary:
+	for actor in actors.values(): _release_carried(actor)
 	var result := _save()
 	if not result.ok:
 		close_reason = "房间结束，但保存失败："+str(result.error)+"；上次有效存档已保留"

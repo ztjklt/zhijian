@@ -172,6 +172,7 @@ func hurt_player(amount: float, direction: Vector2, contact: Vector2 = Vector2.I
 	PaperCombatAudio.impact(game.feedback,"hurt",at,weapon_type)
 	add_damage_text(at, lost)
 	if health <= 0:
+		if game.carried_id != "": game.drop_carried()
 		if _lab()!=null:_lab().stop()
 		PaperCombatAudio.cry(game.feedback,"player",at)
 		health = 100
