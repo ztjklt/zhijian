@@ -1,0 +1,25 @@
+Use case: stylized-concept
+Asset type: production-ready transparent 2D cutout animation component atlas for a Godot stickman game.
+Primary request: Design a handsome, cool, agile STICK FIGURE martial-arts hero. Absolutely still a minimalist stickman: circular head, single narrow line-like trunk, long simple arms and legs. Refined modern action-animation graphics, confident and sharp, NOT a cute children's drawing. Design the actual disconnected components, ready to assemble on a skeleton.
+
+Style: exceptionally clean flat charcoal-black ink silhouette, smooth elegant continuous contours, precise curves and rounded joint ends, opaque solid interiors and crisp antialiased edges. No sketch texture, wobble, scratchy outlines, scribbles, gradients or shadows. Head is a solid black disk with only two narrow white angular eyes, angled with calm confidence toward screen right. No nose or mouth. No hair, hat, outfit, armour, shoes with clothing detail, scarf, necktie, muscles, human anatomy, costume or 3D rendering. Limbs are slim round-ended bars, a little tapered with subtle athletic rhythm, not broad muscular shapes. Distinctive visual character comes from proportions and eyes. All joint ends have full black rounded caps for seamless overlap, no visible mechanical joint symbols.
+
+Composition: exactly 12 isolated objects on a 4-column by 3-row evenly spaced grid; spacious transparent gutters between all cells; no labels, text, numbers, grid lines or full assembled people. All straight limb components point vertically down, with joint axis centered horizontally; drawing direction must suit rigid bone rotation.
+
+Row 1 left to right:
+1. circular charcoal-black head, white angular confident eyes directed screen-right, both eyes well within the silhouette; one head only, centered;
+2. one slim gently curved trunk segment, vertical, subtly broader at shoulder end and narrower at hips, black smooth rounded ends, no human chest shape;
+3. one straight slim upper arm segment, capsule-like with a gentle taper, black;
+4. one straight slim forearm segment, black, wrist slightly narrower, both ends full rounded caps.
+Row 2 left to right:
+5. one small compact rounded black fist, no detailed fingers, vertical wrist at top;
+6. one long straight slim upper-leg segment with slight graceful taper, black rounded ends;
+7. one long straight slim lower-leg segment, black rounded ends;
+8. one minimalist black foot shape pointing right, short low and streamlined with a round heel and gently pointed rounded toe, no shoe details.
+Row 3 left to right:
+9. one small solid charcoal-black circular overlap patch;
+10. one slim golden-yellow drawing pencil pointing vertically upward, simple clean graphite tip and tiny muted coral eraser;
+11. an alternate head exactly matching cell 1 in size and silhouette, eyes closed as two confident short white strokes;
+12. one small black clenched fist suited to holding a pencil, matching cell 5 proportions.
+
+Constraints: ALL unused pixels genuinely transparent with preserved alpha, not a painted checkerboard. Black pieces must be opaque. White eyes are opaque white. All 12 objects completely separated, all contours uncut and well inside their own cells. No rendered background, no shadows, no text, no decorations. Prioritize handsome stickman silhouette, graphic polish, clean reliable join geometry and readability at small game scale.

@@ -1,0 +1,30 @@
+{
+  "final_files": [
+    "rabbit.png",
+    "deer.png",
+    "bat-v2.png"
+  ],
+  "retained_initial_variant": "bat.png",
+  "assets": [
+    {
+      "file": "rabbit.png",
+      "sha256": "801cfdbc557b20b1ac0ef140e16ee5e10488be8f4df57b1052d48f1caaea100b",
+      "source_original_byte_identical": true
+    },
+    {
+      "file": "deer.png",
+      "sha256": "ec1d109b9c2881a18ea24af4a7ce37f6abef160781ef631518cfb438026d1447",
+      "source_original_byte_identical": true
+    },
+    {
+      "file": "bat.png",
+      "sha256": "df87b407257e833ef8cebb69773763bddcb393ecad15bba67d5a1e0a9dcdbb2d",
+      "source_original_byte_identical": true
+    },
+    {
+      "file": "bat-v2.png",
+      "sha256": "6a243db36d5c654b189d62e761916a97394aabe55d525467c95b24c6886a16cc",
+      "source_original_byte_identical": true
+    }
+  ]
+}

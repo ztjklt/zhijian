@@ -1,0 +1,4430 @@
+{
+	"chem-bond": {
+		"font_size": 64,
+		"height": 45,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/chem-bond.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						264,
+						1
+					]
+				]
+			}
+		],
+		"text": "H—O—H",
+		"width": 264
+	},
+	"chem-carbon": {
+		"font_size": 64,
+		"height": 53,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/chem-carbon.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						390,
+						1
+					]
+				]
+			}
+		],
+		"text": "C + O₂ → CO₂",
+		"width": 390
+	},
+	"chem-carbon-dioxide": {
+		"font_size": 64,
+		"height": 53,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/chem-carbon-dioxide.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						110,
+						1
+					]
+				]
+			}
+		],
+		"text": "CO₂",
+		"width": 110
+	},
+	"chem-equilibrium": {
+		"font_size": 64,
+		"height": 54,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/chem-equilibrium.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						490,
+						1
+					]
+				]
+			}
+		],
+		"text": "N₂ + 3H₂ ⇌ 2NH₃",
+		"width": 490
+	},
+	"chem-hydrogen": {
+		"font_size": 64,
+		"height": 53,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/chem-hydrogen.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						116,
+						1
+					]
+				]
+			}
+		],
+		"text": "H₂O",
+		"width": 116
+	},
+	"chem-ion": {
+		"font_size": 64,
+		"height": 55,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/chem-ion.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						255,
+						1
+					]
+				]
+			}
+		],
+		"text": "Na⁺ + Cl⁻",
+		"width": 255
+	},
+	"chem-methane": {
+		"font_size": 64,
+		"height": 53,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/chem-methane.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						111,
+						1
+					]
+				]
+			}
+		],
+		"text": "CH₄",
+		"width": 111
+	},
+	"chem-small": {
+		"font_size": 64,
+		"height": 45,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/chem-small.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						434,
+						1
+					]
+				]
+			}
+		],
+		"text": "C  ·  H  ·  O  ·  N",
+		"width": 434
+	},
+	"chem-water": {
+		"font_size": 64,
+		"height": 53,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/chem-water.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						490,
+						1
+					]
+				]
+			}
+		],
+		"text": "2H₂ + O₂ → 2H₂O",
+		"width": 490
+	},
+	"fraction-slope": {
+		"font_size": 64,
+		"height": 115,
+		"kind": "fraction",
+		"path": "res://assets/image/ink-materials/fraction-slope.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						170.0,
+						42.8399963378906
+					],
+					[
+						384.0,
+						42.8399963378906
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 385
+	},
+	"fraction-speed": {
+		"font_size": 64,
+		"height": 107,
+		"kind": "fraction",
+		"path": "res://assets/image/ink-materials/fraction-speed.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						170.0,
+						43.8399963378906
+					],
+					[
+						223.0,
+						43.8399963378906
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 224
+	},
+	"graph-absolute": {
+		"font_size": 64,
+		"height": 336,
+		"kind": "graph",
+		"path": "res://assets/image/ink-materials/graph-absolute.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						1.0,
+						245.0
+					],
+					[
+						601.0,
+						245.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						293.0,
+						335.0
+					],
+					[
+						293.0,
+						7.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						28.5,
+						47.1999969482422
+					],
+					[
+						36.765625,
+						53.3812561035156
+					],
+					[
+						45.03125,
+						59.5625
+					],
+					[
+						53.296875,
+						65.7437438964844
+					],
+					[
+						61.5625,
+						71.9250030517578
+					],
+					[
+						69.828125,
+						78.1062469482422
+					],
+					[
+						78.09375,
+						84.2875061035156
+					],
+					[
+						86.359375,
+						90.46875
+					],
+					[
+						94.625,
+						96.6499938964844
+					],
+					[
+						102.890625,
+						102.831253051758
+					],
+					[
+						111.15625,
+						109.012496948242
+					],
+					[
+						119.421875,
+						115.193756103516
+					],
+					[
+						127.6875,
+						121.375
+					],
+					[
+						135.953125,
+						127.556243896484
+					],
+					[
+						144.21875,
+						133.737503051758
+					],
+					[
+						152.484375,
+						139.918746948242
+					],
+					[
+						160.75,
+						146.100006103516
+					],
+					[
+						169.015625,
+						152.28125
+					],
+					[
+						177.28125,
+						158.462493896484
+					],
+					[
+						185.546875,
+						164.643753051758
+					],
+					[
+						193.8125,
+						170.824996948242
+					],
+					[
+						202.078125,
+						177.006256103516
+					],
+					[
+						210.34375,
+						183.1875
+					],
+					[
+						218.609375,
+						189.368743896484
+					],
+					[
+						226.875,
+						195.550003051758
+					],
+					[
+						235.140625,
+						201.731246948242
+					],
+					[
+						243.40625,
+						207.912506103516
+					],
+					[
+						251.671875,
+						214.09375
+					],
+					[
+						259.9375,
+						220.274993896484
+					],
+					[
+						268.203125,
+						226.456237792969
+					],
+					[
+						276.46875,
+						232.637512207031
+					],
+					[
+						284.734375,
+						238.818756103516
+					],
+					[
+						293.0,
+						245.0
+					],
+					[
+						301.265625,
+						238.818756103516
+					],
+					[
+						309.53125,
+						232.637512207031
+					],
+					[
+						317.796875,
+						226.456237792969
+					],
+					[
+						326.0625,
+						220.274993896484
+					],
+					[
+						334.328125,
+						214.09375
+					],
+					[
+						342.59375,
+						207.912506103516
+					],
+					[
+						350.859375,
+						201.731246948242
+					],
+					[
+						359.125,
+						195.550003051758
+					],
+					[
+						367.390625,
+						189.368743896484
+					],
+					[
+						375.65625,
+						183.1875
+					],
+					[
+						383.921875,
+						177.006256103516
+					],
+					[
+						392.1875,
+						170.824996948242
+					],
+					[
+						400.453125,
+						164.643753051758
+					],
+					[
+						408.71875,
+						158.462493896484
+					],
+					[
+						416.984375,
+						152.28125
+					],
+					[
+						425.25,
+						146.100006103516
+					],
+					[
+						433.515625,
+						139.918746948242
+					],
+					[
+						441.78125,
+						133.737503051758
+					],
+					[
+						450.046875,
+						127.556243896484
+					],
+					[
+						458.3125,
+						121.375
+					],
+					[
+						466.578125,
+						115.193756103516
+					],
+					[
+						474.84375,
+						109.012496948242
+					],
+					[
+						483.109375,
+						102.831253051758
+					],
+					[
+						491.375,
+						96.6499938964844
+					],
+					[
+						499.640625,
+						90.46875
+					],
+					[
+						507.90625,
+						84.2875061035156
+					],
+					[
+						516.171875,
+						78.1062469482422
+					],
+					[
+						524.4375,
+						71.9250030517578
+					],
+					[
+						532.703125,
+						65.7437438964844
+					],
+					[
+						540.96875,
+						59.5625
+					],
+					[
+						549.234375,
+						53.3812561035156
+					],
+					[
+						557.5,
+						47.1999969482422
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 629
+	},
+	"graph-affine": {
+		"font_size": 64,
+		"height": 336,
+		"kind": "graph",
+		"path": "res://assets/image/ink-materials/graph-affine.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						1.0,
+						245.0
+					],
+					[
+						601.0,
+						245.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						293.0,
+						335.0
+					],
+					[
+						293.0,
+						7.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						28.5,
+						328.200012207031
+					],
+					[
+						36.765625,
+						323.600006103516
+					],
+					[
+						45.03125,
+						319.0
+					],
+					[
+						53.296875,
+						314.399993896484
+					],
+					[
+						61.5625,
+						309.799987792969
+					],
+					[
+						69.828125,
+						305.200012207031
+					],
+					[
+						78.09375,
+						300.600006103516
+					],
+					[
+						86.359375,
+						296.0
+					],
+					[
+						94.625,
+						291.399993896484
+					],
+					[
+						102.890625,
+						286.799987792969
+					],
+					[
+						111.15625,
+						282.200012207031
+					],
+					[
+						119.421875,
+						277.600006103516
+					],
+					[
+						127.6875,
+						273.0
+					],
+					[
+						135.953125,
+						268.399993896484
+					],
+					[
+						144.21875,
+						263.799987792969
+					],
+					[
+						152.484375,
+						259.200012207031
+					],
+					[
+						160.75,
+						254.600006103516
+					],
+					[
+						169.015625,
+						250.0
+					],
+					[
+						177.28125,
+						245.399993896484
+					],
+					[
+						185.546875,
+						240.799987792969
+					],
+					[
+						193.8125,
+						236.200012207031
+					],
+					[
+						202.078125,
+						231.600006103516
+					],
+					[
+						210.34375,
+						227.0
+					],
+					[
+						218.609375,
+						222.399993896484
+					],
+					[
+						226.875,
+						217.800003051758
+					],
+					[
+						235.140625,
+						213.199996948242
+					],
+					[
+						243.40625,
+						208.600006103516
+					],
+					[
+						251.671875,
+						204.0
+					],
+					[
+						259.9375,
+						199.399993896484
+					],
+					[
+						268.203125,
+						194.800003051758
+					],
+					[
+						276.46875,
+						190.199996948242
+					],
+					[
+						284.734375,
+						185.600006103516
+					],
+					[
+						293.0,
+						181.0
+					],
+					[
+						301.265625,
+						176.399993896484
+					],
+					[
+						309.53125,
+						171.800003051758
+					],
+					[
+						317.796875,
+						167.199996948242
+					],
+					[
+						326.0625,
+						162.600006103516
+					],
+					[
+						334.328125,
+						158.0
+					],
+					[
+						342.59375,
+						153.399993896484
+					],
+					[
+						350.859375,
+						148.800003051758
+					],
+					[
+						359.125,
+						144.199996948242
+					],
+					[
+						367.390625,
+						139.600006103516
+					],
+					[
+						375.65625,
+						135.0
+					],
+					[
+						383.921875,
+						130.399993896484
+					],
+					[
+						392.1875,
+						125.800003051758
+					],
+					[
+						400.453125,
+						121.199996948242
+					],
+					[
+						408.71875,
+						116.600006103516
+					],
+					[
+						416.984375,
+						112.0
+					],
+					[
+						425.25,
+						107.399993896484
+					],
+					[
+						433.515625,
+						102.800003051758
+					],
+					[
+						441.78125,
+						98.1999969482422
+					],
+					[
+						450.046875,
+						93.6000061035156
+					],
+					[
+						458.3125,
+						89.0
+					],
+					[
+						466.578125,
+						84.3999938964844
+					],
+					[
+						474.84375,
+						79.8000030517578
+					],
+					[
+						483.109375,
+						75.1999969482422
+					],
+					[
+						491.375,
+						70.6000061035156
+					],
+					[
+						499.640625,
+						66.0
+					],
+					[
+						507.90625,
+						61.3999938964844
+					],
+					[
+						516.171875,
+						56.8000030517578
+					],
+					[
+						524.4375,
+						52.1999969482422
+					],
+					[
+						532.703125,
+						47.6000061035156
+					],
+					[
+						540.96875,
+						43.0
+					],
+					[
+						549.234375,
+						38.3999938964844
+					],
+					[
+						557.5,
+						33.8000030517578
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 629
+	},
+	"graph-axes": {
+		"font_size": 64,
+		"height": 336,
+		"kind": "graph",
+		"path": "res://assets/image/ink-materials/graph-axes.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						1.0,
+						245.0
+					],
+					[
+						601.0,
+						245.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						293.0,
+						335.0
+					],
+					[
+						293.0,
+						7.0
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 629
+	},
+	"graph-domain": {
+		"font_size": 64,
+		"height": 44,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/graph-domain.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						145,
+						1
+					]
+				]
+			}
+		],
+		"text": "x ∈ R",
+		"width": 145
+	},
+	"graph-label": {
+		"font_size": 64,
+		"height": 60,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/graph-label.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						194,
+						1
+					]
+				]
+			}
+		],
+		"text": "y = f(x)",
+		"width": 194
+	},
+	"graph-limit": {
+		"font_size": 64,
+		"height": 31,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/graph-limit.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						173,
+						1
+					]
+				]
+			}
+		],
+		"text": "x → ∞",
+		"width": 173
+	},
+	"graph-linear": {
+		"font_size": 64,
+		"height": 59,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/graph-linear.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						262,
+						1
+					]
+				]
+			}
+		],
+		"text": "y = kx + b",
+		"width": 262
+	},
+	"graph-origin": {
+		"font_size": 64,
+		"height": 60,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/graph-origin.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						196,
+						1
+					]
+				]
+			}
+		],
+		"text": "O (0, 0)",
+		"width": 196
+	},
+	"graph-parabola": {
+		"font_size": 64,
+		"height": 336,
+		"kind": "graph",
+		"path": "res://assets/image/ink-materials/graph-parabola.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						1.0,
+						245.0
+					],
+					[
+						601.0,
+						245.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						293.0,
+						335.0
+					],
+					[
+						293.0,
+						7.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						22.75,
+						29.6224975585938
+					],
+					[
+						31.1953125,
+						42.8732604980469
+					],
+					[
+						39.640625,
+						55.703369140625
+					],
+					[
+						48.0859375,
+						68.1128082275391
+					],
+					[
+						56.53125,
+						80.1016082763672
+					],
+					[
+						64.9765625,
+						91.6697235107422
+					],
+					[
+						73.421875,
+						102.817199707031
+					],
+					[
+						81.8671875,
+						113.544006347656
+					],
+					[
+						90.3125,
+						123.850158691406
+					],
+					[
+						98.7578125,
+						133.735656738281
+					],
+					[
+						107.203125,
+						143.200469970703
+					],
+					[
+						115.6484375,
+						152.244659423828
+					],
+					[
+						124.09375,
+						160.8681640625
+					],
+					[
+						132.5390625,
+						169.071014404297
+					],
+					[
+						140.984375,
+						176.853210449219
+					],
+					[
+						149.4296875,
+						184.214752197266
+					],
+					[
+						157.875,
+						191.155624389648
+					],
+					[
+						166.3203125,
+						197.675842285156
+					],
+					[
+						174.765625,
+						203.775405883789
+					],
+					[
+						183.2109375,
+						209.454299926758
+					],
+					[
+						191.65625,
+						214.712539672852
+					],
+					[
+						200.1015625,
+						219.55012512207
+					],
+					[
+						208.546875,
+						223.967041015625
+					],
+					[
+						216.9921875,
+						227.963317871094
+					],
+					[
+						225.4375,
+						231.538909912109
+					],
+					[
+						233.8828125,
+						234.69384765625
+					],
+					[
+						242.328125,
+						237.428131103516
+					],
+					[
+						250.7734375,
+						239.741760253906
+					],
+					[
+						259.21875,
+						241.634735107422
+					],
+					[
+						267.6640625,
+						243.107025146484
+					],
+					[
+						276.109375,
+						244.15869140625
+					],
+					[
+						284.5546875,
+						244.789672851562
+					],
+					[
+						293.0,
+						245.0
+					],
+					[
+						301.4453125,
+						244.789672851562
+					],
+					[
+						309.890625,
+						244.15869140625
+					],
+					[
+						318.3359375,
+						243.107025146484
+					],
+					[
+						326.78125,
+						241.634735107422
+					],
+					[
+						335.2265625,
+						239.741760253906
+					],
+					[
+						343.671875,
+						237.428131103516
+					],
+					[
+						352.1171875,
+						234.69384765625
+					],
+					[
+						360.5625,
+						231.538909912109
+					],
+					[
+						369.0078125,
+						227.963317871094
+					],
+					[
+						377.453125,
+						223.967041015625
+					],
+					[
+						385.8984375,
+						219.55012512207
+					],
+					[
+						394.34375,
+						214.712539672852
+					],
+					[
+						402.7890625,
+						209.454299926758
+					],
+					[
+						411.234375,
+						203.775405883789
+					],
+					[
+						419.6796875,
+						197.675842285156
+					],
+					[
+						428.125,
+						191.155624389648
+					],
+					[
+						436.5703125,
+						184.214752197266
+					],
+					[
+						445.015625,
+						176.853210449219
+					],
+					[
+						453.4609375,
+						169.071014404297
+					],
+					[
+						461.90625,
+						160.8681640625
+					],
+					[
+						470.3515625,
+						152.244659423828
+					],
+					[
+						478.796875,
+						143.200469970703
+					],
+					[
+						487.2421875,
+						133.735656738281
+					],
+					[
+						495.6875,
+						123.850158691406
+					],
+					[
+						504.1328125,
+						113.544006347656
+					],
+					[
+						512.578125,
+						102.817199707031
+					],
+					[
+						521.0234375,
+						91.6697235107422
+					],
+					[
+						529.46875,
+						80.1016082763672
+					],
+					[
+						537.9140625,
+						68.1128082275391
+					],
+					[
+						546.359375,
+						55.703369140625
+					],
+					[
+						554.8046875,
+						42.8732604980469
+					],
+					[
+						563.25,
+						29.6224975585938
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 629
+	},
+	"graph-sin": {
+		"font_size": 64,
+		"height": 59,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/graph-sin.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						223,
+						1
+					]
+				]
+			}
+		],
+		"text": "y = sin x",
+		"width": 223
+	},
+	"graph-sine": {
+		"font_size": 64,
+		"height": 345,
+		"kind": "graph",
+		"path": "res://assets/image/ink-materials/graph-sine.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						1.0,
+						245.0
+					],
+					[
+						601.0,
+						245.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						293.0,
+						335.0
+					],
+					[
+						293.0,
+						7.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						13.3982543945312,
+						245.0
+					],
+					[
+						22.1358032226562,
+						254.507659912109
+					],
+					[
+						30.8733520507812,
+						263.923767089844
+					],
+					[
+						39.6109161376953,
+						273.157623291016
+					],
+					[
+						48.3484649658203,
+						282.120300292969
+					],
+					[
+						57.0860290527344,
+						290.725494384766
+					],
+					[
+						65.8235778808594,
+						298.890319824219
+					],
+					[
+						74.5611419677734,
+						306.5361328125
+					],
+					[
+						83.2986907958984,
+						313.58935546875
+					],
+					[
+						92.0362396240234,
+						319.982025146484
+					],
+					[
+						100.773803710938,
+						325.652557373047
+					],
+					[
+						109.511352539062,
+						330.546356201172
+					],
+					[
+						118.248901367188,
+						334.616333007812
+					],
+					[
+						126.986465454102,
+						337.823211669922
+					],
+					[
+						135.724014282227,
+						340.136169433594
+					],
+					[
+						144.461578369141,
+						341.532928466797
+					],
+					[
+						153.199127197266,
+						342.0
+					],
+					[
+						161.936676025391,
+						341.532928466797
+					],
+					[
+						170.674224853516,
+						340.136169433594
+					],
+					[
+						179.41178894043,
+						337.823211669922
+					],
+					[
+						188.149353027344,
+						334.616333007812
+					],
+					[
+						196.886901855469,
+						330.546356201172
+					],
+					[
+						205.624450683594,
+						325.652557373047
+					],
+					[
+						214.361999511719,
+						319.982025146484
+					],
+					[
+						223.099548339844,
+						313.58935546875
+					],
+					[
+						231.837127685547,
+						306.5361328125
+					],
+					[
+						240.574676513672,
+						298.890319824219
+					],
+					[
+						249.312225341797,
+						290.725494384766
+					],
+					[
+						258.049774169922,
+						282.120300292969
+					],
+					[
+						266.787322998047,
+						273.157623291016
+					],
+					[
+						275.52490234375,
+						263.923767089844
+					],
+					[
+						284.262451171875,
+						254.507659912109
+					],
+					[
+						293.0,
+						245.0
+					],
+					[
+						301.737548828125,
+						235.492340087891
+					],
+					[
+						310.47509765625,
+						226.076232910156
+					],
+					[
+						319.212677001953,
+						216.842391967773
+					],
+					[
+						327.950225830078,
+						207.879699707031
+					],
+					[
+						336.687774658203,
+						199.274520874023
+					],
+					[
+						345.425323486328,
+						191.109680175781
+					],
+					[
+						354.162872314453,
+						183.463851928711
+					],
+					[
+						362.900451660156,
+						176.41064453125
+					],
+					[
+						371.638000488281,
+						170.017974853516
+					],
+					[
+						380.375549316406,
+						164.347442626953
+					],
+					[
+						389.113098144531,
+						159.453643798828
+					],
+					[
+						397.850646972656,
+						155.383682250977
+					],
+					[
+						406.588195800781,
+						152.176788330078
+					],
+					[
+						415.325775146484,
+						149.863830566406
+					],
+					[
+						424.063323974609,
+						148.467071533203
+					],
+					[
+						432.800872802734,
+						148.0
+					],
+					[
+						441.538421630859,
+						148.467071533203
+					],
+					[
+						450.276000976562,
+						149.863830566406
+					],
+					[
+						459.013549804688,
+						152.176788330078
+					],
+					[
+						467.751098632812,
+						155.383682250977
+					],
+					[
+						476.488647460938,
+						159.453643798828
+					],
+					[
+						485.226196289062,
+						164.347442626953
+					],
+					[
+						493.963745117188,
+						170.017974853516
+					],
+					[
+						502.701293945312,
+						176.41064453125
+					],
+					[
+						511.438842773438,
+						183.463851928711
+					],
+					[
+						520.176391601562,
+						191.109680175781
+					],
+					[
+						528.913940429688,
+						199.274520874023
+					],
+					[
+						537.651550292969,
+						207.879699707031
+					],
+					[
+						546.389099121094,
+						216.842391967773
+					],
+					[
+						555.126647949219,
+						226.076232910156
+					],
+					[
+						563.864196777344,
+						235.492340087891
+					],
+					[
+						572.601745605469,
+						245.0
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 629
+	},
+	"history-book": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/history-book.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						470,
+						1
+					]
+				]
+			}
+		],
+		"text": "读史，使人明智。",
+		"width": 470
+	},
+	"history-dynasty": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/history-dynasty.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						635,
+						1
+					]
+				]
+			}
+		],
+		"text": "夏  商  周  秦  汉  唐  宋",
+		"width": 635
+	},
+	"history-han": {
+		"font_size": 256,
+		"height": 222,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/history-han.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						232,
+						1
+					]
+				]
+			}
+		],
+		"text": "汉",
+		"width": 232
+	},
+	"history-script": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/history-script.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						787,
+						1
+					]
+				]
+			}
+		],
+		"text": "甲骨 → 金文 → 篆书 → 隶书",
+		"width": 787
+	},
+	"history-seal": {
+		"font_size": 256,
+		"height": 239,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/history-seal.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						232,
+						1
+					]
+				]
+			}
+		],
+		"text": "史",
+		"width": 232
+	},
+	"history-song": {
+		"font_size": 256,
+		"height": 240,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/history-song.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						242,
+						1
+					]
+				]
+			}
+		],
+		"text": "宋",
+		"width": 242
+	},
+	"history-step-1": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/history-step-1.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						250,
+						1
+					]
+				]
+			}
+		],
+		"text": "先秦时期",
+		"width": 250
+	},
+	"history-step-2": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/history-step-2.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						251,
+						1
+					]
+				]
+			}
+		],
+		"text": "秦汉之间",
+		"width": 251
+	},
+	"history-step-3": {
+		"font_size": 64,
+		"height": 61,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/history-step-3.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						247,
+						1
+					]
+				]
+			}
+		],
+		"text": "隋唐气象",
+		"width": 247
+	},
+	"history-tang": {
+		"font_size": 256,
+		"height": 242,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/history-tang.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						242,
+						1
+					]
+				]
+			}
+		],
+		"text": "唐",
+		"width": 242
+	},
+	"history-words": {
+		"font_size": 64,
+		"height": 61,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/history-words.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						854,
+						1
+					]
+				]
+			}
+		],
+		"text": "文字记下时间，时间留下回声。",
+		"width": 854
+	},
+	"lit-dufu": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-dufu.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						720,
+						1
+					]
+				]
+			}
+		],
+		"text": "国破山河在，城春草木深。",
+		"width": 720
+	},
+	"lit-forest": {
+		"font_size": 256,
+		"height": 241,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-forest.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						239,
+						1
+					]
+				]
+			}
+		],
+		"text": "林",
+		"width": 239
+	},
+	"lit-libo-1": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-libo-1.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						444,
+						1
+					]
+				]
+			}
+		],
+		"text": "长风破浪会有时",
+		"width": 444
+	},
+	"lit-libo-2": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-libo-2.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						445,
+						1
+					]
+				]
+			}
+		],
+		"text": "直挂云帆济沧海",
+		"width": 445
+	},
+	"lit-mountain": {
+		"font_size": 256,
+		"height": 237,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-mountain.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						205,
+						1
+					]
+				]
+			}
+		],
+		"text": "山",
+		"width": 205
+	},
+	"lit-peach": {
+		"font_size": 64,
+		"height": 60,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-peach.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						253,
+						1
+					]
+				]
+			}
+		],
+		"text": "桃花源记",
+		"width": 253
+	},
+	"lit-peach-1": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-peach-1.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						657,
+						1
+					]
+				]
+			}
+		],
+		"text": "山有小口，仿佛若有光。",
+		"width": 657
+	},
+	"lit-peach-2": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-peach-2.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						662,
+						1
+					]
+				]
+			}
+		],
+		"text": "复行数十步，豁然开朗。",
+		"width": 662
+	},
+	"lit-peach-3": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-peach-3.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						598,
+						1
+					]
+				]
+			}
+		],
+		"text": "土地平旷，屋舍俨然。",
+		"width": 598
+	},
+	"lit-peach-4": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-peach-4.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						595,
+						1
+					]
+				]
+			}
+		],
+		"text": "阡陌交通，鸡犬相闻。",
+		"width": 595
+	},
+	"lit-song": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-song.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						410,
+						1
+					]
+				]
+			}
+		],
+		"text": "天净沙 · 秋思",
+		"width": 410
+	},
+	"lit-song-1": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-song-1.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						380,
+						1
+					]
+				]
+			}
+		],
+		"text": "枯藤老树昏鸦",
+		"width": 380
+	},
+	"lit-song-2": {
+		"font_size": 64,
+		"height": 61,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-song-2.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						379,
+						1
+					]
+				]
+			}
+		],
+		"text": "小桥流水人家",
+		"width": 379
+	},
+	"lit-song-3": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-song-3.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						378,
+						1
+					]
+				]
+			}
+		],
+		"text": "古道西风瘦马",
+		"width": 378
+	},
+	"lit-water": {
+		"font_size": 256,
+		"height": 243,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/lit-water.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						240,
+						1
+					]
+				]
+			}
+		],
+		"text": "水",
+		"width": 240
+	},
+	"math-area": {
+		"font_size": 64,
+		"height": 46,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/math-area.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						158,
+						1
+					]
+				]
+			}
+		],
+		"text": "S = ab",
+		"width": 158
+	},
+	"math-delta": {
+		"font_size": 64,
+		"height": 46,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/math-delta.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						310,
+						1
+					]
+				]
+			}
+		],
+		"text": "Δ = b² − 4ac",
+		"width": 310
+	},
+	"math-equation": {
+		"font_size": 64,
+		"height": 45,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/math-equation.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						381,
+						1
+					]
+				]
+			}
+		],
+		"text": "x² − 3x + 2 = 0",
+		"width": 381
+	},
+	"math-integral": {
+		"font_size": 64,
+		"height": 73,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/math-integral.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						210,
+						1
+					]
+				]
+			}
+		],
+		"text": "∫ f(x) dx",
+		"width": 210
+	},
+	"math-map": {
+		"font_size": 64,
+		"height": 60,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/math-map.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						222,
+						1
+					]
+				]
+			}
+		],
+		"text": "x → f(x)",
+		"width": 222
+	},
+	"math-pi": {
+		"font_size": 64,
+		"height": 45,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/math-pi.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						71,
+						1
+					]
+				]
+			}
+		],
+		"text": "πr²",
+		"width": 71
+	},
+	"math-pythagoras": {
+		"font_size": 64,
+		"height": 46,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/math-pythagoras.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						279,
+						1
+					]
+				]
+			}
+		],
+		"text": "a² + b² = c²",
+		"width": 279
+	},
+	"math-root": {
+		"font_size": 64,
+		"height": 121,
+		"kind": "root",
+		"path": "res://assets/image/ink-materials/math-root.png",
+		"routes": [
+			{
+				"one_way": false,
+				"points": [
+					[
+						2.0,
+						84.0
+					],
+					[
+						22.0,
+						71.0
+					],
+					[
+						41.0,
+						112.0
+					],
+					[
+						71.0,
+						3.0
+					],
+					[
+						410.0,
+						3.0
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 411
+	},
+	"math-sequence": {
+		"font_size": 64,
+		"height": 41,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/math-sequence.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						316,
+						1
+					]
+				]
+			}
+		],
+		"text": "a₁, a₂, …, aₙ",
+		"width": 316
+	},
+	"math-sum": {
+		"font_size": 64,
+		"height": 53,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/math-sum.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						228,
+						1
+					]
+				]
+			}
+		],
+		"text": "x + y = z",
+		"width": 228
+	},
+	"note-bridge": {
+		"font_size": 64,
+		"height": 61,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/note-bridge.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						661,
+						1
+					]
+				]
+			}
+		],
+		"text": "画一座桥，走到下一句。",
+		"width": 661
+	},
+	"note-imagine": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/note-imagine.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						726,
+						1
+					]
+				]
+			}
+		],
+		"text": "在留白处，继续你的想象。",
+		"width": 726
+	},
+	"note-light": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/note-light.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						661,
+						1
+					]
+				]
+			}
+		],
+		"text": "光沿着自己的道路前进。",
+		"width": 661
+	},
+	"note-next": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/note-next.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						532,
+						1
+					]
+				]
+			}
+		],
+		"text": "下一段，还在远方。",
+		"width": 532
+	},
+	"note-observe": {
+		"font_size": 64,
+		"height": 61,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/note-observe.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						572,
+						1
+					]
+				]
+			}
+		],
+		"text": "观察 · 猜想 · 验证",
+		"width": 572
+	},
+	"note-shape": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/note-shape.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						599,
+						1
+					]
+				]
+			}
+		],
+		"text": "数与形，相遇在这里。",
+		"width": 599
+	},
+	"note-small": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/note-small.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						854,
+						1
+					]
+				]
+			}
+		],
+		"text": "微小的尺度，也有辽阔的世界。",
+		"width": 854
+	},
+	"note-world": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/note-world.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						918,
+						1
+					]
+				]
+			}
+		],
+		"text": "你画下的下一笔，就是新的方向。",
+		"width": 918
+	},
+	"physics-density": {
+		"font_size": 64,
+		"height": 59,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/physics-density.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						243,
+						1
+					]
+				]
+			}
+		],
+		"text": "ρ = m / V",
+		"width": 243
+	},
+	"physics-energy": {
+		"font_size": 64,
+		"height": 51,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/physics-energy.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						275,
+						1
+					]
+				]
+			}
+		],
+		"text": "Eₖ = ½mv²",
+		"width": 275
+	},
+	"physics-force": {
+		"font_size": 64,
+		"height": 44,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/physics-force.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						182,
+						1
+					]
+				]
+			}
+		],
+		"text": "F = ma",
+		"width": 182
+	},
+	"physics-ohm": {
+		"font_size": 64,
+		"height": 44,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/physics-ohm.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						179,
+						1
+					]
+				]
+			}
+		],
+		"text": "U = IR",
+		"width": 179
+	},
+	"physics-potential": {
+		"font_size": 64,
+		"height": 59,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/physics-potential.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						243,
+						1
+					]
+				]
+			}
+		],
+		"text": "Eₚ = mgh",
+		"width": 243
+	},
+	"physics-power": {
+		"font_size": 64,
+		"height": 47,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/physics-power.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						226,
+						1
+					]
+				]
+			}
+		],
+		"text": "P = W / t",
+		"width": 226
+	},
+	"physics-reflection": {
+		"font_size": 64,
+		"height": 46,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/physics-reflection.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						107,
+						1
+					]
+				]
+			}
+		],
+		"text": "i = r",
+		"width": 107
+	},
+	"physics-wave": {
+		"font_size": 64,
+		"height": 47,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/physics-wave.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						169,
+						1
+					]
+				]
+			}
+		],
+		"text": "λ = vT",
+		"width": 169
+	},
+	"physics-work": {
+		"font_size": 64,
+		"height": 45,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/physics-work.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						187,
+						1
+					]
+				]
+			}
+		],
+		"text": "W = Fs",
+		"width": 187
+	},
+	"shape-benzene": {
+		"font_size": 64,
+		"height": 382,
+		"kind": "benzene",
+		"path": "res://assets/image/ink-materials/shape-benzene.png",
+		"routes": [
+			{
+				"one_way": false,
+				"points": [
+					[
+						361.0,
+						193.0
+					],
+					[
+						291.5,
+						313.377532958984
+					],
+					[
+						152.5,
+						313.377532958984
+					],
+					[
+						83.0,
+						193.0
+					],
+					[
+						152.5,
+						72.6224746704102
+					],
+					[
+						291.5,
+						72.6224746704102
+					],
+					[
+						361.0,
+						193.0
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 441
+	},
+	"shape-elements": {
+		"font_size": 64,
+		"height": 131,
+		"kind": "elements",
+		"path": "res://assets/image/ink-materials/shape-elements.png",
+		"routes": [
+			{
+				"one_way": false,
+				"points": [
+					[
+						2.0,
+						47.0
+					],
+					[
+						75.0,
+						47.0
+					],
+					[
+						75.0,
+						129.0
+					],
+					[
+						2.0,
+						129.0
+					],
+					[
+						2.0,
+						47.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						81.0,
+						32.0
+					],
+					[
+						154.0,
+						32.0
+					],
+					[
+						154.0,
+						114.0
+					],
+					[
+						81.0,
+						114.0
+					],
+					[
+						81.0,
+						32.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						160.0,
+						17.0
+					],
+					[
+						233.0,
+						17.0
+					],
+					[
+						233.0,
+						99.0
+					],
+					[
+						160.0,
+						99.0
+					],
+					[
+						160.0,
+						17.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						239.0,
+						2.0
+					],
+					[
+						312.0,
+						2.0
+					],
+					[
+						312.0,
+						84.0
+					],
+					[
+						239.0,
+						84.0
+					],
+					[
+						239.0,
+						2.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						318.0,
+						47.0
+					],
+					[
+						391.0,
+						47.0
+					],
+					[
+						391.0,
+						129.0
+					],
+					[
+						318.0,
+						129.0
+					],
+					[
+						318.0,
+						47.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						397.0,
+						32.0
+					],
+					[
+						470.0,
+						32.0
+					],
+					[
+						470.0,
+						114.0
+					],
+					[
+						397.0,
+						114.0
+					],
+					[
+						397.0,
+						32.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						476.0,
+						17.0
+					],
+					[
+						549.0,
+						17.0
+					],
+					[
+						549.0,
+						99.0
+					],
+					[
+						476.0,
+						99.0
+					],
+					[
+						476.0,
+						17.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						555.0,
+						2.0
+					],
+					[
+						628.0,
+						2.0
+					],
+					[
+						628.0,
+						84.0
+					],
+					[
+						555.0,
+						84.0
+					],
+					[
+						555.0,
+						2.0
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 630
+	},
+	"shape-prism": {
+		"font_size": 64,
+		"height": 275,
+		"kind": "prism",
+		"path": "res://assets/image/ink-materials/shape-prism.png",
+		"routes": [
+			{
+				"one_way": false,
+				"points": [
+					[
+						71.0,
+						272.0
+					],
+					[
+						293.0,
+						4.0
+					],
+					[
+						513.0,
+						272.0
+					],
+					[
+						71.0,
+						272.0
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 602
+	},
+	"shape-spring": {
+		"font_size": 64,
+		"height": 197,
+		"kind": "spring",
+		"path": "res://assets/image/ink-materials/shape-spring.png",
+		"routes": [
+			{
+				"one_way": false,
+				"points": [
+					[
+						101.0,
+						149.0
+					],
+					[
+						105.0,
+						171.0
+					],
+					[
+						123.0,
+						127.0
+					],
+					[
+						141.0,
+						171.0
+					],
+					[
+						159.0,
+						127.0
+					],
+					[
+						177.0,
+						171.0
+					],
+					[
+						195.0,
+						127.0
+					],
+					[
+						213.0,
+						171.0
+					],
+					[
+						231.0,
+						127.0
+					],
+					[
+						249.0,
+						171.0
+					],
+					[
+						267.0,
+						127.0
+					],
+					[
+						285.0,
+						171.0
+					],
+					[
+						303.0,
+						127.0
+					],
+					[
+						321.0,
+						171.0
+					],
+					[
+						339.0,
+						127.0
+					],
+					[
+						357.0,
+						171.0
+					],
+					[
+						375.0,
+						127.0
+					],
+					[
+						393.0,
+						171.0
+					],
+					[
+						411.0,
+						127.0
+					],
+					[
+						429.0,
+						171.0
+					],
+					[
+						459.0,
+						149.0
+					]
+				]
+			},
+			{
+				"one_way": false,
+				"points": [
+					[
+						459.0,
+						107.0
+					],
+					[
+						559.0,
+						107.0
+					],
+					[
+						559.0,
+						194.0
+					],
+					[
+						459.0,
+						194.0
+					],
+					[
+						459.0,
+						107.0
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 562
+	},
+	"shape-timeline": {
+		"font_size": 64,
+		"height": 70,
+		"kind": "timeline",
+		"path": "res://assets/image/ink-materials/shape-timeline.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						1.0,
+						61.0
+					],
+					[
+						641.0,
+						61.0
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 645
+	},
+	"shape-triangle": {
+		"font_size": 64,
+		"height": 357,
+		"kind": "triangle",
+		"path": "res://assets/image/ink-materials/shape-triangle.png",
+		"routes": [
+			{
+				"one_way": false,
+				"points": [
+					[
+						32.0,
+						319.0
+					],
+					[
+						304.0,
+						37.0
+					],
+					[
+						590.0,
+						319.0
+					],
+					[
+						32.0,
+						319.0
+					]
+				]
+			}
+		],
+		"text": "",
+		"width": 615
+	},
+	"terrain-0-0": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-0-0.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1622,
+						1
+					]
+				]
+			}
+		],
+		"text": "正数与负数表示相反意义的量。数轴上的点与实数相对应。",
+		"width": 1622
+	},
+	"terrain-0-1": {
+		"font_size": 64,
+		"height": 61,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-0-1.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1813,
+						1
+					]
+				]
+			}
+		],
+		"text": "两点之间，线段最短。过一点有且只有一条直线与已知直线垂直。",
+		"width": 1813
+	},
+	"terrain-0-2": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-0-2.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1622,
+						1
+					]
+				]
+			}
+		],
+		"text": "三角形的内角和等于一百八十度。等腰三角形两底角相等。",
+		"width": 1622
+	},
+	"terrain-0-3": {
+		"font_size": 64,
+		"height": 61,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-0-3.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1875,
+						1
+					]
+				]
+			}
+		],
+		"text": "函数描述两个变量之间的对应关系。自变量改变，函数值随之变化。",
+		"width": 1875
+	},
+	"terrain-0-4": {
+		"font_size": 64,
+		"height": 49,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-0-4.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1137,
+						1
+					]
+				]
+			}
+		],
+		"text": "a²+b²=c²    x²−3x+2=0    Δ=b²−4ac    S=πr²",
+		"width": 1137
+	},
+	"terrain-0-5": {
+		"font_size": 64,
+		"height": 58,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-0-5.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1159,
+						1
+					]
+				]
+			}
+		],
+		"text": "y=sin x    y=cos x    y=kx+b    x∈R    f(x)=x²",
+		"width": 1159
+	},
+	"terrain-0-6": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-0-6.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						2008,
+						1
+					]
+				]
+			}
+		],
+		"text": "相似三角形对应角相等，对应边成比例。圆周角等于所对圆心角的一半。",
+		"width": 2008
+	},
+	"terrain-0-7": {
+		"font_size": 64,
+		"height": 59,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-0-7.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1325,
+						1
+					]
+				]
+			}
+		],
+		"text": "aₙ=a₁+(n−1)d    Sₙ=n(a₁+aₙ)/2    sin²x+cos²x=1",
+		"width": 1325
+	},
+	"terrain-1-0": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-1-0.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1814,
+						1
+					]
+				]
+			}
+		],
+		"text": "晋太元中，武陵人捕鱼为业。缘溪行，忘路之远近。忽逢桃花林。",
+		"width": 1814
+	},
+	"terrain-1-1": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-1-1.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1686,
+						1
+					]
+				]
+			}
+		],
+		"text": "夹岸数百步，中无杂树，芳草鲜美，落英缤纷。渔人甚异之。",
+		"width": 1686
+	},
+	"terrain-1-2": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-1-2.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1878,
+						1
+					]
+				]
+			}
+		],
+		"text": "复前行，欲穷其林。林尽水源，便得一山。山有小口，仿佛若有光。",
+		"width": 1878
+	},
+	"terrain-1-3": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-1-3.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1687,
+						1
+					]
+				]
+			}
+		],
+		"text": "便舍船，从口入。初极狭，才通人。复行数十步，豁然开朗。",
+		"width": 1687
+	},
+	"terrain-1-4": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-1-4.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						2006,
+						1
+					]
+				]
+			}
+		],
+		"text": "土地平旷，屋舍俨然，有良田、美池、桑竹之属。阡陌交通，鸡犬相闻。",
+		"width": 2006
+	},
+	"terrain-1-5": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-1-5.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						2070,
+						1
+					]
+				]
+			}
+		],
+		"text": "枯藤老树昏鸦，小桥流水人家，古道西风瘦马。夕阳西下，断肠人在天涯。",
+		"width": 2070
+	},
+	"terrain-1-6": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-1-6.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1488,
+						1
+					]
+				]
+			}
+		],
+		"text": "国破山河在，城春草木深。感时花溅泪，恨别鸟惊心。",
+		"width": 1488
+	},
+	"terrain-1-7": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-1-7.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1750,
+						1
+					]
+				]
+			}
+		],
+		"text": "长风破浪会有时，直挂云帆济沧海。会当凌绝顶，一览众山小。",
+		"width": 1750
+	},
+	"terrain-2-0": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-2-0.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1870,
+						1
+					]
+				]
+			}
+		],
+		"text": "甲骨文刻在龟甲和兽骨上。金文多见于青铜器。文字保存历史信息。",
+		"width": 1870
+	},
+	"terrain-2-1": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-2-1.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1366,
+						1
+					]
+				]
+			}
+		],
+		"text": "黄河与长江流域，留下了早期农业与聚落的遗迹。",
+		"width": 1366
+	},
+	"terrain-2-2": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-2-2.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1622,
+						1
+					]
+				]
+			}
+		],
+		"text": "考古发现与传世文献相互参照，帮助我们认识过去的生活。",
+		"width": 1622
+	},
+	"terrain-2-3": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-2-3.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1304,
+						1
+					]
+				]
+			}
+		],
+		"text": "秦汉时期，统一的多民族国家得到建立和发展。",
+		"width": 1304
+	},
+	"terrain-2-4": {
+		"font_size": 64,
+		"height": 61,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-2-4.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1558,
+						1
+					]
+				]
+			}
+		],
+		"text": "丝绸之路连接不同地区，促进物品、技术与文化的交流。",
+		"width": 1558
+	},
+	"terrain-2-5": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-2-5.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1623,
+						1
+					]
+				]
+			}
+		],
+		"text": "唐诗与宋词记录人们的情感。城市、商业与文化一同发展。",
+		"width": 1623
+	},
+	"terrain-2-6": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-2-6.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1660,
+						1
+					]
+				]
+			}
+		],
+		"text": "夏 · 商 · 周 · 秦 · 汉 · 隋 · 唐 · 宋 · 元 · 明 · 清",
+		"width": 1660
+	},
+	"terrain-2-7": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-2-7.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1622,
+						1
+					]
+				]
+			}
+		],
+		"text": "纸、印刷与书籍，让知识能够跨越地域，传到更远的地方。",
+		"width": 1622
+	},
+	"terrain-3-0": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-3-0.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1492,
+						1
+					]
+				]
+			}
+		],
+		"text": "力可以改变物体的运动状态，也可以改变物体的形状。",
+		"width": 1492
+	},
+	"terrain-3-1": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-3-1.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1878,
+						1
+					]
+				]
+			}
+		],
+		"text": "速度表示物体运动的快慢。路程相同时，所用时间越短，速度越大。",
+		"width": 1878
+	},
+	"terrain-3-2": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-3-2.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1749,
+						1
+					]
+				]
+			}
+		],
+		"text": "光在同种均匀介质中沿直线传播。反射时，反射角等于入射角。",
+		"width": 1749
+	},
+	"terrain-3-3": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-3-3.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1430,
+						1
+					]
+				]
+			}
+		],
+		"text": "质量是物体的一种属性。密度是质量与体积的比值。",
+		"width": 1430
+	},
+	"terrain-3-4": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-3-4.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1112,
+						1
+					]
+				]
+			}
+		],
+		"text": "F=ma    v=s/t    ρ=m/V    W=Fs    P=W/t",
+		"width": 1112
+	},
+	"terrain-3-5": {
+		"font_size": 64,
+		"height": 60,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-3-5.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1221,
+						1
+					]
+				]
+			}
+		],
+		"text": "U=IR    Q=I²Rt    Eₖ=½mv²    Eₚ=mgh    λ=vT",
+		"width": 1221
+	},
+	"terrain-3-6": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-3-6.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1557,
+						1
+					]
+				]
+			}
+		],
+		"text": "能量可以从一种形式转化为另一种形式，总量保持不变。",
+		"width": 1557
+	},
+	"terrain-3-7": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-3-7.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1552,
+						1
+					]
+				]
+			}
+		],
+		"text": "电流、电压与电阻相互联系。串联电路中各处电流相等。",
+		"width": 1552
+	},
+	"terrain-4-0": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-4-0.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						2006,
+						1
+					]
+				]
+			}
+		],
+		"text": "物质由分子、原子或离子等微观粒子构成。原子在化学变化中重新组合。",
+		"width": 2006
+	},
+	"terrain-4-1": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-4-1.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1942,
+						1
+					]
+				]
+			}
+		],
+		"text": "元素是具有相同核电荷数的一类原子的总称。化学式表示物质的组成。",
+		"width": 1942
+	},
+	"terrain-4-2": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-4-2.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1431,
+						1
+					]
+				]
+			}
+		],
+		"text": "化学变化前后，原子的种类、数目和质量保持不变。",
+		"width": 1431
+	},
+	"terrain-4-3": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-4-3.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1366,
+						1
+					]
+				]
+			}
+		],
+		"text": "氧气支持燃烧，二氧化碳能使澄清石灰水变浑浊。",
+		"width": 1366
+	},
+	"terrain-4-4": {
+		"font_size": 64,
+		"height": 44,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-4-4.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1667,
+						1
+					]
+				]
+			}
+		],
+		"text": "2H₂+O₂→2H₂O    C+O₂→CO₂    CaCO₃→CaO+CO₂",
+		"width": 1667
+	},
+	"terrain-4-5": {
+		"font_size": 64,
+		"height": 44,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-4-5.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1401,
+						1
+					]
+				]
+			}
+		],
+		"text": "H · He · Li · Be · B · C · N · O · F · Ne",
+		"width": 1401
+	},
+	"terrain-4-6": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-4-6.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1622,
+						1
+					]
+				]
+			}
+		],
+		"text": "分子之间有间隔。温度改变时，粒子的运动状况也会改变。",
+		"width": 1622
+	},
+	"terrain-4-7": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-4-7.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1815,
+						1
+					]
+				]
+			}
+		],
+		"text": "酸、碱、盐的性质各有特点。实验中的观察，是理解反应的起点。",
+		"width": 1815
+	},
+	"terrain-5-0": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-5-0.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1942,
+						1
+					]
+				]
+			}
+		],
+		"text": "正弦函数和余弦函数是周期函数。一个周期内，变化按一定规律重复。",
+		"width": 1942
+	},
+	"terrain-5-1": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-5-1.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						2067,
+						1
+					]
+				]
+			}
+		],
+		"text": "函数图像由一系列点组成。点的横坐标与纵坐标分别表示自变量和函数值。",
+		"width": 2067
+	},
+	"terrain-5-2": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-5-2.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1876,
+						1
+					]
+				]
+			}
+		],
+		"text": "二次函数的图像是抛物线。对称轴经过顶点，开口方向由系数决定。",
+		"width": 1876
+	},
+	"terrain-5-3": {
+		"font_size": 64,
+		"height": 54,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-5-3.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1125,
+						1
+					]
+				]
+			}
+		],
+		"text": "y=sin x    y=cos x    y=tan x    y=|x|    y=x²",
+		"width": 1125
+	},
+	"terrain-5-4": {
+		"font_size": 64,
+		"height": 58,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-5-4.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1282,
+						1
+					]
+				]
+			}
+		],
+		"text": "sin(−x)=−sin x    cos(−x)=cos x    sin(x+2π)=sin x",
+		"width": 1282
+	},
+	"terrain-5-5": {
+		"font_size": 64,
+		"height": 63,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-5-5.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1685,
+						1
+					]
+				]
+			}
+		],
+		"text": "导数描述函数在某一点附近的变化趋势，切线表示局部方向。",
+		"width": 1685
+	},
+	"terrain-5-6": {
+		"font_size": 64,
+		"height": 62,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-5-6.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1688,
+						1
+					]
+				]
+			}
+		],
+		"text": "从坐标、数列、函数到曲线，用不同的方法描述同一个世界。",
+		"width": 1688
+	},
+	"terrain-5-7": {
+		"font_size": 64,
+		"height": 59,
+		"kind": "text",
+		"path": "res://assets/image/ink-materials/terrain-5-7.png",
+		"routes": [
+			{
+				"one_way": true,
+				"points": [
+					[
+						0,
+						1
+					],
+					[
+						1157,
+						1
+					]
+				]
+			}
+		],
+		"text": "x→∞    f(x+T)=f(x)    aₙ=a₁qⁿ⁻¹    ∫f(x)dx",
+		"width": 1157
+	}
+}

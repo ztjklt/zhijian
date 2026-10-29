@@ -1,0 +1,17 @@
+extends SceneTree
+func _initialize() -> void: call_deferred("run")
+func run() -> void:
+	var lobby=load("res://scenes/network_lobby.tscn").instantiate()
+	root.add_child(lobby)
+	lobby.session.profile={"address":"ws://127.0.0.1:51991/ws","token":"isolated-fixture","code":"12345678","world_id":"isolated-world"}
+	lobby.address.text="ws://127.0.0.1:51992/ws"
+	lobby._start("join",true)
+	if lobby.session.address!="ws://127.0.0.1:51991/ws":
+		print("FAIL: 恢复凭据被发送到编辑后的另一个服务器"); quit(1); return
+	lobby._start("create",false)
+	if lobby.session.address!="ws://127.0.0.1:51992/ws" or lobby.session.token!="":
+		print("FAIL: 新房间未使用当前地址或携带了旧凭据"); quit(1); return
+	lobby.session.queue_free(); lobby.queue_free()
+	await process_frame
+	print("NETWORK_LOBBY_RESTORE_TEST: PASS")
+	quit()

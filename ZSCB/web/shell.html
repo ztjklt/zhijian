@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f7f2e3">
+  <meta name="description" content="纸间：在同一张纸上，边走、边画、边战斗。打开浏览器，独自创作或邀请朋友加入双人世界。">
+  <title>纸间 · 在同一张纸上</title>
+  $GODOT_HEAD_INCLUDE
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f7f2e3;color:#273e42}
+    body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+    canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
+    #loading{position:fixed;inset:0;display:grid;place-content:center;text-align:center;padding:28px;background:#f7f2e3;z-index:2}
+    #loading.hidden{display:none}h1{font-family:serif;font-size:clamp(48px,10vw,88px);font-weight:500;letter-spacing:.2em;margin:0 0 16px;padding-left:.2em}
+    .tagline{font-size:16px;letter-spacing:.08em;margin:0 0 48px;color:#687777}
+    progress{appearance:none;width:min(320px,75vw);height:4px;border:0;display:block;margin:0 auto 18px;background:#e2ddce}
+    progress::-webkit-progress-bar{background:#e2ddce}progress::-webkit-progress-value{background:#386e70}progress::-moz-progress-bar{background:#386e70}
+    #status{max-width:480px;font-size:14px;line-height:1.8;color:#687777;white-space:pre-wrap;overflow-wrap:anywhere}
+    #retry{display:none;margin:24px auto 0;border:1px solid #386e70;border-radius:4px;padding:12px 24px;background:transparent;color:#273e42;font-size:16px;cursor:pointer}
+  </style>
+</head>
+<body>
+  <canvas id="canvas" tabindex="0" aria-label="纸间游戏画面"></canvas>
+  <section id="loading" aria-live="polite">
+    <h1>纸间</h1><p class="tagline">边走 · 边画 · 边战斗</p>
+    <progress id="progress" max="100"></progress>
+    <div id="status" role="status">正在铺开纸面，首次打开需要加载游戏资源…</div>
+    <button id="retry" type="button">重新加载</button>
+  </section>
+  <script src="$GODOT_URL"></script>
+  <script>
+    const canvas=document.getElementById('canvas');
+    const loading=document.getElementById('loading');
+    const progress=document.getElementById('progress');
+    const status=document.getElementById('status');
+    const retry=document.getElementById('retry');
+    retry.addEventListener('click',()=>location.reload());
+    canvas.addEventListener('contextmenu',event=>event.preventDefault());
+    window.addEventListener('beforeunload',event=>{
+      if(window.paperOnlineActive){event.preventDefault();event.returnValue='';}
+    });
+    let loadFailed=false;
+    function fail(error){
+      loadFailed=true;
+      progress.hidden=true;retry.style.display='block';
+      status.textContent='游戏暂时无法启动。若下载中断，请检查网络后点击重新加载；浏览器需支持 WebGL 2。\n'+String(error.message||error);
+      console.error(error);
+    }
+    window.addEventListener('unhandledrejection',event=>{
+      if(!loading.classList.contains('hidden')){event.preventDefault();fail(event.reason||new Error('资源加载中断'));}
+    });
+    try {
+      if(typeof Engine==='undefined'){throw new Error('游戏启动文件下载失败，请检查网络后重试。');}
+      const config=$GODOT_CONFIG;
+      const missing=Engine.getMissingFeatures({threads:$GODOT_THREADS_ENABLED});
+      if(missing.length){throw new Error('浏览器缺少：'+missing.join('、'));}
+      const engine=new Engine(config);
+      engine.startGame({canvas,canvasResizePolicy:2,onProgress:(current,total)=>{
+        if(loadFailed)return;
+        if(total>0){progress.value=current/total*100;status.textContent=current>=total?'资源已加载，正在启动游戏…':'正在加载游戏 '+Math.floor(current/total*100)+'%（约'+Math.ceil(total/1048576)+'MB，下载中断会自动重试）';}
+        else{progress.removeAttribute('value');}
+      }}).then(()=>{loading.classList.add('hidden');canvas.focus();}).catch(fail);
+    } catch(error) { fail(error); }
+  </script>
+</body>
+</html>

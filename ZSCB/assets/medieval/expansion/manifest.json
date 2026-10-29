@@ -1,0 +1,579 @@
+{
+  "version": 1,
+  "units": "meters",
+  "coordinates": "walk_edges normalized to actual MedievalEntity source_rect (alpha > .05, stride 3, padding 3); x [-.5,.5], y [0,1] bottom-up; visually calibrated 2026-10-24",
+  "entries": {
+    "grass_meadow": {
+      "path": "res://assets/medieval/expansion/grass_meadow.png",
+      "width": 0.9,
+      "height": 0.35,
+      "health": 12,
+      "category": "foliage",
+      "walk_edges": [],
+      "source": "builtin image_gen"
+    },
+    "grass_tall": {
+      "path": "res://assets/medieval/expansion/grass_tall.png",
+      "width": 0.7,
+      "height": 0.65,
+      "health": 14,
+      "category": "foliage",
+      "walk_edges": [],
+      "source": "builtin image_gen"
+    },
+    "reeds": {
+      "path": "res://assets/medieval/expansion/reeds.png",
+      "width": 0.65,
+      "height": 1.3,
+      "health": 20,
+      "category": "foliage",
+      "walk_edges": [],
+      "source": "builtin image_gen"
+    },
+    "wildflowers": {
+      "path": "res://assets/medieval/expansion/wildflowers.png",
+      "width": 0.6,
+      "height": 0.6,
+      "health": 12,
+      "category": "foliage",
+      "walk_edges": [],
+      "source": "builtin image_gen"
+    },
+    "bush": {
+      "path": "res://assets/medieval/expansion/bush.png",
+      "width": 1.3,
+      "height": 1,
+      "health": 35,
+      "category": "foliage",
+      "walk_edges": [],
+      "source": "builtin image_gen"
+    },
+    "wheat": {
+      "path": "res://assets/medieval/expansion/wheat.png",
+      "width": 1.2,
+      "height": 1,
+      "health": 20,
+      "category": "foliage",
+      "walk_edges": [],
+      "source": "builtin image_gen"
+    },
+    "haystack": {
+      "path": "res://assets/medieval/expansion/haystack.png",
+      "width": 1.8,
+      "height": 1.5,
+      "health": 90,
+      "category": "prop",
+      "walk_edges": [
+        [
+          -0.4851,
+          0.0623,
+          -0.3104,
+          0.5952
+        ],
+        [
+          -0.3104,
+          0.5952,
+          -0.0093,
+          0.8168
+        ],
+        [
+          -0.0093,
+          0.8168,
+          0.2732,
+          0.5952
+        ],
+        [
+          0.2732,
+          0.5952,
+          0.4814,
+          0.0623
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "fence": {
+      "path": "res://assets/medieval/expansion/fence.png",
+      "width": 2,
+      "height": 1.2,
+      "health": 65,
+      "category": "prop",
+      "walk_edges": [
+        [
+          -0.412,
+          0.731,
+          0.4127,
+          0.6888
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "signpost": {
+      "path": "res://assets/medieval/expansion/signpost.png",
+      "width": 0.8,
+      "height": 1.7,
+      "health": 55,
+      "category": "prop",
+      "walk_edges": [],
+      "source": "builtin image_gen"
+    },
+    "lantern": {
+      "path": "res://assets/medieval/expansion/lantern.png",
+      "width": 0.6,
+      "height": 1.5,
+      "health": 40,
+      "category": "prop",
+      "walk_edges": [],
+      "source": "builtin image_gen"
+    },
+    "well": {
+      "path": "res://assets/medieval/expansion/well.png",
+      "width": 1.5,
+      "height": 2.4,
+      "health": 180,
+      "category": "roof",
+      "walk_edges": [
+        [
+          -0.4884,
+          0.7413,
+          -0.3351,
+          0.9918
+        ],
+        [
+          -0.3351,
+          0.9918,
+          0.2727,
+          0.9645
+        ],
+        [
+          0.2727,
+          0.9645,
+          0.4894,
+          0.7461
+        ],
+        [
+          -0.3562,
+          0.2976,
+          0.352,
+          0.2976
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "forge": {
+      "path": "res://assets/medieval/expansion/forge.png",
+      "width": 4.4,
+      "height": 3.7,
+      "health": 440,
+      "category": "roof",
+      "walk_edges": [
+        [
+          -0.4948,
+          0.3969,
+          -0.2573,
+          0.8033
+        ],
+        [
+          -0.2573,
+          0.8033,
+          0.2633,
+          0.654
+        ],
+        [
+          0.2633,
+          0.654,
+          0.4948,
+          0.3732
+        ],
+        [
+          -0.4052,
+          0.9917,
+          -0.2894,
+          0.9917
+        ],
+        [
+          -0.4276,
+          0.3886,
+          0.4052,
+          0.3495
+        ],
+        [
+          -0.3305,
+          0.16,
+          -0.2745,
+          0.16
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "tavern": {
+      "path": "res://assets/medieval/expansion/tavern.png",
+      "width": 5.2,
+      "height": 4.3,
+      "health": 520,
+      "category": "roof",
+      "walk_edges": [
+        [
+          -0.4653,
+          0.5508,
+          -0.292,
+          0.8004
+        ],
+        [
+          -0.292,
+          0.8004,
+          0.2845,
+          0.9791
+        ],
+        [
+          0.2845,
+          0.9791,
+          0.4766,
+          0.5572
+        ],
+        [
+          -0.4246,
+          0.3358,
+          0.39,
+          0.3212
+        ],
+        [
+          -0.4759,
+          0.2323,
+          -0.0659,
+          0.3303
+        ],
+        [
+          -0.3056,
+          0.3721,
+          -0.1564,
+          0.3721
+        ],
+        [
+          -0.0614,
+          0.3884,
+          0.0878,
+          0.3884
+        ],
+        [
+          0.2355,
+          0.4074,
+          0.3561,
+          0.4074
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "windmill": {
+      "path": "res://assets/medieval/expansion/windmill.png",
+      "width": 3.5,
+      "height": 7.2,
+      "health": 480,
+      "category": "roof",
+      "walk_edges": [
+        [
+          -0.1931,
+          0.6344,
+          -0.0087,
+          0.807
+        ],
+        [
+          -0.0087,
+          0.807,
+          0.1757,
+          0.6344
+        ],
+        [
+          -0.3124,
+          0.2688,
+          0.3113,
+          0.2688
+        ],
+        [
+          -0.0521,
+          0.4787,
+          0.0347,
+          0.4787
+        ],
+        [
+          -0.0412,
+          0.3365,
+          0.0456,
+          0.3365
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "watermill": {
+      "path": "res://assets/medieval/expansion/watermill.png",
+      "width": 5,
+      "height": 4.5,
+      "health": 500,
+      "category": "roof",
+      "walk_edges": [
+        [
+          -0.4902,
+          0.5943,
+          -0.332,
+          0.9292
+        ],
+        [
+          -0.332,
+          0.9292,
+          0.1634,
+          0.8478
+        ],
+        [
+          0.1634,
+          0.8478,
+          0.2934,
+          0.5876
+        ],
+        [
+          -0.3236,
+          0.9971,
+          -0.2583,
+          0.9971
+        ],
+        [
+          -0.4831,
+          0.3455,
+          -0.1739,
+          0.3742
+        ],
+        [
+          0.0018,
+          0.4239,
+          0.1107,
+          0.4163
+        ],
+        [
+          -0.4058,
+          0.5799,
+          -0.2723,
+          0.5684
+        ],
+        [
+          0.3039,
+          0.5081,
+          0.4656,
+          0.4316
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "tent": {
+      "path": "res://assets/medieval/expansion/tent.png",
+      "width": 3.2,
+      "height": 2.5,
+      "health": 160,
+      "category": "roof",
+      "walk_edges": [
+        [
+          -0.489,
+          0.1033,
+          -0.1713,
+          0.9834
+        ],
+        [
+          -0.1713,
+          0.9834,
+          0.2195,
+          0.8686
+        ],
+        [
+          0.2195,
+          0.8686,
+          0.4934,
+          0.1033
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "cart_goods": {
+      "path": "res://assets/medieval/expansion/cart_goods.png",
+      "width": 2,
+      "height": 1.3,
+      "health": 130,
+      "category": "prop",
+      "walk_edges": [
+        [
+          -0.4688,
+          0.5725,
+          0.3729,
+          0.5207
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "orchard_tree": {
+      "path": "res://assets/medieval/expansion/orchard_tree.png",
+      "width": 3,
+      "height": 3.3,
+      "health": 190,
+      "category": "roof",
+      "walk_edges": [
+        [
+          -0.459,
+          0.4531,
+          -0.2643,
+          0.4965
+        ],
+        [
+          -0.2643,
+          0.4965,
+          -0.0487,
+          0.5106
+        ],
+        [
+          -0.0487,
+          0.5106,
+          0.1669,
+          0.551
+        ],
+        [
+          0.1669,
+          0.551,
+          0.4242,
+          0.4753
+        ],
+        [
+          -0.4242,
+          0.6791,
+          -0.1947,
+          0.7245
+        ],
+        [
+          -0.1947,
+          0.7245,
+          0.0348,
+          0.7931
+        ],
+        [
+          0.0348,
+          0.7931,
+          0.2782,
+          0.7477
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "fountain": {
+      "path": "res://assets/medieval/expansion/fountain.png",
+      "width": 2.4,
+      "height": 2,
+      "health": 230,
+      "category": "prop",
+      "walk_edges": [
+        [
+          -0.4445,
+          0.3654,
+          0.4383,
+          0.3654
+        ],
+        [
+          -0.2016,
+          0.8418,
+          0.1993,
+          0.8418
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "bench": {
+      "path": "res://assets/medieval/expansion/bench.png",
+      "width": 1.5,
+      "height": 0.7,
+      "health": 80,
+      "category": "prop",
+      "walk_edges": [
+        [
+          -0.4958,
+          0.6413,
+          0.4769,
+          0.5246
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "ruin_arch": {
+      "path": "res://assets/medieval/expansion/ruin_arch.png",
+      "width": 3,
+      "height": 3.5,
+      "health": 320,
+      "category": "roof",
+      "walk_edges": [
+        [
+          -0.3663,
+          0.7251,
+          -0.2023,
+          0.8908
+        ],
+        [
+          -0.2023,
+          0.8908,
+          -0.0039,
+          0.9904
+        ],
+        [
+          -0.0039,
+          0.9904,
+          0.1773,
+          0.8948
+        ],
+        [
+          0.1773,
+          0.8948,
+          0.3326,
+          0.7434
+        ],
+        [
+          0.3326,
+          0.6558,
+          0.4189,
+          0.6558
+        ],
+        [
+          -0.3706,
+          0.6159,
+          -0.2541,
+          0.6159
+        ]
+      ],
+      "source": "builtin image_gen"
+    },
+    "bridge_stone": {
+      "path": "res://assets/medieval/expansion/bridge_stone.png",
+      "width": 4.8,
+      "height": 2.8,
+      "health": 460,
+      "category": "roof",
+      "walk_edges": [
+        [
+          -0.4591,
+          0.5983,
+          -0.2146,
+          0.9435
+        ],
+        [
+          -0.2146,
+          0.9435,
+          -0.004,
+          0.9854
+        ],
+        [
+          -0.004,
+          0.9854,
+          0.2065,
+          0.9435
+        ],
+        [
+          0.2065,
+          0.9435,
+          0.4666,
+          0.5983
+        ]
+      ],
+      "source": "builtin image_gen"
+    }
+  }
+}

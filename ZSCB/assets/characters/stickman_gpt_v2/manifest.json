@@ -1,0 +1,85 @@
+{
+  "generator": "OpenAI built-in image_gen",
+  "source": "atlas.png",
+  "style": "sleek charcoal-black stickman with sharp white eyes, smooth silhouette, no clothes or hair",
+  "size": [
+    1448,
+    1086
+  ],
+  "transparent": true,
+  "regions": {
+    "head": [
+      107,
+      90,
+      241,
+      242
+    ],
+    "torso": [
+      497,
+      39,
+      92,
+      310
+    ],
+    "arm": [
+      870,
+      59,
+      71,
+      283
+    ],
+    "forearm": [
+      1213,
+      86,
+      61,
+      257
+    ],
+    "hand": [
+      164,
+      517,
+      113,
+      161
+    ],
+    "thigh": [
+      503,
+      406,
+      80,
+      318
+    ],
+    "shin": [
+      869,
+      420,
+      72,
+      292
+    ],
+    "shoe": [
+      1173,
+      571,
+      191,
+      115
+    ],
+    "joint": [
+      173,
+      876,
+      103,
+      103
+    ],
+    "pencil": [
+      524,
+      770,
+      41,
+      277
+    ],
+    "blink": [
+      781,
+      793,
+      241,
+      242
+    ],
+    "grip": [
+      1200,
+      857,
+      108,
+      134
+    ]
+  },
+  "created": "2026-10-24"
+}

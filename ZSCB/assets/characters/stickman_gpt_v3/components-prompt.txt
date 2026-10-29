@@ -1,0 +1,15 @@
+Use case: stylized-concept
+Asset type: transparent disconnected 2D cutout character component atlas for Skeleton2D/Bone2D animation.
+Input image: the approved full-body combat-guard concept image, supplied as a character identity, proportion and contour reference. Do not use the old relaxed-standing pose as the pose reference.
+Primary request: Produce clean reusable separated components of this exact minimalist black stickman fighter. Preserve the circular black head, sharp white eyes, slim line-like body, compact fists, smooth contour language and limb thickness of the reference. The components must support a bent-knee, raised-fist guard when assembled on bones.
+
+Technical distinction: this is a neutral component atlas, not an image of the guard pose. Upper arms, forearms, thighs and shins are each separate straight segments pointing vertically down, with their joint centers on the vertical centerline and full round black end caps for seamless overlap. Do not bake a bent elbow or bent knee into a single limb segment. Use matching joint diameters at adjacent segment ends. Keep all components at a coherent production scale; limb lengths and overall proportions must agree with the reference. No square cut ends, detached decorations, visible circles marking joints or hollow seams.
+
+Layout: exactly twelve isolated components in an evenly spaced four-column, three-row grid with generous transparent gutters. No full assembled person, labels, numbers or grid lines.
+Row 1: circular black head with sharp white eyes looking screen right; slim line-like torso with a short neck connection; straight upper arm; straight forearm.
+Row 2: compact side-view guard fist; compact side-view punching fist with straight wrist connection; straight thigh; straight shin.
+Row 3: minimal forward-pointing planted foot with a flat ground contact; matching minimal rear foot posed on the forefoot with a raised heel and an identifiable ankle connection; small solid circular overlap patch; alternate head with identical size and silhouette and eyes closed.
+
+All black parts fully opaque, white eyes opaque white, unused pixels genuinely transparent with preserved alpha. Flat charcoal black only, crisp smooth antialiased edges. Keep every component entirely inside its own cell. No hair, clothing, boxing glove bulk, muscles, armour, sketch texture, gradients, shadows, perspective foreshortening, effects, weapons, text or watermark. Do not turn the character into a costumed human. Hands and feet should be compact but distinct enough to read at native game size.
+
+Production clarification: use the input image only for identity and design. REMOVE its soft dark halo entirely. Every component is flat opaque black inside a crisp contour; outside alpha must be zero. Absolutely no glow, haze, smudges or cast shadows. Straight limb segments have constant or very gently tapered stick-like thickness, with rounded caps of matching diameter at their joint ends.

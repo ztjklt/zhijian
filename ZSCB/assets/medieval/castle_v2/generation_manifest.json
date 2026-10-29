@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-24",
+  "tool": "image_gen.imagegen (built-in)",
+  "concept": {
+    "file": "concept.png",
+    "original": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-57dd7cb5-b408-4e1f-b990-5b4135b07fbc.png",
+    "prompt": "Use case: stylized-concept. Asset type: master concept for a destructible 2D side-view medieval castle in the game Paper Castle.\nCreate one magnificent COHERENT castle, strictly flat orthographic front/side elevation for a 2D side-scrolling paper game. Wide 3:2 composition, whole castle fully visible with generous clear margin. Pure delicate confident black ink line drawing on genuinely transparent background, transparent/open stone interiors (no white painted fill), sparse tasteful crosshatching, beautiful hand-drawn storybook medieval masonry. No color, no grey wash, no paper texture, no scenery, no text, no people.\nArchitecture: an impressively connected silhouette, two tall crenellated square outer towers, continuous stone curtain walls attached flush to tower faces, central large OPEN arched gate, a majestic stepped central keep rising BEHIND/ABOVE the gate with two slender turrets, pointed roof and tiny pennants. Strong readable elegance, Gothic windows, proportional matching stones, coherent shared foundations and continuous walkways. Absolutely no disconnected floating buildings, no gaps between tower/wall/gate, no isolated little brick blocks.\nDesign for later decomposition into individual repeatable flush-edge wall segments, outer tower, gatehouse arch and upper keep; distinct construction seams permitted but visually joined. At native gameplay scale a stickman person is about one tenth of outer tower height. Black outline weights restrained and consistent, no excessive noisy scribbles. Transparent alpha."
+  },
+  "master": {
+    "file": "castle_master.png",
+    "original": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-df6ae8fa-acd9-4f3b-982b-15352e613b00.png",
+    "reference": "concept.png",
+    "prompt": "Create a production sprite of this same medieval castle in a 2D notebook drawing game. Use the reference as the architectural design: preserve the connected outer towers, curtain walls, open central gateway, stepped keep and pointed roofs.\nRender as elegant simple black pen outlines with a transparent background. A clean pen drawing: masonry indicated by thin black lines and sparse hatching, no painted stone fill, no soft shadows, no backdrop. The notebook paper behind the sprite should show between the pen lines. Keep the castle complete, front elevation, all joined foundations and walls, consistent stone scale. No text, no people, no additional scenery. Whole building in frame with margin."
+  },
+  "decomposition": "Shared contiguous atlas source regions; every region has separate collision and damage, preserving exact visual joins."
+}

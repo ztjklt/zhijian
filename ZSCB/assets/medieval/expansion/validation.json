@@ -1,0 +1,294 @@
+{
+  "validated_count": 22,
+  "all_final_pngs_are_unmodified_builtin_outputs": true,
+  "actual_renderer_gallery": "review/godot-gallery-{1..4}.png",
+  "gameplay_scale_pixels_per_metre": 60,
+  "assets": [
+    {
+      "id": "grass_meadow",
+      "pixels": [
+        2022,
+        778
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "daee1283144e2f49c975999e2da66b40745678cae748a3441f0f042ef436f815",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "grass_tall",
+      "pixels": [
+        1225,
+        1284
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "330ff1f0ef46a4d6733672c20c87300e0f8d7d4db9557e5774ba3631602b8356",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "reeds",
+      "pixels": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "f1adfdc6285200ee9dafd125655edf04e676cc4a2283e60db0f395d2ce6b7bcd",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "wildflowers",
+      "pixels": [
+        1254,
+        1254
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "4bb1026258d15dcaa9e1c14a5f6143d1fd17ea3adecc658695cddf0803a0c325",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "bush",
+      "pixels": [
+        1536,
+        1024
+      ],
+      "alpha_range": [
+        0,
+        252
+      ],
+      "sha256": "52720e9eb56e1bbc2744040d398e965e2e580c3a982c5108f3f6b9ed5bd7cfe2",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "wheat",
+      "pixels": [
+        1312,
+        1199
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "7f3d76f3e703afd0733330ab262649eb4961267f3c5475ef67f3d04257aa6689",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "haystack",
+      "pixels": [
+        1402,
+        1122
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "c6e7b823387c49cf4e64035ac61d051a87379674e9c1b6bc04855e19e20d8f77",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "fence",
+      "pixels": [
+        1619,
+        971
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "3715040b3dd8229f78eccf65f96d639ea2ab5b3b9762457e0bd8989883cb78e4",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "signpost",
+      "pixels": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "fc60ca0e51bb173f1f64b37e43a209e742642977ad69910e1118922b221be85a",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "lantern",
+      "pixels": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "2a23f8123f467edc7e012b4c9f419f9695fa425aef2c75d01008a2eb4a16929d",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "well",
+      "pixels": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "86b6271f2781360e3cca47087629f7f400fab53638ecab3a03d38c1dd8f0a05a",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "forge",
+      "pixels": [
+        1374,
+        1145
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "8594cdb5de66b4d27c35d9294becccc3da97e7bc40aec4a1dce124fd2ed7cac6",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "tavern",
+      "pixels": [
+        1374,
+        1145
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "7ad7f49913a94c37991cc3ad706d2d61130b94034cc4e2e3a99666e4da74fc03",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "windmill",
+      "pixels": [
+        1024,
+        1536
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "b54637cf7c0a253d5589f20e566f8d75e9c050e2f459f38a76bf00a638dd8082",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "watermill",
+      "pixels": [
+        1437,
+        1095
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "e74f7b299c070e05c1f5ad29e265060547c55423131b4e3c6a40b23fc6be3213",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "tent",
+      "pixels": [
+        1427,
+        1102
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "011083843ebb548faab1342523dde3edddfb9149a38bedd045bd1cb932205d15",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "cart_goods",
+      "pixels": [
+        1536,
+        1024
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "f89e2b374d2d20341df24e867f89d248119a45b5c90b153648cdcae50cccac66",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "orchard_tree",
+      "pixels": [
+        1536,
+        1024
+      ],
+      "alpha_range": [
+        0,
+        253
+      ],
+      "sha256": "8584293465e302d4f8b22c9133eef52debc9d74e2ad3fdae33232f376fe4b236",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "fountain",
+      "pixels": [
+        1422,
+        1106
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "46de30a1315cd47660e163e5f63ed88002c1cc0464a66dc083a24b36e2d07978",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "bench",
+      "pixels": [
+        1536,
+        1024
+      ],
+      "alpha_range": [
+        0,
+        253
+      ],
+      "sha256": "604ce52ee4ed822edb3f238aa2eead4b90b71be04469ac2fb7e337c967c1de20",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "ruin_arch",
+      "pixels": [
+        1198,
+        1313
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "99492f6d4e9b4f32c995950a23dbf8f7a820ddd64196f6a9a47f1fd8719596f5",
+      "original_preserved_identically": true
+    },
+    {
+      "id": "bridge_stone",
+      "pixels": [
+        1635,
+        962
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "269e3904eedb2a7e685cdc6b21d78dbf8bcaebcc1b576cb9e07ac9308cb8c7af",
+      "original_preserved_identically": true
+    }
+  ]
+}

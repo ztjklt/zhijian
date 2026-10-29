@@ -1,0 +1,85 @@
+{
+  "generator": "OpenAI built-in image_gen",
+  "source": "atlas.png",
+  "style": "classic round-head black-line stickman, no hair, hats or clothing",
+  "size": [
+    1448,
+    1086
+  ],
+  "transparent": true,
+  "regions": {
+    "head": [
+      81,
+      128,
+      239,
+      234
+    ],
+    "torso": [
+      527,
+      50,
+      56,
+      326
+    ],
+    "arm": [
+      888,
+      89,
+      50,
+      274
+    ],
+    "forearm": [
+      1240,
+      155,
+      47,
+      208
+    ],
+    "hand": [
+      165,
+      522,
+      85,
+      123
+    ],
+    "thigh": [
+      532,
+      424,
+      54,
+      268
+    ],
+    "shin": [
+      891,
+      460,
+      52,
+      238
+    ],
+    "shoe": [
+      1206,
+      603,
+      132,
+      60
+    ],
+    "joint": [
+      159,
+      874,
+      62,
+      62
+    ],
+    "pencil": [
+      522,
+      730,
+      51,
+      314
+    ],
+    "blink": [
+      779,
+      787,
+      238,
+      233
+    ],
+    "grip": [
+      1220,
+      837,
+      101,
+      128
+    ]
+  },
+  "created": "2026-10-24"
+}

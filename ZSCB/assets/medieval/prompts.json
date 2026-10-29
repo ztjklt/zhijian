@@ -1,0 +1,58 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "transparent_background": true,
+  "common": "Use case: stylized-concept. Asset type: 2D side-view game sprite for Paper Castle, displayed over cream ruled notebook paper. Style: confident BLACK ink outline, slightly wobbly hand-drawn medieval notebook doodle; medium-bold clean readable outlines, very sparse hatching, simple charming shapes. Actual transparent background and mostly transparent interiors so paper lines show through. Orthographic SIDE elevation, no perspective ground. Whole object visible with 5% clear padding. No color, no gray shading, no opaque white fills, no background scenery, no paper baked in, no text, no labels, no grids, no shadows, no watermark. ",
+  "specs": [
+    [
+      "house",
+      "ONE isolated medieval peasant half-timber cottage, steep thatched roof with chimney, timber beams, small arched door on right and two shutter windows. Modest simple cottage, roughly square silhouette. Black linework only. Complete building including bottom foundation line."
+    ],
+    [
+      "market",
+      "ONE isolated medieval outdoor market stall, striped cloth canopy on two wooden posts, front counter with baskets of apples and bread drawn in simple line art, small hanging balance scale. Side elevation with only slight front visibility, wide readable silhouette. Cloth stripes drawn as thin black outlines, no black solid stripes."
+    ],
+    [
+      "wall",
+      "ONE modular straight medieval castle wall SECTION, wider than tall, full face stone block pattern, five crenellations at top, two narrow arrow slit windows, straight vertical left and right seams to connect neighboring wall sections. Flat front elevation. No towers or castle attached. Sparse block pattern. Complete single rectangular wall module, not a complete castle."
+    ],
+    [
+      "tower",
+      "ONE modular medieval castle square TOWER section, tall upright rectangular stone tower, flat crenellated battlement crown, two arched narrow windows stacked vertically, stone block linework. Height about twice width. Flat front elevation, no adjoining walls, no landscape. Single tower only."
+    ],
+    [
+      "gate",
+      "ONE isolated medieval castle arched GATEHOUSE module, stone arch frame with crenellated top, open dark-line wooden portcullis inside arch, gap between the bars transparent. Front elevation, wider than tall. No towers or walls attached. Single gate module. Keep the doorway empty/transparent except portcullis lines."
+    ],
+    [
+      "pine",
+      "ONE isolated medieval woodland pine tree, slightly crooked slim trunk and three irregular tiers of pointed branch boughs, playful pen doodle silhouette, sparse short needle marks. No oak, no ground line."
+    ],
+    [
+      "barrel",
+      "ONE isolated medieval wooden barrel upright, round staves and two iron hoops, black outline only, little bung visible. Side elevation, transparent spaces between all lines. No other objects."
+    ],
+    [
+      "crate",
+      "ONE isolated medieval square wooden cargo crate, simple boards and large diagonal X brace, straight orthographic side view, bold black outline only. No other objects."
+    ],
+    [
+      "wagon",
+      "ONE isolated medieval wooden merchant wagon WITHOUT horse or person, long open cargo bed with wooden railings, two large spoked wheels clearly visible from side, shafts extend to LEFT to hitch horse. A few sacks in bed. Pure side elevation, facing/travelling LEFT. No ground line. Broad wide silhouette, single wagon asset."
+    ],
+    [
+      "villager",
+      "Animation SPRITE SHEET of ONE SAME medieval peasant villager, cheerful simple ink doodle person wearing small cap, tunic and boots, carrying no weapons. EXACT 4 columns x 2 rows of equal size cells, 8 poses total, no drawn grid. Side view facing RIGHT. Row 1: four distinct full walking-cycle poses: left foot forward, passing feet, right foot forward, opposite passing. Row 2: recoiling struck pose leaning back; airborne tumbling pose; defeated lying flat on ground pose with closed eyes; second resting defeated prone pose. NON-GRAPHIC, no blood, no wounds, fully clothed. SAME head, face, proportions and tunic in every cell, body height 75% cell in standing frames, feet on same baseline. All sprites centered individually in cells, generous gutters, no cross-cell overlap, absolutely NO text or labels. Simple expressive face with dot eyes. Landscape sheet, width twice height. Keep dead poses WITHIN their own cell."
+    ],
+    [
+      "horse",
+      "Animation SPRITE SHEET of ONE SAME medieval cart horse WITHOUT wagon or rider. EXACT 4 columns x 2 rows equal cells, 8 poses, no visible grid. Side view facing LEFT, simple ink outline, plain harness drawn with a few straps. Row 1: four distinct walking-cycle leg poses, same body and head aligned. Row 2: recoiling hit pose, falling/tumbling pose, peaceful defeated lying-down pose with closed eyes, second defeated lying pose. NON-GRAPHIC, no blood or wounds. Each complete horse stays entirely inside its cell with generous gutters. Same horse identity/size throughout; pure black outlines with transparent interiors. Landscape sheet width twice height, each cell square."
+    ],
+    [
+      "dragon",
+      "Animation SPRITE SHEET of ONE SAME small medieval European flying dragon, friendly fierce notebook doodle with long tail, two legs, two BAT wings, horns and pointy snout. EXACT 4 columns x 2 rows equal cells, EIGHT chronological flight wingbeat frames read left-to-right row-by-row. Side view facing RIGHT. Wings: highest, high, horizontal, down, lowest, down, horizontal, high. SAME body/head/tail size and position per cell, only wing and slight leg/tail pose changes. Each entire dragon including both wing tips stays in its own cell with generous gutters; never overlap cells. Pure medium-bold black outline; wing membrane empty transparent with vein outlines. No solid black body, no flames, no scenery, no labels or drawn grid. Landscape sheet twice as wide as tall, each cell square."
+    ]
+  ],
+  "final_driver_prompt": "Use case: stylized-concept. Asset type: 2D side-view game sprite for Paper Castle, displayed over cream ruled notebook paper. Style: confident BLACK ink outline, slightly wobbly hand-drawn medieval notebook doodle; medium-bold clean readable outlines, very sparse hatching, simple charming shapes. Actual transparent background and mostly transparent interiors so paper lines show through. Orthographic SIDE elevation, no perspective ground. Whole object visible with 5% clear padding. No color, no gray shading, no opaque white fills, no background scenery, no paper baked in, no text, no labels, no grids, no shadows, no watermark. Subject: ONE isolated medieval wagon driver, a peasant merchant with small soft cap and simple tunic, seated side-on facing LEFT, leaning slightly forward, arms extended left holding a pair of thin reins, legs bent at knees, boots resting lower left. No wagon, no horse, no chair, no props except reins. Charming human ink doodle, same general medieval villager style, dot eyes, simple expressive friendly face, light beard. Whole figure and reins in frame with transparent padding. Single seated character only, not spritesheet.",
+  "final_dragon_prompt": "Create a transparent PNG animation sprite sheet for a family-friendly medieval paper-doodle video game. Show one small whimsical European dragon FLYING. Eight chronological wing-flapping poses in EXACTLY four columns and two rows of equal-sized square cells, on a transparent canvas twice as wide as tall. Draw all eight dragons with thin black ink contour lines and empty transparent interiors. Same dragon identity and size, same side view facing right, same head and body position in every cell. Wing poses sequentially: raised, partly raised, horizontal, lowered, fully lowered, partly lowered, horizontal, partly raised. Each full silhouette fits its own square cell with wide empty gutters. Simple curved neck, small rounded snout, little feet, long curved tail, outlined wings with a few interior veins. Charming notebook doodle, clean readable outlines. No other subjects, no text or labels, no cell borders, no paper background, no colored fills, no ground, no shadows. This image is a game animation sheet of a flying fantasy creature only.",
+  "notes": "For oak exact original prompt see generation_manifest.json oak_prompt. Dragon final prompt supersedes its initial subject request."
+}

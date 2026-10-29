@@ -1,0 +1,103 @@
+{
+  "generator": "OpenAI built-in image_gen",
+  "source": "atlas.png",
+  "grip_source": "grips.png",
+  "regions": {
+    "head": [
+      74,
+      85,
+      290,
+      281
+    ],
+    "torso": [
+      490,
+      27,
+      161,
+      364
+    ],
+    "arm": [
+      876,
+      69,
+      109,
+      294
+    ],
+    "forearm": [
+      1229,
+      100,
+      89,
+      263
+    ],
+    "guard_fist": [
+      119,
+      518,
+      184,
+      158
+    ],
+    "punch_fist": [
+      475,
+      539,
+      218,
+      127
+    ],
+    "thigh": [
+      877,
+      423,
+      99,
+      327
+    ],
+    "shin": [
+      1230,
+      442,
+      89,
+      298
+    ],
+    "shoe": [
+      102,
+      836,
+      246,
+      155
+    ],
+    "rear_foot": [
+      515,
+      797,
+      193,
+      202
+    ],
+    "joint": [
+      866,
+      878,
+      111,
+      113
+    ],
+    "blink": [
+      1122,
+      790,
+      267,
+      262
+    ],
+    "hand": [
+      459,
+      84,
+      378,
+      564
+    ],
+    "back_hand": [
+      1240,
+      83,
+      346,
+      558
+    ]
+  },
+  "style": "combat guard, black stickman, white eyes, relaxed holding hands",
+  "created": "2026-10-24",
+  "grip_socket_source_pixels": {
+    "front": [
+      731,
+      457
+    ],
+    "rear": [
+      1494,
+      459
+    ]
+  }
+}

@@ -1,3 +1,50 @@
+# OS / editor / generated caches
 .DS_Store
 Thumbs.db
+.godot/
+__pycache__/
+*.py[cod]
+.vscode/
+.idea/
 *.tmp
+*.bak
+*.log
+
+# Local credentials (keep source files such as profile_store.gd)
+.env
+.env.*
+!.env.example
+export_credentials.cfg
+*.pem
+*.key
+*.p12
+*.pfx
+.maker/
+.maker-mcp/
+.railway/
+credentials/
+*_credentials/
+network_profile.json*
+
+# Player data and server persistence
+paper_castle_*.json*
+paper_castle_preferences.cfg
+preferences.cfg
+saves/
+userdata/
+app_userdata/
+network-worlds/
+network_worlds/
+worlds/
+world-state.json
+
+# Rebuildable exports and historical raw evidence
+releases/
+dist/
+build/
+exports/
+*.pck
+*.wasm
+ZSCB/docs/previews/
+ZSCB/docs/superpowers/evidence/
+ZSCB/web/deployment.json

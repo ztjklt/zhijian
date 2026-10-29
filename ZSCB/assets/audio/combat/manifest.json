@@ -1,0 +1,461 @@
+[
+  {
+    "file": "sword_swing_1.wav",
+    "sources": [
+      "sword_sword.1.ogg",
+      "original air synthesis"
+    ],
+    "seconds": 0.3602,
+    "sha256": "874bdb6ed6f684b9f078506cd100a7a72e0817cab61b6ef3429d742b13539a3e"
+  },
+  {
+    "file": "sword_hit_1.wav",
+    "sources": [
+      "sword_sword_clash.1.ogg",
+      "original low impact synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "d4d0bff6123ed32e2226b8e7f354a4055651f7d379d8be540c98997fedc5119f"
+  },
+  {
+    "file": "hammer_swing_1.wav",
+    "sources": [
+      "rpg_wood_01.ogg",
+      "original broad air synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "c8e24458aafb36ca78e07cc0e42e8206fe50d28bb6a75efbc812f4eeba790e0e"
+  },
+  {
+    "file": "hammer_hit_1.wav",
+    "sources": [
+      "rpg_stones_01.ogg",
+      "rpg_wood_01.ogg",
+      "original low impact synthesis"
+    ],
+    "seconds": 0.6095,
+    "sha256": "d7bda862101eddbbb74ef9c0b6083c74464fccfac29eaa90ffab25826c328c4e"
+  },
+  {
+    "file": "spear_swing_1.wav",
+    "sources": [
+      "sword_sword.1.ogg",
+      "original narrow air synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "455b77f5b9caf081cd7de41e7e9eaacb63c73c8a76cf3473a3d1d5be5a357752"
+  },
+  {
+    "file": "spear_hit_1.wav",
+    "sources": [
+      "rpg_blade_01.ogg",
+      "rpg_wood_01.ogg"
+    ],
+    "seconds": 0.1539,
+    "sha256": "892087e50b9c4008353bc229ec9c89458cb3b3dd79eee7576205b05a8e59952b"
+  },
+  {
+    "file": "bow_draw_1.wav",
+    "sources": [
+      "original taut string synthesis"
+    ],
+    "seconds": 0.44,
+    "sha256": "e4ab248f98f011bd922f23a31d79920e25c0ddf6c2cd6c112b54f9cd9b839245"
+  },
+  {
+    "file": "bow_shoot_1.wav",
+    "sources": [
+      "original plucked string + arrow air synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "48e498a8b14be4f8ab272bc34f3f57a08b34d29de6f60177f1c9d49794f469c7"
+  },
+  {
+    "file": "bow_hit_1.wav",
+    "sources": [
+      "rpg_wood_01.ogg",
+      "original string synthesis"
+    ],
+    "seconds": 0.3,
+    "sha256": "0f50ef45c58112e49ec9e99a4d580694ec765484413c8c22641fdec87351c413"
+  },
+  {
+    "file": "firearm_shoot_1.wav",
+    "sources": [
+      "original powder crack/noise + resonant boom synthesis"
+    ],
+    "seconds": 0.46,
+    "sha256": "8d61b977188d3bb9a9fdeaa6c00b358afb4b0decdcee86bbb1efc46fad4f03ec"
+  },
+  {
+    "file": "firearm_hit_1.wav",
+    "sources": [
+      "rpg_stones_01.ogg",
+      "original impact/noise synthesis"
+    ],
+    "seconds": 0.46,
+    "sha256": "913a07aea32a931cb79e413a3e8a7851b7fcbace8357f567ddc6773fb50c9555"
+  },
+  {
+    "file": "death_human_low_1.wav",
+    "sources": [
+      "human_3yell1.wav"
+    ],
+    "seconds": 1.4754,
+    "sha256": "fd2e35278fffd8450a72ac0f739525d4e7f7adae16ee82d01de59cf70b01e1e0"
+  },
+  {
+    "file": "death_human_high_1.wav",
+    "sources": [
+      "female_original0.ogg (processed variants of one take)"
+    ],
+    "seconds": 0.902,
+    "sha256": "47ae39889d1d116d2ce2948cc4cd54c4ced5fcd9d687444428fe399b35ba9cdf"
+  },
+  {
+    "file": "death_horse_1.wav",
+    "sources": [
+      "horse_1.mp3"
+    ],
+    "seconds": 2.3,
+    "sha256": "5a60ab9fcfe31c85a828a5b5372c2092144416d282b7ce799c197c03968a529e"
+  },
+  {
+    "file": "death_rabbit_1.wav",
+    "sources": [
+      "creature_scream_01.ogg (stylized small-animal processing)"
+    ],
+    "seconds": 0.4739,
+    "sha256": "4d897042283b1e05265babffd4e43959846ed843cb85e692aa9b1004109c5645"
+  },
+  {
+    "file": "death_deer_1.wav",
+    "sources": [
+      "creature_hurt_01.ogg (stylized animal processing)"
+    ],
+    "seconds": 0.2731,
+    "sha256": "e9355ec70f75d4229d2a9676130ef478367caafefcf9d27345169b04d5f53316"
+  },
+  {
+    "file": "death_bat_1.wav",
+    "sources": [
+      "creature_bug_01.ogg (stylized bat processing)"
+    ],
+    "seconds": 0.0891,
+    "sha256": "eb829a4190483895412ec1cb0004d9d29b0ebc13779dc6320e30d61049402320"
+  },
+  {
+    "file": "death_dragon_1.wav",
+    "sources": [
+      "creature_roar_01.ogg (pitched down)"
+    ],
+    "seconds": 0.394,
+    "sha256": "1540006573d7d117d4c0352f18f051226b1aa07a1a647589479c047531131462"
+  },
+  {
+    "file": "sword_swing_2.wav",
+    "sources": [
+      "sword_sword.3.ogg",
+      "original air synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "191b8ea98c5306d777920f6902915e591eafc026046a536dffd9854922bd78d2"
+  },
+  {
+    "file": "sword_hit_2.wav",
+    "sources": [
+      "sword_sword_clash.2.ogg",
+      "original low impact synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "a487122f4444da1a888932dc350fc8ad0cb9822b55e45907517046655a02a94d"
+  },
+  {
+    "file": "hammer_swing_2.wav",
+    "sources": [
+      "rpg_wood_02.ogg",
+      "original broad air synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "86af75054f79d8ea12b74a2ab6f67f4f86907a3a0d1c240583cffc97967beae2"
+  },
+  {
+    "file": "hammer_hit_2.wav",
+    "sources": [
+      "rpg_stones_02.ogg",
+      "rpg_wood_02.ogg",
+      "original low impact synthesis"
+    ],
+    "seconds": 0.765,
+    "sha256": "f048b12e5317f59781bdf08059fa9d3a735cc8c4e49033c0ade8a36baf91863d"
+  },
+  {
+    "file": "spear_swing_2.wav",
+    "sources": [
+      "sword_sword.3.ogg",
+      "original narrow air synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "2dfb2c8191fe8029a47cc87a1b6476b4c11c1bd430559379437b437acc68789d"
+  },
+  {
+    "file": "spear_hit_2.wav",
+    "sources": [
+      "rpg_blade_02.ogg",
+      "rpg_wood_02.ogg"
+    ],
+    "seconds": 0.2001,
+    "sha256": "198ab5a937fe96d050d4d43ba7adb61a6938d8faadb4f3a50f8473716506a68d"
+  },
+  {
+    "file": "bow_draw_2.wav",
+    "sources": [
+      "original taut string synthesis"
+    ],
+    "seconds": 0.44,
+    "sha256": "6d8661d32d71500a0c6e661b723974ed680f5a9a420515d8c3a70976e259d80a"
+  },
+  {
+    "file": "bow_shoot_2.wav",
+    "sources": [
+      "original plucked string + arrow air synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "255b45664b92ab58d3fb1dac1ad01aafe51b64eb1e6b33a23bba0d1166646f92"
+  },
+  {
+    "file": "bow_hit_2.wav",
+    "sources": [
+      "rpg_wood_02.ogg",
+      "original string synthesis"
+    ],
+    "seconds": 0.3,
+    "sha256": "bdba51a5ff3018684fa29a593e4ae0d66153b7cac5d8ecaad3c3bbeabb4e52c2"
+  },
+  {
+    "file": "firearm_shoot_2.wav",
+    "sources": [
+      "original powder crack/noise + resonant boom synthesis"
+    ],
+    "seconds": 0.46,
+    "sha256": "1462412d4a04bf0a592ad2476c10566878c43592d236c08e3c812838678875a9"
+  },
+  {
+    "file": "firearm_hit_2.wav",
+    "sources": [
+      "rpg_stones_02.ogg",
+      "original impact/noise synthesis"
+    ],
+    "seconds": 0.46,
+    "sha256": "d79749565190bdf8fd8593f6f7a5749d1d00e6449d37443138919c0fa9a8f504"
+  },
+  {
+    "file": "death_human_low_2.wav",
+    "sources": [
+      "human_3yell3.wav"
+    ],
+    "seconds": 0.351,
+    "sha256": "af0317f92d6ffe3edbf7c25ce63949fc593e10aa7e6467691daf6bc89cf2d0be"
+  },
+  {
+    "file": "death_human_high_2.wav",
+    "sources": [
+      "female_original0.ogg (processed variants of one take)"
+    ],
+    "seconds": 0.9395,
+    "sha256": "4b620908e11f3159e9f187613f3b7dad9003beb60d46853416b5256fa992126b"
+  },
+  {
+    "file": "death_horse_2.wav",
+    "sources": [
+      "horse_2.mp3"
+    ],
+    "seconds": 1.4769,
+    "sha256": "c206bc3abfd9409edae227efc3be4eeeed0205ef7f58e44f25b0d56b94c07a86"
+  },
+  {
+    "file": "death_rabbit_2.wav",
+    "sources": [
+      "creature_scream_02.ogg (stylized small-animal processing)"
+    ],
+    "seconds": 0.4589,
+    "sha256": "da96cb7257dd03209df03f70540eb7135d2ac8d5ab5f679c4efeae2b8bb040dd"
+  },
+  {
+    "file": "death_deer_2.wav",
+    "sources": [
+      "creature_hurt_02.ogg (stylized animal processing)"
+    ],
+    "seconds": 0.2757,
+    "sha256": "348eaad83404bdff1971fe7a14b47187e5d97502e8351e992fae4eaebd6615f2"
+  },
+  {
+    "file": "death_bat_2.wav",
+    "sources": [
+      "creature_bug_02.ogg (stylized bat processing)"
+    ],
+    "seconds": 0.2123,
+    "sha256": "7c9ad97b26147abef85176c05ff00098fd6202f534546af9ea80c64f5c241592"
+  },
+  {
+    "file": "death_dragon_2.wav",
+    "sources": [
+      "creature_roar_02.ogg (pitched down)"
+    ],
+    "seconds": 0.9525,
+    "sha256": "45e4eaf394f3a16e54ef78d943f50cc9c6748cd632a3a4283c1fd38fe0fe1672"
+  },
+  {
+    "file": "sword_swing_3.wav",
+    "sources": [
+      "sword_sword.5.ogg",
+      "original air synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "99bc8be0000a8ceadf237c7730f3a9a69ccbd3dcbcea95a3094ce143984094fc"
+  },
+  {
+    "file": "sword_hit_3.wav",
+    "sources": [
+      "sword_sword_clash.3.ogg",
+      "original low impact synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "d7330a66047118d2e1fcc94d17ec33594cb76f8bc61f9d547a7e3f51bf86c04c"
+  },
+  {
+    "file": "hammer_swing_3.wav",
+    "sources": [
+      "rpg_wood_03.ogg",
+      "original broad air synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "454da49ee2a4e0981637cdc975c15b498c119b5de5024fdf12f1639e6a2ef155"
+  },
+  {
+    "file": "hammer_hit_3.wav",
+    "sources": [
+      "rpg_stones_03.ogg",
+      "rpg_wood_03.ogg",
+      "original low impact synthesis"
+    ],
+    "seconds": 0.798,
+    "sha256": "51e5ed87f9f2e76d88388358db82c865b4eed945226308b66d09dbffe026e37c"
+  },
+  {
+    "file": "spear_swing_3.wav",
+    "sources": [
+      "sword_sword.5.ogg",
+      "original narrow air synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "e9f13407ee0d598702d9bccc0c7ec2417bfa3b0b424f1519034d59b00b7d89c1"
+  },
+  {
+    "file": "spear_hit_3.wav",
+    "sources": [
+      "rpg_blade_03.ogg",
+      "rpg_wood_03.ogg"
+    ],
+    "seconds": 0.1786,
+    "sha256": "3176fab397c01fc1cf471467b677e3078620b110936340a51a6e96a717aaeea8"
+  },
+  {
+    "file": "bow_draw_3.wav",
+    "sources": [
+      "original taut string synthesis"
+    ],
+    "seconds": 0.44,
+    "sha256": "ff6245b30dbe2aa60006d07c3658bc49d61978c4586e71fc10d159847d28225c"
+  },
+  {
+    "file": "bow_shoot_3.wav",
+    "sources": [
+      "original plucked string + arrow air synthesis"
+    ],
+    "seconds": 0.36,
+    "sha256": "c561caf567f8332e85b454a204acabd9cd333009319b3fb683cd4182f8f78dbf"
+  },
+  {
+    "file": "bow_hit_3.wav",
+    "sources": [
+      "rpg_wood_03.ogg",
+      "original string synthesis"
+    ],
+    "seconds": 0.3,
+    "sha256": "857cabf41cf49dbad416e37a2c9e12b3323f5ae3710ed7e4a00324af518cee8a"
+  },
+  {
+    "file": "firearm_shoot_3.wav",
+    "sources": [
+      "original powder crack/noise + resonant boom synthesis"
+    ],
+    "seconds": 0.46,
+    "sha256": "75006b5bde75f368a1a6ecbfe699efbfcacfd483c910c6c2317519021e88c94c"
+  },
+  {
+    "file": "firearm_hit_3.wav",
+    "sources": [
+      "rpg_stones_03.ogg",
+      "original impact/noise synthesis"
+    ],
+    "seconds": 0.46,
+    "sha256": "a33b3624d8d3593f9dbf47758b4aafd10eef9ca2a1887afb5d9a7d14b6e12c49"
+  },
+  {
+    "file": "death_human_low_3.wav",
+    "sources": [
+      "human_2yell4.wav"
+    ],
+    "seconds": 1.3195,
+    "sha256": "32cb1dba719eaef249d980a7ba96ad368cff39a71d9acf6817e95d053dcdad3d"
+  },
+  {
+    "file": "death_human_high_3.wav",
+    "sources": [
+      "female_original0.ogg (processed variants of one take)"
+    ],
+    "seconds": 0.8673,
+    "sha256": "2f88e97ce136ebc3ab718d864e45a3edc19d28cb7e6d56b8cd0294242f836572"
+  },
+  {
+    "file": "death_horse_3.wav",
+    "sources": [
+      "horse_3.mp3"
+    ],
+    "seconds": 2.3,
+    "sha256": "7c19672f84cde2fa1d5ccf8b620c3d6176139e9dfd886ef9d01e2cc56690dbf4"
+  },
+  {
+    "file": "death_rabbit_3.wav",
+    "sources": [
+      "creature_scream_01.ogg (stylized small-animal processing)"
+    ],
+    "seconds": 0.4428,
+    "sha256": "e1851c75604e39714e02e3c1c4934c3c66780cfcef3d4159445b56060793ddef"
+  },
+  {
+    "file": "death_deer_3.wav",
+    "sources": [
+      "creature_hurt_03.ogg (stylized animal processing)"
+    ],
+    "seconds": 0.2185,
+    "sha256": "98e3aa6ed0ee310ce87d599d1c89003d0068923444c273488eb42dac04defd3e"
+  },
+  {
+    "file": "death_bat_3.wav",
+    "sources": [
+      "creature_bug_03.ogg (stylized bat processing)"
+    ],
+    "seconds": 0.198,
+    "sha256": "daa77e087dc46c6944081ff476cfe905f9650c045276199d8092289aa924b39a"
+  },
+  {
+    "file": "death_dragon_3.wav",
+    "sources": [
+      "creature_roar_03.ogg (pitched down)"
+    ],
+    "seconds": 0.4844,
+    "sha256": "8e343c68f24745d48681642ae70218e1f568e78025614843d6d295ebde4de45d"
+  }
+]

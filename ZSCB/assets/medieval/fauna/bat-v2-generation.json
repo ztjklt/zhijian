@@ -1,0 +1,7 @@
+{
+  "tool": "builtin image_gen",
+  "prompt": "Use case: precise-object-edit. Edit this 4 columns ×2 rows bat monster animation sprite sheet. Preserve the charming simple black ink creature identity, consistent proportions, all eight poses and their order. Fix ONLY cell isolation: each complete bat including both wingtips and feet must fit fully inside its own equal cell, with at least 15 percent empty transparent padding around its entire silhouette. The third top-row bat's horizontal wing must NOT cross into the fourth cell. The fourth top-row bat's downward wings must NOT cross into the bottom row. Make ALL eight bats slightly smaller within their cells if necessary, at one common scale. Four equal columns and two equal rows across the whole canvas, no drawn grid, no text, no numbers. Top row: four flight flap poses. Bottom row: hurt, tumbling, downed, alternate downed. True transparent alpha background. No new scenery, no extra marks, no ground or shadow. Keep all body centers aligned at consistent cell-local coordinates.",
+  "original_path": "/Users/jitian/.codex/generated_images/01a16e47-2ea7-7342-8bb8-faac04dc903a/exec-38d25b8b-019d-45bd-912c-08782019cd78.png",
+  "edit_target": "bat.png",
+  "purpose": "Retain identity and isolate complete animation silhouettes"
+}

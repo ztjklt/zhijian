@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-24",
+  "tool": "OpenAI built-in image_gen.imagegen",
+  "mode": "generate",
+  "transparent_background": true,
+  "assets": [
+    {
+      "file": "sheet.png",
+      "width_height": [
+        1619,
+        971
+      ],
+      "sha256": "9278a7512501833e125d68245bcb34f7cfaad1bdd2ed5ace726a1ad128b5945c",
+      "generated_source_id": "exec-569105de-1eb0-4575-9f9c-e97fc6445ecd",
+      "prompt": "Create ONE production-ready transparent PNG UI PANEL BACKGROUND texture for a premium 2D hand-drawn paper sandbox game called Paper Between. This is a usable game UI material, NOT a mockup, NOT a contact sheet, no labels, NO TEXT, no icons, no characters. A single broad rectangular off-white scrap of notebook paper, torn fibrous irregular deckle edges on all four sides, subtle layered torn paper underneath along lower and right edge, tiny curled fiber details, restrained soft ambient contact shadow. Front-on perfectly flat orthographic scan, no perspective. Cream-white natural paper center with very subtle graphite grain and almost invisible muted blue notebook ruling near edge ONLY; keep central 80% extremely clean, uniform, light, and empty to support small dark UI text. Charming intentional handmade sketchbook aesthetic, matches graphite stick figure drawings on crumpled homework paper; tactile sophisticated game interface rather than office dashboard. Silhouette rectangular with slightly skewed torn corners; width about 1.7 times height, complete object centered with a transparent margin all around. NO tape across the center. White/ivory palette, graphite gray hairline edge accents. Transparent background including outside shadow falloff, preserve alpha. High quality final game asset.",
+      "alpha_preserved": true
+    },
+    {
+      "file": "strip.png",
+      "width_height": [
+        2172,
+        724
+      ],
+      "sha256": "7d1662654ee8111955023e7e4a4bf6e7fdc7886046af160f79362125a0625e39",
+      "generated_source_id": "exec-62305564-6f65-48e8-bb19-a48b5f787037",
+      "prompt": "Generate ONE single blank horizontal torn paper UI BUTTON STRIP texture as a production transparent PNG asset for a sophisticated handmade pencil-drawn game interface. NOT a UI mockup or sheet, no text, no symbols, no icons, no letters. A single long warm-white rectangular scrap of sketchbook paper, width about 3 times height, silhouette nearly horizontal and level so it stretches nicely as a game button or toolbar. Ragged hand-torn fibrous edge, slight double-paper layers on lower edge, small graphite sketch hatching confined to the outside corners and a subtle short pale blue notebook rule only at the extreme left edge. The middle 85% clean opaque warm-white paper with subtle fine natural grain; plenty of flat empty area for dark labels. A tiny piece of translucent desaturated cream masking tape peeks behind upper-left corner, but does not intrude into central text area. Restrained soft ambient contact shadow. Flat front-on orthographic scan, no perspective. Complete paper object centered with generous transparent margin, alpha transparency outside and shadows fading into transparency. Elegant playful tactile scratch-paper collage, restrained detail for legibility at small size. High-quality final game UI asset.",
+      "alpha_preserved": true
+    }
+  ],
+  "integration": "scripts/paper_theme.gd uses crop/resize and StyleBoxTexture nine-patch at runtime; source PNGs remain unchanged."
+}

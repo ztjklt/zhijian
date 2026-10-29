@@ -1,0 +1,9 @@
+# Shared exclusions for caches, credentials and saves live in ../.gitignore.
+.godot/
+__pycache__/
+releases/
+export_credentials.cfg
+network_profile.json*
+paper_castle_*.json*
+.env
+.env.*

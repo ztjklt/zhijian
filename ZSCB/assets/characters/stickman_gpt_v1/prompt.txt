@@ -1,0 +1,18 @@
+Use case: stylized-concept.
+ONE transparent production cutout texture atlas for a PURE CLASSIC STICK FIGURE in a 2D drawing sandbox. User explicitly wants 火柴人 / stickman, NOT a clothed human character. Make the iconic slender round-head black-line stick figure beautiful through proportion, fluid contour quality, clear expression and elegant rounded ends.
+CRITICAL STYLE: perfectly simple round white/ivory circular head with a smooth black outline; one or two tiny black dot eyes looking to the right and a tiny friendly curved mouth. No nose, ears, hair, hats, clothing, jacket, scarf, trousers, boots, gloves, textures or skin tones. Body and limbs are thin solid matte-black ink strokes with clean rounded caps, modestly tapered for a professional animator's hand-drawn look. Hands are tiny black rounded simple shapes; feet are small horizontal black strokes, not shoes. Black and white only except the separate yellow pencil. No 3D shading. No decorative character design. Minimal, expressive, athletic and light, immediately recognizable as a stickman. When assembled, height approximately 3.5 circular head diameters.
+Deliver ONE alpha-transparent atlas in an EXACT 4-column by 3-row grid. Each component centered in its own equal cell, with at least 15% transparent margin to all cell edges. No text, labels, cell outlines, borders, assembled reference characters or animation frames. Keep each item completely separate from all others.
+Cell order:
+Row1 col1: round white head with smooth black outline and tiny right-looking face, neutral happy expression, no neck.
+Row1 col2: a single slender black torso stroke, shoulder end at top, hip at bottom, slight graceful organic curve; no limbs attached.
+Row1 col3: a straight slender black upper arm segment with rounded overlapping joint ends, shoulder top to elbow bottom.
+Row1 col4: a straight slender black forearm segment with rounded ends, elbow top to wrist bottom.
+Row2 col1: one small simple black rounded hand, wrist at top, two subtle fingertip notches, no glove.
+Row2 col2: one slender black upper leg stroke, hip top to knee bottom.
+Row2 col3: one slender black lower leg stroke, knee top to ankle bottom.
+Row2 col4: a single simple black stick-figure foot, slightly curved horizontal rounded stroke pointing RIGHT, no shoe detail.
+Row3 col1: one tiny solid black circular joint-cover dot, no collar or scarf.
+Row3 col2: a slim yellow drawing pencil pointing UP with black graphite tip and small eraser, no hand.
+Row3 col3: EXACT same circular head as row1col1, same outline and size, with closed blinking eyes; no other change.
+Row3 col4: a second small simple black hand suitable for holding the pencil, no object attached.
+Shape and stroke quality must feel deliberately drawn by a skilled 2D animator, with clean antialiasing and no polygon corners or chunky block shapes. True transparent background with clean alpha suitable for direct game compositing. This is a stickman component atlas, not a boy, mascot with clothes, paper doll, or illustration of a person.

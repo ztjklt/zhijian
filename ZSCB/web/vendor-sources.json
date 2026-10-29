@@ -1,0 +1,30 @@
+{
+  "official_url": "https://godot-releases.nbg1.your-objectstorage.com/4.6.3-stable/Godot_v4.6.3-stable_export_templates.tpz",
+  "entries": [
+    {
+      "file": "version.txt",
+      "sha256": "4855bd38072b77c73c45739cf6a6787d7df790a368b0a437102f352650e6186b",
+      "crc32": "9263573e",
+      "bytes": 13
+    },
+    {
+      "file": "web_nothreads_debug.zip",
+      "sha256": "4a8a8ef7519637f7898fad25f09d3e466965e99c04e441682e1bc2d97a548922",
+      "crc32": "fb4fb5d8",
+      "bytes": 10120053
+    },
+    {
+      "file": "web_nothreads_release.zip",
+      "sha256": "1446f79dc12f60ce5d244c39fb6628ec298337ca5c4f91a16491feea72aa1bc9",
+      "crc32": "144b6217",
+      "bytes": 9574223
+    }
+  ],
+  "font": {
+    "name": "Noto Sans CJK SC Regular",
+    "source": "https://github.com/notofonts/noto-cjk/tree/main/Sans",
+    "download": "https://cdn.jsdelivr.net/gh/notofonts/noto-cjk@main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf",
+    "license": "SIL Open Font License 1.1",
+    "sha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"
+  }
+}

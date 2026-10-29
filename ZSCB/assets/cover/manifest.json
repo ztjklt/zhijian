@@ -1,0 +1,133 @@
+{
+  "name": "纸间",
+  "version": 10,
+  "generation": "Two transparent mixed school-note fields generated with built-in image_gen; six original background/title/menu assets preserved.",
+  "background_source": "cover-v5/cover-background.png",
+  "assets": [
+    {
+      "file": "assets/background.png",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "alpha_bbox": [
+        0,
+        0,
+        1672,
+        941
+      ],
+      "source": "/Users/jitian/.codex/generated_images/01a16bc6-1ce6-7452-908d-f7ed32d872fe/exec-b606ff05-60e3-45f6-9055-e43f8a59febe.png"
+    },
+    {
+      "file": "assets/title-paper.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        157,
+        175,
+        1126,
+        1090
+      ],
+      "source": "/Users/jitian/.codex/generated_images/01a16bc6-1ce6-7452-908d-f7ed32d872fe/exec-c86c109a-3da1-493d-8349-d1d19b26014a.png"
+    },
+    {
+      "file": "assets/title-between.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        178,
+        158,
+        1104,
+        1131
+      ],
+      "source": "/Users/jitian/.codex/generated_images/01a16bc6-1ce6-7452-908d-f7ed32d872fe/exec-f3aa169e-c604-40b2-bcc7-ae6727d4685a.png"
+    },
+    {
+      "file": "assets/button-practice.png",
+      "size": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        226,
+        122,
+        1988,
+        639
+      ],
+      "source": "/Users/jitian/.codex/generated_images/01a16bc6-1ce6-7452-908d-f7ed32d872fe/exec-cce9a41b-7754-47bd-a30a-7c1b5d65686c.png"
+    },
+    {
+      "file": "assets/button-multiplayer.png",
+      "size": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        226,
+        116,
+        2003,
+        642
+      ],
+      "source": "/Users/jitian/.codex/generated_images/01a16bc6-1ce6-7452-908d-f7ed32d872fe/exec-8a110afe-e51d-48b2-b4f1-30dad0bc85b3.png"
+    },
+    {
+      "file": "assets/button-settings.png",
+      "size": [
+        1902,
+        827
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        203,
+        160,
+        1748,
+        700
+      ],
+      "source": "/Users/jitian/.codex/generated_images/01a16bc6-1ce6-7452-908d-f7ed32d872fe/exec-6cc8c348-b94e-4ff7-8db3-78d285b84470.png"
+    },
+    {
+      "file": "assets/school-left.png",
+      "size": [
+        846,
+        1859
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        21,
+        805,
+        1859
+      ],
+      "source": "/Users/jitian/.codex/generated_images/01a16bc6-1ce6-7452-908d-f7ed32d872fe/exec-2682335a-3c6e-473e-acaa-0e4db1e1d031.png"
+    },
+    {
+      "file": "assets/school-right.png",
+      "size": [
+        847,
+        1857
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        0,
+        846,
+        1857
+      ],
+      "source": "/Users/jitian/.codex/generated_images/01a16bc6-1ce6-7452-908d-f7ed32d872fe/exec-dae99461-6160-4516-9ff7-f843dd408d60.png"
+    }
+  ],
+  "preview": "cover-preview.png",
+  "layout": "layout.json",
+  "layered_preview": "preview.html",
+  "change": "左右草稿改为数学公式、几何图、古诗默写、英文单词及少量生活涂鸦混排，减少火柴人和对战元素。",
+  "previous_version": "cover-v9"
+}

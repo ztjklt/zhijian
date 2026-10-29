@@ -1,0 +1,78 @@
+{
+  "generator": "built-in image_gen.imagegen",
+  "images": [
+    {
+      "id": "oak",
+      "file": "oak.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-375a6cd6-b1ee-4fff-94c2-cfa983d48c2a.png"
+    },
+    {
+      "id": "house",
+      "file": "house.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-5f95ad9a-6fe0-4440-9f6e-bac5e911ed47.png"
+    },
+    {
+      "id": "market",
+      "file": "market.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-558bfccd-8a26-4b41-9a4c-78b1674391ed.png"
+    },
+    {
+      "id": "wall",
+      "file": "wall.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-bd467b61-e120-4a2c-b9ab-2ad40cf4b4c3.png"
+    },
+    {
+      "id": "tower",
+      "file": "tower.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-10173957-6180-4b71-bf68-dac96692a5a7.png"
+    },
+    {
+      "id": "gate",
+      "file": "gate.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-0ec425c7-f202-4fa4-81f1-a3b4c96f7ace.png"
+    },
+    {
+      "id": "pine",
+      "file": "pine.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-e2ad63a0-3c10-43b6-bf10-608506adcc0a.png"
+    },
+    {
+      "id": "barrel",
+      "file": "barrel.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-80be956b-a24c-4b86-9795-c30e7f87fce1.png"
+    },
+    {
+      "id": "crate",
+      "file": "crate.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-05ec08f4-1997-47c3-b26b-82e9ea79507d.png"
+    },
+    {
+      "id": "wagon",
+      "file": "wagon.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-4543e7bd-9f16-4ce4-9cee-bb3508aa6548.png"
+    },
+    {
+      "id": "villager",
+      "file": "villager.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-cf1534ab-85ea-44d6-90b8-58ad0fd3dfe7.png"
+    },
+    {
+      "id": "horse",
+      "file": "horse.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-e34fd369-72e8-47ab-8722-4b2da8bd0dcc.png"
+    },
+    {
+      "id": "dragon",
+      "file": "dragon.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-d4e8b1d7-8ff4-4644-97e6-5299bae90894.png"
+    },
+    {
+      "id": "driver",
+      "file": "driver.png",
+      "source": "/Users/jitian/.codex/generated_images/01a16db4-2950-7743-9007-af39905674ce/exec-47131296-21b6-4e44-9549-12dbd5c1982e.png"
+    }
+  ],
+  "final_driver_prompt": "Use case: stylized-concept. Asset type: 2D side-view game sprite for Paper Castle, displayed over cream ruled notebook paper. Style: confident BLACK ink outline, slightly wobbly hand-drawn medieval notebook doodle; medium-bold clean readable outlines, very sparse hatching, simple charming shapes. Actual transparent background and mostly transparent interiors so paper lines show through. Orthographic SIDE elevation, no perspective ground. Whole object visible with 5% clear padding. No color, no gray shading, no opaque white fills, no background scenery, no paper baked in, no text, no labels, no grids, no shadows, no watermark. Subject: ONE isolated medieval wagon driver, a peasant merchant with small soft cap and simple tunic, seated side-on facing LEFT, leaning slightly forward, arms extended left holding a pair of thin reins, legs bent at knees, boots resting lower left. No wagon, no horse, no chair, no props except reins. Charming human ink doodle, same general medieval villager style, dot eyes, simple expressive friendly face, light beard. Whole figure and reins in frame with transparent padding. Single seated character only, not spritesheet.",
+  "final_dragon_prompt": "Create a transparent PNG animation sprite sheet for a family-friendly medieval paper-doodle video game. Show one small whimsical European dragon FLYING. Eight chronological wing-flapping poses in EXACTLY four columns and two rows of equal-sized square cells, on a transparent canvas twice as wide as tall. Draw all eight dragons with thin black ink contour lines and empty transparent interiors. Same dragon identity and size, same side view facing right, same head and body position in every cell. Wing poses sequentially: raised, partly raised, horizontal, lowered, fully lowered, partly lowered, horizontal, partly raised. Each full silhouette fits its own square cell with wide empty gutters. Simple curved neck, small rounded snout, little feet, long curved tail, outlined wings with a few interior veins. Charming notebook doodle, clean readable outlines. No other subjects, no text or labels, no cell borders, no paper background, no colored fills, no ground, no shadows. This image is a game animation sheet of a flying fantasy creature only.",
+  "oak_prompt": "Use case: stylized-concept. Asset type: ONE isolated 2D side-view game sprite for Paper Castle, a game played on real cream graph notebook paper. Subject: a charming medieval oak tree, gnarled trunk, rounded irregular leafy canopy, a few clearly drawn roots. Black ink contour drawing only, lively slightly wobbly human pen strokes with consistent readable medium weight, sparse tiny hatching, airy interiors. Medieval doodle in a school notebook. Orthographic SIDE elevation, trunk bottom on horizontal baseline, complete silhouette centered with generous transparent margin. Actual transparent background, including open spaces between branches. Black lines only, no white or cream fill, no gray shading, no colored pixels, no ground plane, no graph paper baked in, no scenery, no text, no border, no shadow, no watermark. Single object only, production ready sprite. Preserve open paper-like interior so the game's graph paper shows through."
+}

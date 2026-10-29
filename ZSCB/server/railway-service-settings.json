@@ -1,0 +1,10 @@
+{
+  "dockerfilePath": "server/Dockerfile",
+  "rootDirectory": "/",
+  "numReplicas": 1,
+  "healthcheckPath": "/healthz",
+  "healthcheckTimeout": 60,
+  "restartPolicyType": "ON_FAILURE",
+  "restartPolicyMaxRetries": 3,
+  "sleepApplication": false
+}

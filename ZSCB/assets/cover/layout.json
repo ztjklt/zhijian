@@ -1,0 +1,131 @@
+{
+  "canvas": [
+    1672,
+    941
+  ],
+  "layers": [
+    {
+      "id": "background",
+      "file": "assets/background.png",
+      "rect": [
+        0,
+        0,
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "school-left",
+      "file": "assets/school-left.png",
+      "crop": [
+        0,
+        0,
+        560,
+        1859
+      ],
+      "rect": [
+        0,
+        -30,
+        454,
+        1000
+      ],
+      "opacity": 0.72,
+      "decorative": true
+    },
+    {
+      "id": "school-right",
+      "file": "assets/school-right.png",
+      "rect": [
+        1246,
+        -30,
+        454,
+        1000
+      ],
+      "opacity": 0.72,
+      "decorative": true
+    },
+    {
+      "id": "title-paper",
+      "file": "assets/title-paper.png",
+      "crop": [
+        157,
+        175,
+        969,
+        915
+      ],
+      "rect": [
+        70,
+        92,
+        181,
+        171
+      ]
+    },
+    {
+      "id": "title-between",
+      "file": "assets/title-between.png",
+      "crop": [
+        178,
+        158,
+        926,
+        973
+      ],
+      "rect": [
+        267,
+        85,
+        169,
+        178
+      ]
+    },
+    {
+      "id": "practice",
+      "file": "assets/button-practice.png",
+      "crop": [
+        210,
+        106,
+        1794,
+        549
+      ],
+      "rect": [
+        66,
+        414,
+        366,
+        112
+      ],
+      "rotation": -3
+    },
+    {
+      "id": "multiplayer",
+      "file": "assets/button-multiplayer.png",
+      "crop": [
+        210,
+        100,
+        1809,
+        558
+      ],
+      "rect": [
+        1271,
+        410,
+        350,
+        108
+      ],
+      "rotation": 3
+    },
+    {
+      "id": "settings",
+      "file": "assets/button-settings.png",
+      "crop": [
+        187,
+        144,
+        1577,
+        572
+      ],
+      "rect": [
+        1352,
+        616,
+        232,
+        84
+      ],
+      "rotation": -3
+    }
+  ]
+}
