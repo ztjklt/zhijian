@@ -256,8 +256,9 @@ func carry_position() -> Vector2:
 	return player.position + Vector2(float(facing) * CARRY_DISTANCE, -CARRY_HEIGHT)
 
 func carried_index() -> int:
+	if carried_id == "": return -1
 	for index in objects.size():
-		if str(objects[index].get("id", "")) == carried_id: return index
+		if str(objects[index].get("id", objects[index].get("structure_id", ""))) == carried_id: return index
 	return -1
 
 func toggle_carry() -> bool:
@@ -316,7 +317,8 @@ func pick_carried(index: int) -> bool:
 	if Vector2(object.x, object.y).distance_to(player.position) > DrawingRules.BUILD_RANGE:
 		message("请走近部件，在 12 米内拿起"); return false
 	var body: RigidBody2D = object_nodes[index]
-	carried_id = str(object.id)
+	# Single-player drawings have a stable structure key, but no network id.
+	carried_id = str(object.get("id", object.get("structure_id", "")))
 	carried_previous = {"layer": body.collision_layer, "mask": body.collision_mask, "freeze": body.freeze}
 	body.freeze = true
 	body.linear_velocity = Vector2.ZERO
@@ -1043,13 +1045,14 @@ func _update_object_activity() -> void:
 		for body in object_nodes: body.freeze = true
 		return
 	var active: Dictionary = structure_links.active_keys(network_centers()) if structure_links != null else {}
+	var carried := carried_index()
 	for i in object_nodes.size():
 		if i < objects.size() and object_nodes[i]:
 			var object: Dictionary = objects[i]
 			if object.get("dynamic", true):
 				var far := not active.has(object.get("structure_id", ""))
 				if object_nodes[i] is RigidBody2D:
-					object_nodes[i].freeze = far or (drag != null and selected == i) or carried_id == object.get("id", "")
+					object_nodes[i].freeze = far or (drag != null and selected == i) or carried == i
 
 func _rebuild_objects() -> void:
 	if structure_links != null:

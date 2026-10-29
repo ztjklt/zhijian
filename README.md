@@ -8,6 +8,8 @@
 
 **Godot 完整工程现已收录：[ZSCB/project.godot](ZSCB/project.godot) · [源码运行说明](SOURCE_SYNC.md)**
 
+2026-10-29：已修复携物空状态引发的造物误冻，完整隔离回归 **145／145 通过**。[修复记录](ZSCB/docs/CARRY_ACTIVITY_FIX_2026-10-29.md)
+
 <sub>历史名称：指尖、纸上城堡</sub>
 
 ![开发中](https://img.shields.io/badge/状态-开发中-89755B?style=flat-square)
