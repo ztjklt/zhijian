@@ -48,3 +48,6 @@ exports/
 ZSCB/docs/previews/
 ZSCB/docs/superpowers/evidence/
 ZSCB/web/deployment.json
+
+# Local execution ledger
+.superpowers/

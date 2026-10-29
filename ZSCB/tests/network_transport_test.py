@@ -1,5 +1,6 @@
 """Real TCP tests for the HTTP gateway; no cloud services or user saves."""
 from __future__ import annotations
+from runtime_tools import resolve_godot, user_data_path
 import base64
 import hashlib
 import importlib.util
@@ -8,6 +9,7 @@ import socketserver
 import struct
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -166,7 +168,9 @@ class WebSocketClient:
         if attach_epoch and value.get("type") == "command" and "epoch" not in value:
             value = dict(value, epoch=self.epoch)
         if value.get("type") in ("create", "join") and "protocol" not in value:
-            value = dict(value, protocol=10)
+            codec = Path(__file__).resolve().parents[1] / "scripts/net/codec.gd"
+            version = int(re.search(r"const PROTOCOL := (\d+)", codec.read_text()).group(1))
+            value = dict(value, protocol=version)
         payload = json.dumps(value, separators=(",", ":")).encode()
         header = b"\x81"
         if len(payload) < 126:
@@ -267,7 +271,7 @@ class GodotTransportTests(unittest.TestCase):
         project_config = cls.project / "project.godot"
         cls.user_name = "PaperTransportIsolated_" + uuid.uuid4().hex
         project_config.write_text(project_config.read_text().replace("纸上城堡 · 火柴人沙盒", cls.user_name))
-        cls.godot = os.environ.get("GODOT_BIN", str(Path.home() / "Applications/Godot.app/Contents/MacOS/Godot"))
+        cls.godot = resolve_godot()
         imported = subprocess.run([cls.godot, "--headless", "--path", str(cls.project), "--editor", "--import", "--quit"], capture_output=True, text=True, timeout=60)
         if imported.returncode or "SCRIPT ERROR" in imported.stderr:
             raise AssertionError(imported.stdout + imported.stderr)
@@ -313,7 +317,7 @@ class GodotTransportTests(unittest.TestCase):
             server_output = cls.log.read()
             cls.log.close()
         cls.temp.cleanup()
-        user_data = Path.home() / "Library/Application Support/Godot/app_userdata" / cls.user_name
+        user_data = user_data_path(cls.user_name) if cls.user_name else None
         if cls.user_name and user_data.exists():
             shutil.rmtree(user_data)
         if "SCRIPT ERROR" in server_output or "ERROR:" in server_output:

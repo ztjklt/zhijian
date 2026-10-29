@@ -10,6 +10,9 @@ func run()->void:
 	var game=load("res://scenes/medieval.tscn").instantiate();game.onboarding.persist=false;root.add_child(game)
 	game.set_physics_process(false);game.player.freeze=true
 	var controls=game.map_controls
+	# Exercise the browser's bundled CJK metrics even on hosts with PingFang installed.
+	if ResourceLoader.exists("res://assets/fonts/NotoSansCJKsc-Regular.otf"):
+		for ui in [game.toolbar,controls]:ui.theme.default_font=load("res://assets/fonts/NotoSansCJKsc-Regular.otf")
 	var button=controls.get("trial_button")
 	check(button!=null,"map controls expose a real optional-event action")
 	if button!=null:
@@ -44,7 +47,12 @@ func run()->void:
 			game.toolbar.navigation_open=true
 			for i in 4:await process_frame
 			controls._process(0)
+			print("MILL UI EXPANDED size=",size," panel=",controls.panel.get_global_rect()," minimum=",controls.panel.get_combined_minimum_size()," navigation=",controls.navigation.get_global_rect()," note=",controls.trial_note.get_global_rect()," tools=",game.toolbar.bottom.get_global_rect())
 			check(Rect2(Vector2.ZERO,Vector2(size)).encloses(controls.panel.get_global_rect()),"expanded navigation stays inside "+str(size))
+			var expanded_overlap:=false
+			for tool in game.toolbar.bottom.find_children("*","BaseButton",true,false):
+				if tool.is_visible_in_tree() and controls.panel.get_global_rect().intersects(tool.get_global_rect()):expanded_overlap=true
+			check(not expanded_overlap,"expanded navigation avoids actual tool buttons at "+str(size))
 			var nav_press:=InputEventScreenTouch.new();nav_press.index=73;nav_press.pressed=true;nav_press.position=button.get_global_rect().get_center()
 			game.touch_controls.handle_touch(nav_press)
 			check(game.touch_controls.owners.get(73,"")=="ui","expanded event action avoids movement ownership at "+str(size))

@@ -1,3 +1,4 @@
+from runtime_tools import resolve_godot, user_data_path
 """Three actual Godot processes sharing one random private test profile."""
 from pathlib import Path
 import argparse
@@ -16,9 +17,9 @@ args = parser.parse_args()
 core = Path(__file__).resolve().parents[1]
 source = args.project_source.resolve() if args.project_source else core
 tests = args.tests_source.resolve() if args.tests_source else core / 'tests'
-godot = Path.home() / 'Applications/Godot.app/Contents/MacOS/Godot'
+godot = resolve_godot()
 name = 'PaperProfileRestart_' + uuid.uuid4().hex
-data = Path.home() / 'Library/Application Support/Godot/app_userdata' / name
+data = user_data_path(name)
 with tempfile.TemporaryDirectory(prefix='paper-profile-restart-') as folder:
     project = Path(folder) / 'project'
     shutil.copytree(source, project, ignore=shutil.ignore_patterns('.godot', '__pycache__'))

@@ -375,6 +375,7 @@ func restore_state(state: Dictionary) -> void:
 	for id in state.get("bookmarks", []): collected[int(id)] = true
 
 func respawn() -> void:
+	if game.carried_id != "" and game.network_session == null: game.drop_carried()
 	if game.network_session != null:
 		game.network_session.send_op("respawn")
 		return

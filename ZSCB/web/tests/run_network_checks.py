@@ -15,7 +15,7 @@ import tempfile
 
 ROOT=Path(__file__).resolve().parents[3]
 parser=argparse.ArgumentParser(add_help=False)
-parser.add_argument('--client-project',type=Path,default=ROOT/'dist/纸间网页版-20261025-r7/project')
+parser.add_argument('--client-project',type=Path,default=ROOT/'dist/纸间网页候选-r22/project')
 parser.add_argument('--matched-source',type=Path,help='Frozen source for server and tests; defaults to Web release manifest')
 args,forwarded=parser.parse_known_args()
 if args.matched_source is None:
@@ -60,8 +60,9 @@ with tempfile.TemporaryDirectory(prefix='paper-web-network-') as temp:
     source=runner.read_text().replace('import argparse','import argparse, re')
     old='cfg.read_text().replace(\'config/name="纸上城堡 · 火柴人沙盒"\',f\'config/name="{name}"\')'
     new='re.sub(r\'^config/name=.*$\',f\'config/name="{name}"\',cfg.read_text(),flags=re.M)'
-    if source.count(old)!=1:raise RuntimeError('Review fixed-r2 runner profile isolation before use')
-    runner.write_text(source.replace(old,new,1))
+    if source.count(old)==1: source=source.replace(old,new,1)
+    elif new not in source: raise RuntimeError('Review runner profile isolation before use')
+    runner.write_text(source)
     # The frozen runner's client rename then targets the unique seed namespace.
     sys.argv=[str(runner),'--project-source',str(fixture),*forwarded]
     sys.path.insert(0,str(tests))

@@ -1,12 +1,13 @@
+from runtime_tools import resolve_godot, user_data_path
 """Run all behavior tests once in a disposable project, with private data per test."""
 from pathlib import Path
 import re, shutil, subprocess, tempfile, uuid
 source=Path(__file__).resolve().parents[1]
-godot=Path.home()/'Applications/Godot.app/Contents/MacOS/Godot'
+godot=resolve_godot()
 failed=[]; names=[]
 with tempfile.TemporaryDirectory(prefix='paper-full-suite-') as folder:
     project=Path(folder)/'project'
-    shutil.copytree(source,project,ignore=shutil.ignore_patterns('.godot','__pycache__'))
+    shutil.copytree(source,project,ignore=shutil.ignore_patterns('.godot','__pycache__','releases','previews','evidence'))
     # Documentation captures are evidence, not runtime/importable assets.
     (project / 'docs' / '.gdignore').touch()
     config=project/'project.godot'; original=config.read_text()
@@ -38,5 +39,5 @@ with tempfile.TemporaryDirectory(prefix='paper-full-suite-') as folder:
         raise SystemExit(1 if failed else 0)
     finally:
         for name in names:
-            data=Path.home()/'Library/Application Support/Godot/app_userdata'/name
+            data=user_data_path(name)
             if data.exists(): shutil.rmtree(data)

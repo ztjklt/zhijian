@@ -37,8 +37,13 @@ var preview_x := 0.0
 var preview_y := 0.0
 var selected := -1
 var drag = null
-var carried_id := ""
-var carried_previous: Dictionary = {}
+var carry_controller = preload("res://scripts/carry_controller.gd").new(self)
+var carried_id: String:
+	get: return carry_controller.id
+	set(value): carry_controller.id = value
+var carried_previous: Dictionary:
+	get: return carry_controller.previous
+	set(value): carry_controller.previous = value
 const CARRY_DISTANCE := 0.82
 const CARRY_HEIGHT := 0.72
 const CARRY_DROP_OFFSET := 0.42
@@ -99,6 +104,7 @@ var backpack_panel: Control = null
 var backpack_ui = null
 var onboarding := PaperOnboarding.new()
 var first_work
+var next_steps
 var character_visual: Node2D
 var experience: PaperExperience
 # Online presentation and authoritative rooms keep independent state.
@@ -217,6 +223,9 @@ func _ready() -> void:
 	cooperation_panel=preload("res://scripts/cooperation_panel.gd").new()
 	cooperation_panel.game=self
 	lab_layer.add_child(cooperation_panel)
+	next_steps=preload("res://scripts/next_steps.gd").new()
+	next_steps.game=self
+	lab_layer.add_child(next_steps)
 	map_controls = preload("res://scripts/medieval_controls.gd").new()
 	map_controls.game = self
 	ui_layer.add_child(map_controls)
@@ -243,7 +252,11 @@ func lab_open() -> bool:
 	return weapon_lab_panel != null and weapon_lab_panel.visible
 
 func personal_overlay_open() -> bool:
-	return cooperation_open() or lab_open() or (experience != null and experience.visible)
+	return next_steps_open() or cooperation_open() or lab_open() or (experience != null and experience.visible)
+
+func next_steps_open()->bool:return next_steps!=null and next_steps.visible
+func open_next_steps()->void:
+	if next_steps!=null:next_steps.open()
 
 func cooperation_open()->bool:return cooperation_panel!=null and cooperation_panel.visible
 func open_cooperation()->void:cooperation_panel.open()
@@ -256,50 +269,13 @@ func carry_position() -> Vector2:
 	return player.position + Vector2(float(facing) * CARRY_DISTANCE, -CARRY_HEIGHT)
 
 func carried_index() -> int:
-	if carried_id == "": return -1
-	for index in objects.size():
-		if str(objects[index].get("id", objects[index].get("structure_id", ""))) == carried_id: return index
-	return -1
+	return carry_controller.index()
 
 func toggle_carry() -> bool:
-	if network_session != null:
-		if carried_id != "":
-			network_session.send_op("carry", {"action": "drop", "id": carried_id, "version": objects[carried_index()].version if carried_index() >= 0 else -1})
-			return true
-		if selected >= 0 and selected < objects.size():
-			var candidate: Dictionary = objects[selected]
-			if can_cooperate(candidate):
-				network_session.send_op("carry", {"action": "pick", "id": candidate.id, "version": candidate.version})
-				message("正在等待服务器确认拿起…")
-				return true
-		message("先用 4 选中一个可搬动的部件")
-		return false
-	if carried_id != "": return drop_carried()
-	if selected < 0 or selected >= objects.size():
-		message("先用 4 选中一个部件")
-		return false
-	return pick_carried(selected)
+	return carry_controller.toggle()
 
 func apply_carry_state(id: String) -> void:
-	if id == carried_id: return
-	if carried_id != "":
-		var old_index := carried_index()
-		if old_index >= 0 and old_index < object_nodes.size():
-			var old_body: RigidBody2D = object_nodes[old_index]
-			old_body.collision_layer = int(carried_previous.get("layer", 1)) if not carried_previous.is_empty() else (8 if objects[old_index].get("kind", "") in ["gate", "ladder"] else 1)
-			old_body.collision_mask = int(carried_previous.get("mask", 1)) if not carried_previous.is_empty() else 1 | 8 | 64 | 128
-			old_body.freeze = bool(carried_previous.get("freeze", false))
-	carried_id = id
-	carried_previous.clear()
-	if carried_id == "": return
-	var index := carried_index()
-	if index < 0 or index >= object_nodes.size(): carried_id = ""; return
-	var body: RigidBody2D = object_nodes[index]
-	carried_previous = {"layer": body.collision_layer, "mask": body.collision_mask, "freeze": body.freeze}
-	body.freeze = true
-	body.collision_layer = 0
-	body.collision_mask = 0
-	selected = index
+	carry_controller.apply_remote(id)
 
 func apply_carry_result(result: Dictionary) -> void:
 	if not result.get("ok", false):
@@ -309,83 +285,14 @@ func apply_carry_result(result: Dictionary) -> void:
 	message("已拿起部件 · G 放下 · 可继续移动" if carried_id != "" else "已放下部件")
 
 func pick_carried(index: int) -> bool:
-	if index < 0 or index >= objects.size() or index >= object_nodes.size(): return false
-	var object: Dictionary = objects[index]
-	if not can_cooperate(object): message("没有权限拿起这个部件"); return false
-	if structure_links != null and structure_links.linked(object.get("structure_id", "")):
-		message("部件已连接，请先解除连接再拿起"); return false
-	if Vector2(object.x, object.y).distance_to(player.position) > DrawingRules.BUILD_RANGE:
-		message("请走近部件，在 12 米内拿起"); return false
-	var body: RigidBody2D = object_nodes[index]
-	# Single-player drawings have a stable structure key, but no network id.
-	carried_id = str(object.get("id", object.get("structure_id", "")))
-	carried_previous = {"layer": body.collision_layer, "mask": body.collision_mask, "freeze": body.freeze}
-	body.freeze = true
-	body.linear_velocity = Vector2.ZERO
-	body.angular_velocity = 0
-	body.collision_layer = 0
-	body.collision_mask = 0
-	selected = index
-	update_carried_object()
-	message("已拿起部件 · G 放下 · 可继续移动")
-	return true
+	return carry_controller.pick(index)
 
 func update_carried_object() -> void:
-	if carried_id == "": return
-	var index := carried_index()
-	if index < 0 or index >= object_nodes.size():
-		carried_id = ""
-		carried_previous.clear()
-		return
-	var body: RigidBody2D = object_nodes[index]
-	var target := carry_position()
-	body.position = target
-	body.rotation = float(objects[index].get("angle", 0.0))
-	objects[index].x = target.x
-	objects[index].y = target.y
+	carry_controller.step()
 
 func drop_carried() -> bool:
-	var index := carried_index()
-	if index < 0 or index >= object_nodes.size(): carried_id = ""; carried_previous.clear(); return false
-	var object: Dictionary = objects[index]
-	var body: RigidBody2D = object_nodes[index]
-	var old_layer: int = int(carried_previous.get("layer", 1))
-	var old_mask: int = int(carried_previous.get("mask", 1))
-	body.collision_layer = old_layer
-	body.collision_mask = old_mask
-	var candidate := object.duplicate(true)
-	candidate.x = body.position.x + float(facing) * CARRY_DROP_OFFSET; candidate.y = body.position.y
-	body.collision_layer = 0
-	body.collision_mask = 0
-	var probe := _carry_probe(candidate)
-	if probe == null:
-		body.collision_layer = old_layer; body.collision_mask = old_mask
-		message("这里没有安全落点，仍在携带中")
-		return false
-	probe.free()
-	body.collision_layer = old_layer
-	body.collision_mask = old_mask
-	object.x = candidate.x; object.y = candidate.y
-	body.position = Vector2(object.x, object.y)
-	body.freeze = bool(carried_previous.get("freeze", false))
-	body.linear_velocity = Vector2.ZERO
-	body.angular_velocity = 0
-	carried_id = ""
-	carried_previous.clear()
-	message("已放下部件")
-	return true
+	return carry_controller.drop()
 
-func _carry_probe(object: Dictionary) -> RigidBody2D:
-	var node: RigidBody2D = build_object_scene.instantiate()
-	node.setup(object)
-	if node.get_child_count() == 0:
-		node.free()
-		return null
-	var clearance := PaperSpawnClearance.resolve(self, node, object)
-	if not clearance.valid:
-		node.free()
-		return null
-	return node
 func cooperation_action(id:String,enabled:bool)->void:
 	if network_session==null:message("请先进入双人房间");return
 	for object in objects:
@@ -401,7 +308,8 @@ func receive_cooperation(state:Dictionary)->void:
 		drag=null;selected=-1;connection_source.clear();message("协作许可或编辑者已变化，请重新选择部件")
 
 func close_personal_overlay() -> void:
-	if cooperation_open():cooperation_panel.close()
+	if next_steps_open():next_steps.close()
+	elif cooperation_open():cooperation_panel.close()
 	elif lab_open(): weapon_lab_panel.close()
 	elif experience != null: experience.close()
 
@@ -523,6 +431,7 @@ func change_map(kind: String) -> void:
 		message("房间地图固定；退出后可另开房间")
 		return
 	if kind not in ["knowledge-v1", "nature-v1", "medieval-v1"] or kind == world_kind: return
+	if carried_id != "" and not drop_carried(): return
 	retain_active_stroke()
 	cancel_pointer()
 	sync_objects()
@@ -573,6 +482,7 @@ func respawn_medieval() -> void:
 		network_session.send_op("respawn")
 		return
 	if medieval_world == null: return
+	if carried_id != "": drop_carried()
 	retain_active_stroke()
 	cancel_pointer()
 	player.reset_movement()
@@ -741,6 +651,7 @@ func restore(snap: Dictionary) -> void:
 	if saved_world.get("id", "paper") == "medieval-v1" and not preload("res://scripts/medieval_world.gd").validate_snapshot(saved_world):
 		message("作品状态或版本无效，当前世界已保留")
 		return
+	if saved_world.id != world_kind: carry_controller.clear()
 	map_workspaces = _clone(saved_world.get("maps", {}))
 	if saved_world.id != world_kind:
 		select_world(saved_world.id)
@@ -780,8 +691,8 @@ func restore(snap: Dictionary) -> void:
 	preview_paths = null
 	selected = -1
 	drag = null
-	carried_id = ""
-	carried_previous.clear()
+	# Undo/redo retain an extant held part by stable identity. Rebuild clears
+	# state itself if that part was removed by the restored snapshot.
 	_rebuild_objects()
 	structure_links.restore(saved_world.get("connections", []))
 	refresh_buttons()
@@ -1064,6 +975,7 @@ func _rebuild_objects() -> void:
 	for object in objects:
 		object_nodes.append(_build_physics_for_object(object))
 	if structure_links != null: structure_links.rebuild()
+	carry_controller.reapply()
 
 func toggle_mode() -> void:
 	if mode == "build" and draft.size() > 0:
@@ -1127,6 +1039,7 @@ func delete_selected() -> void:
 		return
 	_finish_drag()
 	record()
+	if selected == carried_index(): carry_controller.clear()
 	objects.remove_at(selected)
 	selected = -1
 	_rebuild_objects()
@@ -1701,6 +1614,7 @@ func _physics_process(delta: float) -> void:
 	elif knowledge_world != null and player.position.y < GROUND_Y - 4:
 		knowledge_world.respawn()
 	elif medieval_world == null and player.position.y < GROUND_Y - 4:
+		if carried_id != "": drop_carried()
 		player.reset_movement()
 		player.position = Vector2(camera_x, GROUND_Y + 0.54)
 		player.linear_velocity = Vector2.ZERO
@@ -1903,7 +1817,6 @@ func cancel_pointer() -> void:
 	active_stroke = null
 	draw_cursor = null
 	_finish_drag()
-	if carried_id != "" and network_session == null: drop_carried()
 
 func set_connection_tool(value: String) -> void:
 	if value not in ["move", "fixed", "hinge", "unlink"]: return
@@ -1938,20 +1851,23 @@ func connection_pointer(point: Vector2) -> void:
 	if source == null: connection_source.clear(); message("原部件已不存在，请重新选择"); return
 	var first: Vector2 = source.to_global(connection_source.point)
 	if first.distance_to(point) > .5: message("两个锚点相距太远，请选同一接缝附近"); return
-	connection_action({"action":"connect", "a":source_key, "b":key, "point":first.lerp(point,.5), "kind":connection_tool})
-	connection_source.clear()
+	if connection_action({"action":"connect", "a":source_key, "b":key, "point":first.lerp(point,.5), "kind":connection_tool}):
+		connection_source.clear()
 
-func connection_action(data: Dictionary) -> void:
+func connection_action(data: Dictionary) -> bool:
 	if network_session != null:
-		network_session.send_op("structure_link", data)
+		# A rejected send has no receipt to wait for. Keep its readiness notice
+		# and the unsent material anchor for an explicit retry after resync.
+		if network_session.send_op("structure_link", data) <= 0: return false
 		message("正在等待服务器确认连接…")
-		return
+		return true
 	var before := snapshot()
 	var result: Dictionary = structure_links.create(data.a,data.b,data.point,data.kind) if data.action == "connect" else structure_links.remove(data.id)
 	if result.ok:
 		record(before)
 		message("转轴已连接 · 部件可以绕接缝转动" if data.get("kind", "") == "hinge" else "连接已解除 · 部件仍保留" if data.action == "unlink" else "固定连接完成 · 部件一起受力")
 	else: message(result.error)
+	return true # Local attempt completed; retain the existing selection lifecycle.
 
 func retain_active_stroke() -> void:
 	# Modal UI and focus loss finish valid ink as a draft, never as a world object.

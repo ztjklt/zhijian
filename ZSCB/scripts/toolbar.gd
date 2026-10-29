@@ -117,6 +117,7 @@ func _ready() -> void:
 	works.get_popup().add_item("武器试打 / 方案对照", 10)
 	works.get_popup().add_item("双人协作 / 共同搭建", 11)
 	works.get_popup().add_item("第一件作品 / 新手引导", 12)
+	works.get_popup().add_item("接下来做什么", 13)
 	works.get_popup().id_pressed.connect(func(id: int):
 		if id == 6: training_button.pressed.emit()
 		elif id == 0: game.save_game()
@@ -129,6 +130,7 @@ func _ready() -> void:
 		elif id == 9: game.save_and_return_to_title()
 		elif id == 10: game.open_weapon_lab()
 		elif id == 11: game.open_cooperation()
+		elif id == 13: game.open_next_steps()
 		elif id == 12: game.first_work.start();last_state="";update_buttons()
 		elif id == 3 and game.touch_controls != null:
 			game.touch_controls.force_visible = not game.touch_controls.force_visible
@@ -438,7 +440,7 @@ func update_buttons() -> void:
 	guide_skip.text="跳过引导，继续自由创作" if work else "明白了，开始创作"
 	if work:
 		guide_title.text=game.first_work.title();guide_body.text=game.first_work.body_text();guide_action.text=game.first_work.action_text()
-		first_work_action.text=["1 画","确认生成","4 搬动","保存","完成"][game.first_work.stage]
+		first_work_action.text=["1 画","确认生成","4 搬动","保存","下一步"][game.first_work.stage]
 		if game.first_work.stage==1:first_work_action.text={1:"1 生成",3:"2 生成",5:"5 塑形"}.get(game.first_work.drawing_mode,"确认生成")
 		if game.first_work.stage==1 and game.draw_mode!=game.first_work.drawing_mode:first_work_action.text="回到笔迹"
 		if compact and status_text.is_empty():status_label.text=game.first_work.short_hint()
