@@ -25,6 +25,9 @@ func _ready()->void:
 	label(content,"武器试打 · 由你布置临时试靶，实际攻击并保留方案对照；不替换当前武器。",14)
 	notice=label(column,"",14);notice.add_theme_color_override("font_color",PaperTheme.TEAL)
 	button(column,"free","继续自由创作",close)
+	# Wrapped CJK labels can initially report a tall minimum at zero width.
+	# Fit again after containers establish their real widths and minima.
+	panel.minimum_size_changed.connect(_layout.call_deferred)
 	get_viewport().size_changed.connect(_layout);_layout();hide()
 func label(parent:Node,text:String,font_size:int)->Label:
 	var item:=Label.new();item.text=text;item.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;item.size_flags_horizontal=Control.SIZE_EXPAND_FILL;item.add_theme_font_size_override("font_size",font_size);parent.add_child(item);return item

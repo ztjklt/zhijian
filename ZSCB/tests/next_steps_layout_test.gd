@@ -10,6 +10,7 @@ func run()->void:
 		root.size=dimensions;await process_frame;await process_frame
 		game.open_next_steps();await process_frame;await process_frame
 		var screen:=Rect2(Vector2.ZERO,Vector2(root.size))
+		if not screen.encloses(panel.panel.get_global_rect()):print("LAYOUT_DIAGNOSTIC requested=",dimensions," root=",root.size," viewport=",root.get_visible_rect()," panel=",panel.panel.get_global_rect()," minimum=",panel.panel.get_combined_minimum_size()," scale=",panel.scale)
 		check(panel.buttons.free.get_theme_color("font_focus_color")==PaperTheme.INK,"focused continue remains readable")
 		check(screen.encloses(panel.panel.get_global_rect()),"panel fits "+str(dimensions))
 		check(screen.encloses(panel.buttons.free.get_global_rect()),"continue remains visible "+str(dimensions))
