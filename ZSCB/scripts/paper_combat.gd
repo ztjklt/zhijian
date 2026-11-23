@@ -15,6 +15,8 @@ var fire_clock := 0.0
 var score := 0
 var emitter := Vector2.ZERO
 const SWING_DURATION := 0.36
+const SHOT_RECOIL_DURATION := 0.22
+const MELEE_CHAIN_WINDOW := 0.65
 const MAX_PROJECTILES := 64
 var natives: Array = []
 var natives_enabled := false
@@ -34,6 +36,8 @@ var blade_delta := 1.0 / 60.0
 var previous_swing := 0.0
 var impact_hold := 0.0
 var motion_index := 0
+var melee_motion_override := -1
+var melee_grip_lowering := 0.0
 var chain_window := 0.0
 var queued_attack := 0.0
 var queued_direction := Vector2.RIGHT
@@ -81,6 +85,34 @@ func is_firearm() -> bool:
 
 func swing_duration() -> float:
 	return PaperWeaponTypes.duration(game.equipped_weapon)
+
+static func melee_motion(kind: String, previous: int, chaining: bool) -> int:
+	if kind == "hammer": return 3
+	if kind == "spear": return 2
+	return (previous + 1) % PaperWeaponMotion.MOVES.size() if chaining else 0
+
+func visible_swing() -> float:
+	if game.network_session == null: return swing
+	var intent = game.network_session.combat_intent
+	if intent.showing("melee"): return intent.remaining
+	return 0.0 if intent.hide_swing else swing
+
+func visible_motion() -> int:
+	if game.network_session != null and game.network_session.combat_intent.showing("melee"):
+		return game.network_session.combat_intent.motion
+	return motion_index
+
+func visible_shot_recoil() -> float:
+	if game.network_session == null: return shot_recoil
+	var intent = game.network_session.combat_intent
+	if intent.showing("firearm"): return intent.remaining
+	return 0.0 if intent.hide_shot else shot_recoil
+
+func visible_ranged_direction() -> Vector2:
+	if game.network_session != null and game.network_session.combat_intent.showing("firearm"):
+		return game.network_session.combat_intent.direction
+	if bow_charge > 0 or visible_shot_recoil() > 0: return bow_direction
+	return (game.aim_world - game.player.position).normalized()
 
 func shoot_bullet(origin: Vector2, direction: Vector2, team: String, stamp: Dictionary = {}) -> void:
 	if projectiles.size() >= MAX_PROJECTILES: return
@@ -145,7 +177,13 @@ func add_damage_text(at: Vector2, amount: float) -> void:
 	effects.append({"position": at, "text": "−%d" % amount, "time": 0.8, "color": Color("b52335")})
 
 func blade_active() -> bool:
-	var remaining := swing / swing_duration()
+	return _blade_active_at(swing)
+
+func visible_blade_active() -> bool:
+	return _blade_active_at(visible_swing())
+
+func _blade_active_at(time_left: float) -> bool:
+	var remaining := time_left / swing_duration()
 	return remaining > 0.12 / SWING_DURATION and remaining <= 1.0 - 0.07 / SWING_DURATION and recoil <= 0
 
 func clash(at: Vector2, native = null, contact_time: float = 1.0) -> void:
@@ -161,6 +199,10 @@ func clash(at: Vector2, native = null, contact_time: float = 1.0) -> void:
 
 func hurt_player(amount: float, direction: Vector2, contact: Vector2 = Vector2.INF, weapon_type: String = "sword") -> void:
 	if invulnerable > 0: return
+	var world = _medieval_world()
+	if world is MedievalWorld and world.game == game and world.single_player_ink() and world.survival != null:
+		# Positive hits keep at least one point, without increasing sub-point damage.
+		amount -= minf(world.survival.armor(),maxf(0.0,amount-1.0))
 	var lost := minf(health, maxf(0, amount))
 	health = maxf(0, health - lost)
 	invulnerable = 0.7
@@ -239,7 +281,7 @@ func attack(direction: Vector2) -> void:
 			return
 		bow_direction = direction
 		shoot_bullet(game.player.position + Vector2(0,.43), direction, "player", _lab().ticket() if _lab()!=null else {})
-		shot_recoil = .22
+		shot_recoil = SHOT_RECOIL_DURATION
 		cooldown = .75
 		PaperCombatAudio.impact(game.feedback,"shoot",game.player.position + direction*.45,"firearm")
 		return
@@ -260,8 +302,8 @@ func attack(direction: Vector2) -> void:
 	player_paths = game.character_visual.sample_weapon()
 	previous_player_paths = player_paths
 	var kind := PaperWeaponTypes.kind(weapon)
-	motion_index = 3 if kind=="hammer" else 2 if kind=="spear" else (motion_index + 1) % PaperWeaponMotion.MOVES.size() if chain_window > 0 else 0
-	chain_window = 0.65
+	motion_index = melee_motion_override if melee_motion_override>=0 else melee_motion(kind, motion_index, chain_window > 0)
+	chain_window = MELEE_CHAIN_WINDOW
 	queued_attack = 0
 	swing_direction = direction
 	cooldown = PaperWeaponTypes.attack_cooldown(weapon)
@@ -311,9 +353,23 @@ func _medieval_world():
 	# Older map fixtures need not provide this optional world at all.
 	return game.medieval_world if "medieval_world" in game else null
 
-func _damage_medieval(entity,amount: float,at: Vector2,impulse: Vector2,weapon_type: String) -> void:
+func _local_war_god():
 	var world=_medieval_world()
-	if world is MedievalWorld:world.damage_entity(entity,amount,at,impulse,weapon_type)
+	if not world is MedievalWorld or not world.single_player_ink():return null
+	return world.get_node_or_null("SandboxWarGod")
+
+func _damage_medieval(entity,amount: float,at: Vector2,impulse: Vector2,weapon_type: String, own_hit := true) -> void:
+	var world=_medieval_world()
+	if world is MedievalWorld:
+		var was_alive: bool = entity.alive
+		world.damage_entity(entity,amount,at,impulse,weapon_type)
+		if own_hit and was_alive and not entity.alive and world.survival != null:
+			var service = world.survival
+			var actor_id := ""
+			if game == world.game: actor_id = service.PLAYER
+			elif game == service.agent_rig(service.ADVENTURER): actor_id = service.ADVENTURER
+			elif game == service.agent_rig(service.COMPANION): actor_id = service.COMPANION
+			if actor_id != "": service.Guild.credit_defeat(service,actor_id,entity.kind)
 	elif world!=null:world.damage_entity(entity,amount,at,impulse)
 
 func _medieval_target_alive(entity) -> bool:
@@ -374,7 +430,7 @@ func step(delta: float, advance_projectiles: bool = true) -> void:
 			var reserve = game.get("ink")
 			if reserve == null or reserve.spend(PaperInkReserve.ARROW_COST):
 				shoot_arrow(game.player.position + Vector2(0, 0.43), bow_direction, "player", bow_ticket)
-				shot_recoil = 0.22
+				shot_recoil = SHOT_RECOIL_DURATION
 				PaperCombatAudio.impact(game.feedback,"shoot",game.player.position + bow_direction * 0.45,"bow")
 			else: game.message("墨水不足，箭未射出；近战仍可使用")
 	for native in natives:
@@ -415,6 +471,10 @@ func step(delta: float, advance_projectiles: bool = true) -> void:
 func _resolve_blades() -> void:
 	# Compare both moving sword models first. Merely attacking nearby never parries.
 	var player_wall := _blade_structure(previous_player_paths, player_paths, _held_blade_origin()) if blade_active() else {}
+	var war=_local_war_god()
+	if war!=null and war.actor==game:
+		if blade_active():war.resolve_guard_swing(self,player_wall)
+		return
 	if blade_active():
 		for native in natives:
 			if not native.blade_active() or hit_ids.has(native.get_instance_id()): continue
@@ -425,6 +485,12 @@ func _resolve_blades() -> void:
 				break
 	if blade_active():
 		var damage := PaperWeaponTypes.damage(swing_weapon, PaperBladeSweep.motion_distance(previous_player_paths, player_paths) / blade_delta)
+		if war!=null and game==_medieval_world().game and not hit_ids.has("war_god") and war.incoming_center().is_finite():
+			var guard_contact:=PaperBladeSweep.circle_contact(previous_player_paths,player_paths,war.incoming_center(),.31,swing_weapon.get("model_fill",false))
+			if not guard_contact.is_empty() and player_wall.get("time",INF)>guard_contact.time:
+				hit_ids["war_god"]=true
+				war.receive_player_hit(damage,guard_contact.position,swing_direction,PaperWeaponTypes.kind(swing_weapon))
+				return
 		var wall: Dictionary = player_wall
 		if wall.has("entity") and _medieval_target_alive(wall.entity):
 			var key := "medieval_" + str(wall.entity.get_instance_id())
@@ -557,6 +623,7 @@ func _step_projectiles(delta: float) -> void:
 	# A wall/body hit earlier in the frame invalidates a later arrow-arrow contact.
 	var contacts: Array = []
 	var ends: Array[Vector2] = []
+	var war=_local_war_god()
 	for i in projectiles.size():
 		var p: Dictionary = projectiles[i]
 		var a: Vector2 = p.position
@@ -573,6 +640,9 @@ func _step_projectiles(delta: float) -> void:
 				contact.object = game.objects[wall.index] if wall.index >= 0 else {}
 			contacts.append(contact)
 		if p.get("team","")=="player":
+			if war!=null and game==_medieval_world().game and war.incoming_center().is_finite():
+				var t:=_circle_hit_time(a,b,war.incoming_center(),.31)
+				if t<=1:contacts.append({"t":t,"i":i,"kind":"war_god","position":a.lerp(b,t)})
 			var lab = _lab()
 			for peer in (game.network_peers if "network_peers" in game else []):
 				if peer.player_id==p.get("shooter",""):lab=peer.weapon_lab if peer.connected and peer.ready_to_play and peer.dead_time<=0 else null;break
@@ -640,8 +710,9 @@ func _step_projectiles(delta: float) -> void:
 				if index >= 0: damage_building(index,p.get("damage",20.0),contact.position,PaperCombatAudio.projectile(p))
 			"medieval":
 				var world = _medieval_world()
-				if world != null: _damage_medieval(contact.entity,p.get("damage",24.0),contact.position,p.velocity.normalized()*2.5,PaperCombatAudio.projectile(p))
+				if world != null: _damage_medieval(contact.entity,p.get("damage",24.0),contact.position,p.velocity.normalized()*2.5,PaperCombatAudio.projectile(p),p.get("team") == "player")
 			"online_player": contact.actor.hit(p.get("damage",24.0),p.velocity,1.0,contact.position,PaperCombatAudio.projectile(p))
+			"war_god": war.receive_player_hit(p.get("damage",24.0),contact.position,p.velocity,PaperCombatAudio.projectile(p))
 			"online_parry": contact.actor.combat.clash(contact.position)
 			"player": hurt_player(p.get("damage",15.0),p.velocity,contact.position,PaperCombatAudio.projectile(p))
 			"native":

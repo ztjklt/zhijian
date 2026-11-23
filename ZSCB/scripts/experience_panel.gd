@@ -119,9 +119,7 @@ func _button(parent: Node, text: String, callback: Callable) -> Button:
 
 func _layout() -> void:
 	var viewport := PaperGuiScale.apply(self)
-	var desired := Vector2(minf(920, viewport.x - 24), minf(640, viewport.y - 24))
-	panel.position = (viewport - desired) * 0.5
-	panel.size = desired
+	PaperGuiScale.fit_panel(panel, Vector2(920,640))
 	actions.columns = 1 if viewport.x < 500 else 3
 	chapters.columns = 3 if viewport.x < 500 else 6
 

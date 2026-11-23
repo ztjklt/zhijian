@@ -19,7 +19,7 @@ func _ready()->void:
 	var shade:=ColorRect.new();shade.color=Color(0,0,0,.25);shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(shade)
 	panel=PanelContainer.new();panel.theme=PaperTheme.create_menu();panel.add_theme_stylebox_override("panel",PaperTheme.panel());add_child(panel)
 	var margin:=MarginContainer.new()
-	for edge in ["left","right","top","bottom"]:margin.add_theme_constant_override("margin_"+edge,18)
+	for edge in ["left","right","top","bottom"]:margin.add_theme_constant_override("margin_"+edge,4)
 	panel.add_child(margin)
 	var column:=VBoxContainer.new();column.add_theme_constant_override("separation",16);margin.add_child(column)
 	heading=Label.new();heading.add_theme_font_size_override("font_size",PaperTheme.menu_font_size(22));heading.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;column.add_child(heading)
@@ -43,12 +43,12 @@ func _process(_delta:float)->void:
 func _layout()->void:
 	var viewport:=get_viewport_rect().size
 	var amount:=Flow.ui_scale(viewport)
-	var logical:=viewport/amount
-	var width:=minf(desired_width,logical.x-32)
-	content.custom_minimum_size.x=maxf(180,width-44)
-	scroll.custom_minimum_size.y=minf(content.get_combined_minimum_size().y,maxf(70,logical.y-230))
-	panel.scale=Vector2(amount,amount);panel.size=Vector2(width,0);panel.reset_size()
-	panel.position=(viewport-panel.size*amount)*.5
+	var bounds:=PaperGuiScale.safe_rect(self)
+	content.custom_minimum_size.x=0
+	scroll.custom_minimum_size.y=0
+	panel.scale=Vector2(amount,amount)
+	panel.size=Vector2(minf(desired_width,bounds.size.x-24),minf(content.get_combined_minimum_size().y+190,bounds.size.y-24))
+	panel.position=(bounds.position+(bounds.size-panel.size)*.5)*amount
 func _input(event:InputEvent)->void:
 	if visible and event.is_action_pressed("cancel"):
 		hide();canceled.emit();get_viewport().set_input_as_handled()

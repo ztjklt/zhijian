@@ -29,8 +29,9 @@ func run()->void:
 	game.set_draw_mode(1)
 	check(game.connection_source.is_empty() and game.mode_drafts[4].size()==1,"leaving connections cancels point selection and preserves draft")
 	game.set_draw_mode(4)
-	for size in [Vector2i(1280,800),Vector2i(844,390),Vector2i(390,844),Vector2i(2560,1440)]:
+	for size in [Vector2i(1280,800),Vector2i(844,390),Vector2i(812,375),Vector2i(568,320),Vector2i(2560,1440)]:
 		root.size=size;game.touch_controls.force_visible=true
+		game.toolbar._layout();game.touch_controls._layout()
 		for i in 4:await process_frame
 		game.toolbar.update_buttons()
 		check(control.is_visible_in_tree() and Rect2(Vector2.ZERO,Vector2(size)).encloses(control.get_global_rect()),"connection button reachable at "+str(size))

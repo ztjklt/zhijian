@@ -20,6 +20,14 @@ func _ready()->void:
 	var heading:=HBoxContainer.new();column.add_child(heading)
 	var title:=label(heading,"双人共同搭建",18);title.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	close_button=button(heading,"关闭",close);close_button.custom_minimum_size.x=64
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	column.add_child(scroll)
+	column = VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation",8)
+	scroll.add_child(column)
 	label(column,"逐件允许朋友搬动／连接，拆除仍归作者。\n当前房间有效；任一人断线会撤回许可，完成的结构保留。",14)
 	list=ItemList.new();list.size_flags_vertical=Control.SIZE_EXPAND_FILL;list.custom_minimum_size.y=55;list.add_theme_font_size_override("font_size",15);column.add_child(list)
 	var paper:=StyleBoxFlat.new();paper.bg_color=Color("f3f1e8");paper.border_color=Color("cbd3c7");paper.set_border_width_all(1);paper.set_corner_radius_all(4);paper.set_content_margin_all(6)
@@ -82,5 +90,5 @@ func _process(delta:float)->void:
 	if clock<=0:clock=.2;refresh()
 func _layout()->void:
 	if panel==null:return
-	var viewport:=PaperGuiScale.apply(self)
-	panel.position=Vector2(12,12);panel.size=Vector2(minf(740,viewport.x-24),minf(560,viewport.y-24));panel.position=(viewport-panel.size)*.5
+	PaperGuiScale.apply(self)
+	PaperGuiScale.fit_panel(panel,Vector2(740,560))

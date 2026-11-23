@@ -67,16 +67,21 @@ func step(delta:float)->void:
 		if support_time>=.3:stage=3;notice="它真的承住了你。接下来保存作品。"
 func action_text()->String:
 	if stage==1 and game.draw_mode!=drawing_mode:return "回到刚才笔迹"
+	if game.touch_controls != null and game.touch_controls.enabled():return ["画矮踏板","确认生成","亲手搬动","保存作品","接下来做什么"][stage]
 	return ["1 画矮踏板","确认生成","4 亲手搬动","保存作品","接下来做什么"][stage]
-func short_hint()->String:return ["画个矮踏板","按当前数字确认","跳上它或亲手搬动","最后保存作品","第一件作品完成！"][stage]
+func short_hint()->String:
+	if game.touch_controls != null and game.touch_controls.enabled():return ["画个矮踏板","点生成确认","跳上它或亲手搬动","最后保存作品","第一件作品完成！"][stage]
+	return ["画个矮踏板","按当前数字确认","跳上它或亲手搬动","最后保存作品","第一件作品完成！"][stage]
 func title()->String:return "%d/4 · %s"%[mini(stage+1,4),["画下你的踏板","让笔迹成为实体","让它真的派上用场","留下第一件作品","第一件作品完成"][stage]]
 func body_text()->String:
 	var text:String=["按1，在脚边前方画一个矮而宽的闭合轮廓。可多笔补画；松手不会生成。","画好了，再按当前工具数字或下方确认按钮。只有成功生成后才继续。","A/D靠近，W或空格跳上这件作品并站稳；也可以按4，亲手拖动它一小段。","点击保存作品，或从作品菜单保存。失败可重试；图纸也会一起保留。","完成了：你画的东西进入了世界、被亲手使用，并已实际保存。继续搭建或叫上朋友。 "][stage]
+	if game.touch_controls != null and game.touch_controls.enabled():
+		text=["点造物，在脚边前方画一个矮而宽的闭合轮廓。可多笔补画；松手不会生成。","画好了，点生成按钮。只有成功生成后才继续。","用摇杆靠近，点跳跃站上作品并站稳；也可以点移动工具，亲手拖动它一小段。","从作品菜单保存。失败可重试；图纸也会一起保留。","你画的东西已进入世界、被亲手使用，并已实际保存。继续搭建或叫上朋友。"][stage]
 	return notice+"\n"+text if notice!="" else text
 func action()->void:
 	if not visible:return
 	match stage:
-		0:game.set_draw_mode(1);game.generator="own";game.message("画一块矮踏板，完成后再按1；可以多笔补画。")
+		0:game.set_draw_mode(1);game.generator="own";game.message("画一块矮踏板，完成后点生成；可以多笔补画。" if game.touch_controls != null and game.touch_controls.enabled() else "画一块矮踏板，完成后再按1；可以多笔补画。")
 		1:
 			if not has_drawing():stage=0;notice="原画稿已清空；重新画一件即可。"
 			elif game.draw_mode!=drawing_mode:game.set_draw_mode(drawing_mode)

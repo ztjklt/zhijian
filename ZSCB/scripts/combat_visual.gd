@@ -113,16 +113,21 @@ func _draw_hint() -> void:
 	var amount := PaperGuiScale.factor(viewport)
 	var logical := viewport / amount
 	var compact := logical.x < 600 or logical.y < 500
+	if compact and game.touch_controls != null and game.touch_controls.enabled() and game.equipped_weapon.is_empty() and game.draw_mode != 2: return
 	var at := Vector2(23 * amount, game.toolbar.bottom.get_global_rect().position.y - 17 * amount)
 	if compact:
 		at = Vector2(20 * amount, game.toolbar.bottom.get_global_rect().end.y + 20 * amount)
-		if game.knowledge_world != null:
+		if game.knowledge_world != null and game.knowledge_world.controls.panel.is_visible_in_tree():
 			at.y = maxf(at.y, game.knowledge_world.controls.panel.get_global_rect().end.y + 20 * amount)
 		elif game.map_controls != null and game.map_controls.panel.is_visible_in_tree():
 			at.y = maxf(at.y, game.map_controls.panel.get_global_rect().end.y + 20 * amount)
 	var caption := "按 3 画武器 · 选握点 → 选类型 → 装备" if game.equipped_weapon.is_empty() else PaperWeaponTypes.label(game.equipped_weapon) + " · R / 右键使用"
 	if battle.bow_equipped: caption = "试用短弓 · Q 返回手绘武器"
-	draw_string(ThemeDB.fallback_font, at, caption, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(13 * amount), Color("617579"))
+	if game.touch_controls != null and game.touch_controls.enabled():
+		caption = "画好后点「选择握点」" if game.equipped_weapon.is_empty() else PaperWeaponTypes.label(game.equipped_weapon) + " · 点攻击使用"
+		if game.selecting_weapon_grip: caption = "握点可贴线调整 · 选类型后再装备"
+	if not game.toolbar.walking_hud() or not game.equipped_weapon.is_empty() or battle.bow_equipped:
+		draw_string(ThemeDB.fallback_font, at, caption, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(13 * amount), Color("617579"))
 	if battle.natives_enabled:
 		draw_string(ThemeDB.fallback_font, at + Vector2(0, 20 * amount), "纸间土著游荡中 · N 开关", HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(11 * amount), Color("81918b"))
 	if battle.bow_charge > 0:

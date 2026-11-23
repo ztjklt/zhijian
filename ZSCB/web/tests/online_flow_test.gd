@@ -16,12 +16,19 @@ func run() -> void:
 			check(flow.parse_invite(raw).get("error","")!="","invalid code or server-changing invitation rejected")
 		check(flow.invite_url("A1B2C3D4")=="https://zhijian-web-production.up.railway.app/?room=A1B2C3D4","invitation contains only public room code")
 	var lobby=load("res://scenes/network_lobby.tscn").instantiate()
+	root.size = Vector2i(568, 320)
 	root.add_child(lobby)
+	for index in [0, 1]:
+		lobby.tabs.current_tab = index
+		for frame in 4: await process_frame
+		check(lobby.scroll.get_global_rect().encloses(lobby.actions[index].get_global_rect()), "short landscape shows the current tab's primary action without scrolling")
+	check(lobby.back_at_top.visible and lobby.scroll.get_global_rect().encloses(lobby.back_at_top.get_global_rect()), "short landscape shows a return button in the header")
 	lobby.address.text="ws://127.0.0.1:51991/ws"
 	lobby.invite.text=""
 	lobby._start("join")
 	check(lobby.session.socket==null,"blank invite rejected before network connection")
 	if lobby.session.socket!=null: lobby.session.socket.close();lobby.session.socket=null
+	lobby.tabs.current_tab = 0
 	lobby._start("create")
 	var first=lobby.session.socket
 	lobby._start("create")

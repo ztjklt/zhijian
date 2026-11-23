@@ -55,6 +55,60 @@ func run()->void:
 	session.set_meta("flow_modal",true);Input.action_press("move_left");await frames(2)
 	check(absf(game.player.linear_velocity.x)<.01,"room dialog blocks predicted movement")
 	Input.action_release("move_left");session.set_meta("flow_modal",false)
+	check_attack_feedback(game, session, state)
+	check_remote_motion(session, state)
 	game.network_session=null;session.free();game.free()
 	print("ONLINE_LATENCY: ",checks," checks, ",failures.size()," failures")
 	quit(0 if failures.is_empty() else 1)
+
+func check_attack_feedback(game, session: PaperNetSession, state: Dictionary) -> void:
+	var intent = session.combat_intent
+	intent.instant_feedback = true
+	game.equipped_weapon = PaperWeaponGrip.practice_sword()
+	game.aim_world = game.player.position - Vector2(2, 0)
+	var ink: float = game.ink.amount
+	game.attack()
+	var sword_sequence := session.seq
+	check(game.combat.visible_swing() > 0 and game.combat.swing == 0, "the owner's sword starts visibly without an authority frame")
+	check(game.character_visual.actor_facing() == -1, "the local attack pose faces the actual aim")
+	check(game.combat.health == 100 and game.ink.amount == ink and game.combat.projectiles.is_empty(), "local feedback cannot deal damage, use ink or spawn projectiles")
+	intent.step(game, 0.7, false)
+	check(game.combat.visible_swing() <= 0, "the local swing finishes on its own timer")
+	session._result({"op":"attack", "seq":sword_sequence, "ok":true, "attack_started":true})
+	state.swing = 0.30
+	session._actor(state)
+	check(game.combat.swing > 0 and game.combat.visible_swing() == 0, "a late confirmation cannot replay a locally shown attack")
+	state.swing = 0.08
+	session._actor(state)
+	state.swing = 0.32
+	session._actor(state)
+	check(game.combat.visible_swing() > 0, "a new authoritative combo still displays after a hidden echo")
+	state.swing = 0.0
+	session._actor(state)
+	intent.reset(game)
+	game.equipped_weapon.weapon_type = "firearm"
+	game.attack()
+	check(game.combat.visible_shot_recoil() > 0 and game.combat.shot_recoil == 0, "firearm recoil displays immediately while the shot stays authoritative")
+	check(game.ink.amount == ink and game.combat.projectiles.is_empty(), "an anticipated shot never spends ink or spawns a bullet")
+	intent.step(game, 0.01, true)
+	check(game.combat.visible_shot_recoil() == 0, "opening a personal panel clears the local attack pose")
+
+func check_remote_motion(session: PaperNetSession, state: Dictionary) -> void:
+	var peer := state.duplicate()
+	peer.id = "friend"
+	peer.position = Vector2.ZERO
+	peer.velocity = Vector2(4.6, 0)
+	peer.movement_reset = 1
+	session._actor(peer)
+	var displayed = session.remotes[peer.id]
+	displayed.smooth_motion = true
+	peer.position = Vector2(1.1, 0)
+	session._actor(peer)
+	displayed._process(1.0 / 60.0)
+	check(displayed.player.position.x > 0.05 and displayed.player.position.x < 0.14, "bursty movement starts on the next frame and avoids a large instantaneous jump")
+	for index in 30: displayed._process(1.0 / 60.0)
+	check(displayed.player.position.distance_to(peer.position) < 0.01, "displayed motion converges to the server position without extrapolating")
+	peer.movement_reset = 2
+	peer.position = Vector2(2.0, 0)
+	session._actor(peer)
+	check(displayed.player.position == peer.position, "an authority relocation still applies immediately")

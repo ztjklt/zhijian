@@ -10,10 +10,10 @@ static func accepts(strokes: Array, point: Vector2) -> bool:
 	return snap_point(strokes, point) != null
 
 # A grip belongs to the ink, never merely to the empty bounding rectangle.
-static func snap_point(strokes: Array, point: Vector2) -> Variant:
-	if not point.is_finite(): return null
+static func snap_point(strokes: Array, point: Vector2, max_distance: float = 0.12) -> Variant:
+	if not point.is_finite() or not is_finite(max_distance) or max_distance < 0: return null
 	var closest: Variant = null
-	var distance := 0.12 * 0.12
+	var distance := max_distance * max_distance
 	for stroke in strokes:
 		var points: Array = stroke.get("points", [])
 		for index in range(1, points.size()):

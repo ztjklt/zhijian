@@ -22,11 +22,15 @@ func run()->void:
 		var viewport:=Rect2(Vector2.ZERO,Vector2(size))
 		check(primary.is_visible_in_tree() and viewport.encloses(primary.get_global_rect()),"actual next action reachable at "+str(size))
 		check(skip.is_visible_in_tree() and viewport.encloses(skip.get_global_rect()),"actual skip reachable at "+str(size))
+		if size.x < 600 or size.y < 500:
+			check(primary.get_global_rect().size.x>=44 and skip.get_global_rect().size.x>=44,"lesson touch targets have usable width at "+str(size))
 		var stick_area:=Rect2(game.touch_controls.stick_center-Vector2.ONE*game.touch_controls.radius,Vector2.ONE*game.touch_controls.radius*2)
 		check(not primary.get_global_rect().intersects(stick_area),"lesson button avoids joystick at "+str(size))
-	root.size=Vector2i(390,844)
+	root.size=Vector2i(844,390)
 	for i in 6:await process_frame
 	game.touch_controls.force_visible=true
+	game.toolbar._layout()
+	for i in 6:await process_frame
 	var touch:=InputEventScreenTouch.new();touch.index=4;touch.pressed=true;touch.position=game.toolbar.first_work_skip.get_global_rect().get_center()
 	game.touch_controls.handle_touch(touch);touch.pressed=false;game.touch_controls.handle_touch(touch)
 	check(not game.first_work.visible and game.draft==draft,"real touch skip retains the full drawing")

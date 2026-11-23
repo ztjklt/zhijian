@@ -29,6 +29,8 @@ var more: MenuButton
 var content_scroll: ScrollContainer
 var count_label: Label
 var editing_entry_id := -1
+var shell: VBoxContainer
+var tabs: HBoxContainer
 
 func _ready() -> void:
 	theme = PaperTheme.create_menu()
@@ -40,7 +42,7 @@ func _ready() -> void:
 	visibility_changed.connect(func():
 		if is_instance_valid(shade): shade.visible = is_visible_in_tree())
 	PaperTheme.grain(self)
-	var shell := VBoxContainer.new()
+	shell = VBoxContainer.new()
 	shell.add_theme_constant_override("separation",12)
 	add_child(shell)
 	var header := HBoxContainer.new()
@@ -52,11 +54,12 @@ func _ready() -> void:
 	search_field=LineEdit.new();search_field.placeholder_text="搜索作品";search_field.custom_minimum_size.y=40
 	search_field.text_changed.connect(func(value:String):query=value;page=0;refresh())
 	shell.add_child(search_field)
-	var tabs:=HBoxContainer.new();shell.add_child(tabs)
+	tabs=HBoxContainer.new();shell.add_child(tabs)
 	for item in ["全部","武器","建筑","地形"]:
 		var button:=_add_button(tabs,item,func():category=item;page=0;refresh())
 		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL;filters.append(button)
 	content_scroll=ScrollContainer.new();content_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
+	content_scroll.follow_focus = true
 	content_scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;shell.add_child(content_scroll)
 	body=BoxContainer.new();body.add_theme_constant_override("separation",24)
 	body.size_flags_horizontal=Control.SIZE_EXPAND_FILL;content_scroll.add_child(body)
@@ -96,6 +99,8 @@ func _ready() -> void:
 	place_button=_add_button(action_row,"先选择一张图纸",func():game.equip_blueprint())
 	place_button.custom_minimum_size=Vector2(230,44);PaperTheme.primary(place_button)
 	get_viewport().size_changed.connect(_layout)
+	visibility_changed.connect(func():
+		if visible: content_scroll.scroll_vertical = 0)
 	_layout();refresh()
 
 func _label(parent:Node,text:String,font_size:int)->Label:
@@ -104,14 +109,21 @@ func _label(parent:Node,text:String,font_size:int)->Label:
 	parent.add_child(label);return label
 
 func _add_button(parent:Control,text:String,callback:Callable)->Button:
-	var button:=Button.new();button.text=text;button.focus_mode=Control.FOCUS_NONE
-	button.custom_minimum_size.y=36;button.pressed.connect(callback);parent.add_child(button);return button
+	var button: Button = PaperSealButton.new() if text != "" else Button.new()
+	button.text=text;button.focus_mode=Control.FOCUS_NONE
+	button.custom_minimum_size.y=44;button.pressed.connect(callback);parent.add_child(button);return button
 
 func _layout()->void:
 	if body==null:return
 	var viewport:=PaperGuiScale.apply(self)
 	var narrow:=viewport.x<700
 	var short_window:=viewport.y<500
+	if narrow and short_window and tabs.get_parent() != body:
+		tabs.reparent(body)
+		body.move_child(tabs,0)
+	elif not (narrow and short_window) and tabs.get_parent() != shell:
+		tabs.reparent(shell)
+		shell.move_child(tabs,2)
 	var style:=PaperTheme.panel();style.set_content_margin_all(14 if narrow or short_window else 24)
 	add_theme_stylebox_override("panel",style)
 	body.vertical=narrow
@@ -127,9 +139,9 @@ func _layout()->void:
 	action_row.vertical=narrow
 	place_button.custom_minimum_size.x=0 if narrow else 230
 	place_button.size_flags_horizontal=Control.SIZE_EXPAND_FILL if narrow else Control.SIZE_FILL
-	var desired:=Vector2(minf(1040,viewport.x-24),minf(620,viewport.y-24))
-	reset_size();size=desired
-	position=Vector2((viewport.x-size.x)*0.5,(viewport.y-size.y)*0.5)*scale.x
+	reset_size()
+	PaperGuiScale.fit_panel(self,Vector2(1040,620))
+	position *= scale.x
 	PaperGuiScale.popup(more.get_popup(),scale.x)
 
 func refresh()->void:
@@ -139,6 +151,7 @@ func refresh()->void:
 	page=clampi(page,0,pages-1);count_label.text="%d 张"%game.bag.entries.size();page_label.text="%d / %d"%[page+1,pages]
 	empty_label.visible=entries.is_empty()
 	empty_label.text="还没有图纸。先画一件作品，再按同一数字键生成。" if game.bag.entries.is_empty() else "没有找到作品，试试其他名称或分类。"
+	if game.bag.entries.is_empty() and game.touch_controls.enabled(): empty_label.text="还没有图纸。先在纸面画一件作品，点生成即可收藏。"
 	for i in filters.size():PaperTheme.selected(filters[i],["全部","武器","建筑","地形"][i]==category)
 	for child in grid.get_children():grid.remove_child(child);child.queue_free()
 	for index in range(page*CARDS_PER_PAGE,mini(entries.size(),(page+1)*CARDS_PER_PAGE)):
@@ -146,7 +159,7 @@ func refresh()->void:
 		var button:=_add_button(grid,"",func():game.select_blueprint(entry.id))
 		button.custom_minimum_size=Vector2(100,140);button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		PaperTheme.selected(button,game.selected_blueprint_id==entry.id)
-		var preview:=preload("res://scripts/blueprint_preview.gd").new();preview.paths=entry.paths
+		var preview:=preload("res://scripts/blueprint_preview.gd").new();preview.set_entry(entry)
 		preview.mouse_filter=Control.MOUSE_FILTER_IGNORE;preview.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		preview.offset_left=10;preview.offset_right=-10;preview.offset_top=10;preview.offset_bottom=-36;button.add_child(preview)
 		var caption:=Label.new();caption.text=("★ " if entry.favorite else "")+entry.name
@@ -161,19 +174,22 @@ func refresh()->void:
 	for slot in range(6):
 		var entry:=BlueprintBag.find_entry(game.bag,game.bag.hotbar[slot])
 		var button:=_add_button(hotbar,str(slot+1),func():game.bind_hotbar(slot))
-		button.add_theme_font_size_override("font_size",14);button.custom_minimum_size=Vector2(29,34)
+		button.add_theme_font_size_override("font_size",14);button.custom_minimum_size=Vector2(29,44)
 		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL;button.disabled=not has_selection
 		button.tooltip_text="Shift+%d · %s"%[slot+1,"空格" if entry.is_empty() else entry.name]
 		PaperTheme.selected(button,has_selection and game.bag.hotbar[slot]==game.selected_blueprint_id)
-	detail_preview.paths=[] if selected.is_empty() else selected.paths;detail_preview.queue_redraw()
+	detail_preview.set_entry(selected)
 	if selected.is_empty():
 		editing_entry_id=-1
 		detail_title.text="选一张图纸";details.text="选中作品，查看详情与可用操作。";place_button.text="先选择一张图纸";name_field.text=""
 	else:
 		var weapon:bool=selected.get("role","")=="weapon"
 		detail_title.text=selected.name;detail_title.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-		details.text=selected.category+"\n"+("装备后，按 R 使用" if weapon else "取出后点击纸面放置，可重复使用")
+		details.text=selected.category+"\n"+("装备后，点击攻击使用" if weapon and game.touch_controls.enabled() else "装备后，按 R 使用" if weapon else "取出后点击纸面放置，可重复使用")
 		place_button.text="装备武器" if weapon else "再次放置"
+		if selected.kind == "ink_cup":
+			details.text = "器具 · 照图制作一只独立的空杯"
+			place_button.text = "照图制杯"
 		if editing_entry_id != selected.id or not name_field.has_focus():name_field.text=selected.name
 		editing_entry_id=selected.id
 	_layout()

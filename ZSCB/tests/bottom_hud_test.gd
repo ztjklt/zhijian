@@ -66,6 +66,10 @@ func run() -> void:
 		root.push_input(press, true)
 		game.cancel_pointer()
 		for button in [toolbar.generate_button, toolbar.clear_button]:
+			if button is PaperSealButton:
+				check(button.paper_opacity>=.6 and button.paper_opacity<=.85,"organic floating paper remains translucent "+button.text)
+				check(is_equal_approx(button.modulate.a,1.0) and is_equal_approx(button.label_ink().a,1.0),"custom-drawn seal typography remains opaque")
+				continue
 			for state in ["normal", "hover", "pressed", "disabled"]:
 				var style: StyleBox = button.get_theme_stylebox(state)
 				check(style is StyleBoxFlat and style.bg_color.a >= 0.6 and style.bg_color.a <= 0.85, "small action background is translucent %s %s" % [button.text, state])

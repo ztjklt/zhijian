@@ -48,5 +48,5 @@ func show_trial()->void:
 	game.message("磨坊试桥在磨坊渡口约129米，沿路前往；到达后可布置试桥台。")
 func _layout()->void:
 	if panel==null:return
-	var viewport:=PaperGuiScale.apply(self)
-	panel.size=Vector2(minf(600,viewport.x-24),minf(600,viewport.y-24));panel.position=(viewport-panel.size)*.5
+	PaperGuiScale.apply(self)
+	PaperGuiScale.fit_panel(panel,Vector2(600,600))

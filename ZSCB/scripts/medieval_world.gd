@@ -4,8 +4,11 @@ extends Node2D
 const Entity := preload("res://scripts/medieval_entity.gd")
 const Sweep := preload("res://scripts/blade_sweep.gd")
 const CastleLayout := preload("res://scripts/medieval_castle_layout.gd")
+const PaperNavigation := preload("res://scripts/paper_navigation.gd")
+const PaperSpace := preload("res://scripts/paper_space.gd")
 const Terrain := preload("res://scripts/medieval_terrain.gd")
 const TreeRoots := preload("res://scripts/medieval_tree_roots.gd")
+const BorderSites := preload("res://scripts/architecture/border_sites.gd")
 const Visibility := preload("res://scripts/medieval_visibility.gd")
 const MAP_ID := "medieval-v1"
 const LENGTH := 180.0
@@ -15,6 +18,10 @@ const BLADE_BOUNDS_MARGIN := 0.00001 # Bounds reject work, never exact contacts.
 const SECTIONS := [{"name":"丘陵树林","x":3.0},{"name":"台地村庄","x":25.5},{"name":"河岸集市","x":54.0},{"name":"高地城堡","x":77.0},{"name":"飞龙山脊","x":92.0},{"name":"风车麦田","x":113.0},{"name":"磨坊渡口","x":134.0},{"name":"古修道院","x":153.0},{"name":"边境营地","x":172.0}]
 var game
 var terrain := Terrain.new()
+var paper_nav: PaperNavigation
+var paper_space: PaperSpace
+var chronicle := preload("res://scripts/world_chronicle.gd").new()
+var last_paper_foot := Vector2.INF
 var entities: Array = []
 var debris: Array = []
 var elapsed := 0.0
@@ -23,6 +30,11 @@ var _impact_cooldowns := {}
 var _previous_velocities := {}
 var _prop_ink_contacts := {}
 var bridge_trial
+var survival
+var priest_work := {}
+var companion_blueprints := BlueprintBag.new_bag()
+var adventurer_state := {}
+var war_god_state := {}
 
 func _enter_tree() -> void:
 	# Returning a parked map keeps its bodies, but tree-exit cleanup removed
@@ -36,16 +48,151 @@ func _restore_actor_exemptions() -> void:
 
 func _ready() -> void:
 	terrain.build_physics(self)
+	if single_player_ink():
+		paper_space=PaperSpace.new()
+		paper_space.terrain=terrain
+		add_child(paper_space)
+		terrain.paper_space=paper_space
+		paper_space.restore({})
+		paper_nav=PaperNavigation.new(self)
 	if entities.is_empty(): _populate()
 	bridge_trial = preload("res://scripts/mill_bridge_trial.gd").new()
 	bridge_trial.world = self
 	add_child(bridge_trial)
+	if single_player_ink():
+		if DisplayServer.get_name() != "headless": add_child(preload("res://scripts/architecture/figure_clearance.gd").new())
+		survival = preload("res://scripts/village_survival.gd").new(self)
+		var survival_art := preload("res://scripts/village_survival_art.gd").new()
+		survival_art.service = survival
+		survival_art.z_index = 14
+		add_child(survival_art)
+
+func single_player_ink() -> bool:
+	return game != null and "network_session" in game and game.network_session == null and not game.network_headless
+
+func apply_paper_plan(records:Array,commit:bool=true) -> Dictionary:
+	if paper_space==null:return {"ok":false,"error":"请进入单人沙盒。"}
+	var result:=paper_space.submit(records,commit)
+	if result.ok and result.changed and commit:
+		update_paper_activity()
+		chronicle.record_paper(records,result.results)
+	return result
+
+func apply_paper_stroke(record:Dictionary) -> Dictionary:
+	var result:=apply_paper_plan([record])
+	return result.results[0] if result.ok else result
+
+func paper_cell_at(at:Vector2) -> Vector2i:
+	return PaperSpace.cell_at(at)
+
+func paper_strokes_snapshot() -> Array:
+	return paper_space.works.duplicate(true) if paper_space!=null else []
+
+func paper_surfaces(x:float,y_min:float,y_max:float) -> Array:
+	if paper_space!=null:return paper_space.surfaces(x,y_min,y_max)
+	return [{"y":terrain.travel_height(x),"face":"floor","mode":"rock","work_id":"legacy:soil"}]
+
+## Report the paper floor at a grounded circular body's actual support.
+func paper_ground_contact(body: StickmanPlayer) -> Dictionary:
+	if not is_instance_valid(body) or not body.is_inside_tree() or body.game == null or not body.game.on_ground:
+		return {}
+	var supports: Array[Dictionary] = []
+	for hit in body.support_hits():
+		if not body.foot_bodies.has(hit.collider):
+			continue
+		var normal: Vector2 = hit.normal
+		if normal.dot(body.global_position - hit.position) <= StickmanPlayer.BODY_RADIUS + 0.035:
+			supports.append(hit)
+	if supports.is_empty():
+		return {}
+	var center_x := body.global_position.x
+	supports.sort_custom(func(a, b): return absf(a.position.x - center_x) < absf(b.position.x - center_x))
+	# At a shared vertex the center ray can hit the new body while the paper
+	# coordinate belongs to the old span. Confirm the same body on its flank.
+	var supporting_body: PhysicsBody2D = supports[0].collider
+	for hit in supports:
+		if hit.collider == supporting_body:
+			var floor_hit := _paper_contact_surface(supporting_body, hit.position)
+			if not floor_hit.is_empty():
+				return floor_hit
+	return {}
+
+func _paper_contact_surface(surface: PhysicsBody2D, point: Vector2) -> Dictionary:
+	var source := ""
+	if paper_space != null and surface.get_parent() == paper_space:
+		# Unnamed replacement bodies contain the surviving pieces of carved legacy soil.
+		source = str(surface.get_meta("paper_work_id", "legacy:east" if point.x > Terrain.EastInk.ORIGINAL_EDGE.x else "legacy:soil"))
+	elif surface.get_parent() == self:
+		match surface.name:
+			&"MountainRiverSoil": source = "legacy:soil"
+			&"EastInkSoil": source = "legacy:east"
+			&"TimberBridge", &"MillRiverCrossing": source = "legacy:road"
+	if source.is_empty():
+		return {}
+	var best: Dictionary = {}
+	var error := 0.003
+	for row in paper_surfaces(point.x, point.y - error, point.y + error):
+		if row.face != "floor":
+			continue
+		if row.work_id != source and not (row.mode == "carve" and surface.get_parent() == paper_space and not surface.get_meta("map_drop_allowed", false)):
+			continue
+		var gap := absf(row.y - point.y)
+		if gap < error:
+			error = gap
+			best = row.duplicate()
+			best.x = point.x
+	return best
+
+func paper_nav_route(from_foot:Vector2,to_foot:Vector2) -> Dictionary:
+	return paper_nav.route(from_foot,to_foot) if paper_nav else {"ok":false,"error":"导航需要已加载的纸面世界"}
+
+func paper_nav_sites(from_foot:Vector2,limit:int=12,radius:float=INF) -> Array:
+	return paper_nav.sites(from_foot,limit,radius) if paper_nav else []
+
+func paper_nav_label(site_id:String,at:Vector2) -> String:
+	return paper_nav.label_for(site_id,at) if paper_nav else "纸面（%.1f，%.1f 米）"%[at.x,at.y]
+
+func paper_nav_step(plan:Dictionary,feet:Vector2,delta:float,speed:float=2.0) -> Dictionary:
+	return paper_nav.advance(plan,feet,delta,speed) if paper_nav else {"ok":false,"error":"纸页尚未载入"}
+
+func paper_nav_steer(plan:Dictionary,feet:Vector2,delta:float,grounded:Variant=null) -> Dictionary:
+	return paper_nav.steer(plan,feet,delta,grounded) if paper_nav else {"ok":false,"error":"纸页尚未载入"}
+
+func paper_motion_bounds() -> Rect2:
+	var base:=Rect2(Vector2(terrain.profile[0].x,terrain.BOTTOM),Vector2(terrain.profile[-1].x-terrain.profile[0].x,13-terrain.BOTTOM))
+	return paper_space.bounds.merge(base) if paper_space!=null and not paper_space.works.is_empty() else base
+
+func paper_has_floor_below(at:Vector2) -> bool:
+	for level in paper_surfaces(at.x,-INF,at.y+.14):
+		if level.face=="floor":return true
+	return false
+
+func update_paper_activity() -> void:
+	if paper_space==null:return
+	var points:Array=[]
+	if is_instance_valid(game.player):points.append(game.player.position)
+	points.append(game.view_camera())
+	for id in ["SandboxCompanion","SandboxAdventurer","SandboxWarGod"]:
+		var companion=get_node_or_null(id)
+		if companion!=null and companion.actor!=null and is_instance_valid(companion.actor.player):points.append(companion.actor.player.position)
+	var priest=get_node_or_null("SandboxPriest")
+	if priest!=null: points.append_array(priest.paper_activity_points())
+	for body in game.object_nodes:
+		if is_instance_valid(body) and body is RigidBody2D and not body.freeze:points.append(body.position)
+	paper_space.activate(points)
+
+func paper_geometry(box:Rect2) -> Array:
+	return paper_space.geometry_in(box) if paper_space!=null else terrain.collision_geometry
+
+func architecture_site(x: float, width: float, clearance := .8, base_y := INF) -> Dictionary:
+	return BorderSites.inspect_site(self,x,width,clearance,base_y)
 
 func _spawn(kind: String, x: float, suffix: int, y: float = -999.0):
 	var entity := Entity.new()
-	var floor_y := terrain.travel_height(x)
 	var stable_id := "castle-piece-"+str(suffix) if kind == "castle_piece" else kind+"-"+str(suffix)
-	entity.setup(kind,Vector2(x,floor_y if y == -999.0 else y),stable_id,floor_y)
+	if single_player_ink() and _composing_new: x = BorderSites.NEW_X.get(stable_id,x)
+	var floor_y := terrain.travel_height(x)
+	entity.setup(kind,Vector2(x,floor_y if y == -999.0 else y),stable_id,floor_y,single_player_ink())
 	# Wide walkers must enter physics already tangent to the slope. Spawning
 	# a level deer rectangle inside a steep hill ejects it above follow range.
 	if entity.is_ground_animal() and y==-999.0:
@@ -56,7 +203,10 @@ func _spawn(kind: String, x: float, suffix: int, y: float = -999.0):
 	entities.append(entity)
 	return entity
 
+var _composing_new := false
+
 func _populate() -> void:
+	_composing_new = true
 	for i in [0,2]: _spawn("oak",[4.5,8.2,13.2,17.2][i],i)
 	for i in [0,2]: _spawn("pine",[90.6,93.0,98.0][i],i)
 	for i in 3: _spawn("house",22.5+i*6,i)
@@ -86,6 +236,7 @@ func _populate() -> void:
 	_spawn("knight",78.6,0)
 	_spawn("dragon",92,0,8.2)
 	_populate_expansion()
+	_composing_new = false
 	for entity in entities:
 		Composition.configure_patrol(entity)
 		_place_ground_prop(entity)
@@ -94,6 +245,7 @@ func _populate_expansion() -> void:
 	# Content migration only calls this for newly authored IDs. Existing bodies,
 	# including destroyed originals and legacy wall assemblies, remain untouched.
 	for record in Composition.records():
+		if _composing_new and single_player_ink() and record.id in BorderSites.OMIT: continue
 		if entities.size()>=384:break
 		if entity_by_id(record.id)!=null:continue
 		var y:float=record.y
@@ -141,6 +293,13 @@ func _place_ground_prop(entity) -> void:
 		entity.tree_roots = TreeRoots.new(entity,terrain)
 		entity.rebuild_geometry()
 		return
+	if entity.brush_art and entity.kind != "castle_piece":
+		if entity.tree_roots == null:
+			entity.tree_roots = Entity.BuildingBook.ground_fit(entity.kind,entity.position,terrain)
+			if entity.tree_roots != null:
+				entity.rotation = 0.0
+				entity.rebuild_geometry()
+		return
 	if entity.is_actor() or entity.kind in ["castle_piece","wagon"] or entity.has_meta("authored_root"):return
 	if entity.kind in ["barrel","crate","haystack","fence","bench","cart_goods"]:
 		var contacts:=_ink_bottom_contacts(entity)
@@ -169,13 +328,54 @@ func _ink_bottom_contacts(entity) -> PackedVector2Array:
 	_prop_ink_contacts[entity.kind]=contacts
 	return contacts
 
+func observe_east_edge() -> Dictionary:
+	return terrain.east_ink.observe(terrain.profile)
+
+func submit_east_segment(command: Dictionary, actor_driven: bool = false) -> Dictionary:
+	if game != null and (game.get("network_session") != null or game.get("network_headless") == true):
+		return {"ok": false, "error": "画家只在单人沙盒里落笔"}
+	return terrain.east_ink.start(command, terrain.profile[-1], actor_driven)
+
+func east_work_target(step_m: float = 0.08) -> Dictionary:
+	return terrain.east_ink.work_target(step_m)
+
+func east_work_name() -> String:
+	return terrain.east_ink.pending.name if terrain.east_ink.actor_driven else ""
+
+func advance_east_nib(actual_nib: Vector2, hand: Vector2, reach: float) -> bool:
+	var count: int = terrain.east_ink.segments.size()
+	var advanced := terrain.advance_east_nib(actual_nib, hand, reach)
+	if terrain.east_ink.segments.size() > count:
+		chronicle.record_frontier(terrain.east_ink.segments.back())
+	return advanced
+
+func east_segments_snapshot() -> Array:
+	return terrain.east_ink.snapshot()
+
+func east_painting() -> bool:
+	return not terrain.east_ink.pending.is_empty()
+
+func east_has_room() -> bool:
+	return Terrain.EastInk.Pages.usable(terrain.profile[-1])
+
+func east_walk_limit() -> float:
+	if terrain.profile[-1].x <= Terrain.EastInk.ORIGINAL_EDGE.x:
+		return LENGTH + 4.0
+	return terrain.profile[-1].x - 0.35
+
 func surface_height(x: float) -> float:
 	return terrain.surface_height(x)
 
 func travel_height(x: float) -> float:
-	return terrain.travel_height(x)
+	if paper_space==null:return terrain.travel_height(x)
+	if x>=terrain.profile[0].x and x<=terrain.profile[-1].x and not paper_space.columns.has(floori(x/PaperSpace.CELL)):return terrain.travel_height(x)
+	var levels:=paper_surfaces(x,-INF,INF)
+	for i in range(levels.size()-1,-1,-1):
+		if levels[i].face=="floor":return levels[i].y
+	return -INF
 
 func step(delta: float) -> void:
+	if survival != null: survival.step(delta)
 	if not is_finite(delta) or delta <= 0: return
 	delta = minf(delta,0.1)
 	elapsed += delta
@@ -188,6 +388,8 @@ func step(delta: float) -> void:
 			continue
 		entity.ground_y=terrain.travel_height(entity.position.x)
 		entity.step(delta)
+		if survival != null and entity.kind == "villager":
+			survival.Livelihood.after_patrol(survival,entity,delta)
 		_follow_slope(entity,delta)
 		terrain.apply_water_body(entity,delta)
 		if entity.alive and (entity.is_person() or entity.is_ground_animal()) and entity.hurt_timer <= 0 and entity.patrol_turn_cooldown <= 0 and not (entity.kind == "driver" and entity.companion_id != "") and _patrol_blocked(entity):
@@ -264,30 +466,44 @@ func _follow_slope(entity,delta: float) -> void:
 		entity.sleeping=false
 
 func _spawn_shape_clear(shape: PackedVector2Array) -> bool:
-	for polygon in terrain.collision_geometry:
-		if not Geometry2D.intersect_polygons(shape,polygon).is_empty():return false
+	return spawn_shape_blocker(shape).is_empty()
+
+## First physical obstruction in the same clearance query used for spawning.
+func spawn_shape_blocker(shape: PackedVector2Array) -> String:
+	for polygon in paper_geometry(Sweep.bounds([shape])):
+		if not Geometry2D.intersect_polygons(shape,polygon).is_empty():return "terrain"
 	for entity in entities:
 		if not entity.alive:continue
 		# The surface, not the decorative façade, is the physical spawn blocker.
 		if entity.has_method("world_walk_segments"):
 			for edge in entity.world_walk_segments():
 				var a:Vector2=edge[0];var b:Vector2=edge[1]
-				if Geometry2D.is_point_in_polygon(a,shape) or Geometry2D.is_point_in_polygon(b,shape):return false
+				if Geometry2D.is_point_in_polygon(a,shape) or Geometry2D.is_point_in_polygon(b,shape):return entity.kind
 				for index in shape.size():
-					if Geometry2D.segment_intersects_segment(a,b,shape[index],shape[(index+1)%shape.size()])!=null:return false
+					if Geometry2D.segment_intersects_segment(a,b,shape[index],shape[(index+1)%shape.size()])!=null:return entity.kind
 		elif entity.collision_layer & 1:
 			for polygon in entity.world_polygons():
-				if not Geometry2D.intersect_polygons(shape,polygon).is_empty():return false
-	return true
+				if not Geometry2D.intersect_polygons(shape,polygon).is_empty():return entity.kind
+	return ""
 
 func safe_legacy_player_position(at: Vector2) -> Vector2:
 	var shape:=PackedVector2Array([at+Vector2(-0.25,-0.48),at+Vector2(0.25,-0.48),at+Vector2(0.25,0.56),at+Vector2(-0.25,0.56)])
 	return at if _spawn_shape_clear(shape) else safe_spawn_position(at.x)
 
-func safe_spawn_position(desired_x: float) -> Vector2:
+func safe_spawn_position(desired_x: float,near_y:float=INF) -> Vector2:
+	if paper_space!=null and (is_finite(near_y) or desired_x < terrain.profile[0].x or desired_x > terrain.profile[-1].x):
+		for i in 25:
+			var x:=desired_x + (0.0 if i==0 else ceilf(i*.5)*.35*(1 if i%2==1 else -1))
+			var surfaces:=paper_surfaces(x,-INF,INF)
+			surfaces.sort_custom(func(a,b):return absf(a.y-near_y)<absf(b.y-near_y) if is_finite(near_y) else a.y>b.y)
+			for level in surfaces:
+				if level.face!="floor":continue
+				var p:=Vector2(x,level.y+.66)
+				var shape:=PackedVector2Array([p+Vector2(-.22,-.44),p+Vector2(.22,-.44),p+Vector2(.22,.45),p+Vector2(-.22,.45)])
+				if _spawn_shape_clear(shape):return p
 	for i in 81:
 		var offset := 0.0 if i == 0 else float((i+1)/2)*0.5*(1 if i%2 == 1 else -1)
-		var x:=clampf(desired_x+offset,0.5,LENGTH-0.5)
+		var x:=clampf(desired_x+offset,0.5,east_walk_limit())
 		var candidate := Vector2(x,terrain.support_height(x,0.27)+0.56)
 		var shape := PackedVector2Array([candidate+Vector2(-0.25,-0.48),candidate+Vector2(0.25,-0.48),candidate+Vector2(0.25,0.56),candidate+Vector2(-0.25,0.56)])
 		if _spawn_shape_clear(shape):return candidate
@@ -300,8 +516,14 @@ func entity_by_id(stable_id: String):
 
 func draw_world(canvas: Node2D) -> void:
 	terrain.draw_world(canvas,game)
+	if paper_space!=null:paper_space.draw_world(canvas,game)
+	var paused_view := get_tree().paused
 	for entity in entities:
+		# The observer can change cameras while the bodies and animation clocks are paused.
+		if paused_view and is_instance_valid(entity.person_visual):
+			entity.person_visual.refresh_pose(0.0)
 		if Visibility.entity_visible(game,entity,1.5):entity.draw_entity(canvas,game)
+	if survival != null: preload("res://scripts/village_survival_art.gd").landscape(canvas,survival,game)
 	if bridge_trial != null: bridge_trial.draw_world(canvas,game)
 	for item in debris:
 		var a: Vector2 = game.world_to_screen(item.position)
@@ -319,7 +541,7 @@ func _polygon_segment(a: Vector2,b: Vector2,polygon: PackedVector2Array) -> Dict
 
 func segment_contact(a: Vector2,b: Vector2) -> Dictionary:
 	var nearest: Dictionary = {}
-	for polygon in terrain.collision_geometry:
+	for polygon in paper_geometry(Rect2(a,Vector2.ZERO).expand(b)):
 		var contact:=_polygon_segment(a,b,polygon)
 		if not contact.is_empty() and contact.time<nearest.get("time",INF):
 			contact.index=-1
@@ -353,7 +575,7 @@ func blade_contact(old: Array,current: Array,origin: Vector2 = Vector2.INF) -> D
 				var b: Vector2 = polygon[(edge+1)%polygon.size()]
 				edges.append({"a":a,"b":b,"bounds":Rect2(a,Vector2.ZERO).expand(b)})
 			candidates.append({"entity":entity,"polygon":polygon,"bounds":box,"edges":edges})
-	for polygon in terrain.collision_geometry:
+	for polygon in paper_geometry(area):
 		var box:=Sweep.bounds([polygon]).grow(BLADE_BOUNDS_MARGIN)
 		if not area.intersects(box,true): continue
 		var edges:Array=[]
@@ -575,7 +797,7 @@ static func _number(record: Dictionary,key: String,minimum: float,maximum: float
 	var value = record.get(key)
 	return (value is float or value is int) and is_finite(float(value)) and float(value) >= minimum and float(value) <= maximum
 
-static func validate_state(records: Variant) -> bool:
+static func validate_state(records: Variant, east_bound: float = Terrain.EastInk.ORIGINAL_EDGE.x, signed_pages:bool=false) -> bool:
 	if not records is Array: return false
 	if records.size() > 384: return false
 	var ids := {}
@@ -586,7 +808,10 @@ static func validate_state(records: Variant) -> bool:
 		var kind = record.get("kind")
 		if not id is String or id.length() < 1 or id.length() > 64 or ids.has(id) or not kind is String or not Entity.supported_kind(kind): return false
 		ids[id] = true
-		if not _number(record,"x",-5,185) or not _number(record,"y",-16,30) or not _number(record,"home_x",0,180): return false
+		if not _number(record,"home_x",0,180):return false
+		if signed_pages:
+			if not _number(record,"x",-INF,INF) or not _number(record,"y",-INF,INF):return false
+		elif not _number(record,"x",-5,east_bound) or not _number(record,"y",-16,30): return false
 		if record.has("angle") and not _number(record,"angle",-PI,PI): return false
 		if not _number(record,"health",0,Entity.initial_health(kind)) or not _number(record,"vx",-30,30) or not _number(record,"vy",-50,50): return false
 		if not record.get("alive") is bool or bool(record.alive) != (float(record.health)>0): return false
@@ -604,13 +829,25 @@ static func validate_state(records: Variant) -> bool:
 	return true
 
 static func validate_snapshot(world:Dictionary)->bool:
+	if not preload("res://scripts/world_chronicle.gd").valid_snapshot(world.get("chronicle",[])): return false
+	if world.has("paper_space") and not PaperSpace.valid_state(world.paper_space):return false
+	if world.has("adventurer") and not load("res://scripts/sandbox_adventurer.gd").valid_snapshot(world.adventurer): return false
+	if world.has("war_god") and not load("res://scripts/sandbox_war_god.gd").valid_snapshot(world.war_god):return false
+	if world.has("survival") and not preload("res://scripts/village_survival.gd").valid_state(world.survival): return false
 	if not preload("res://scripts/mill_bridge_trial.gd").valid_state(world.get("bridge_trial",{})): return false
 	for key in ["terrain_version","content_version"]:
 		var value=world.get(key,1)
 		if not (value is int or value is float):return false
 		if not is_finite(float(value)) or value<1 or value>3 or float(value)!=floorf(float(value)):return false
+	var east_segments = Terrain.EastInk.Pages.joined(world)
+	if not Terrain.EastInk.valid_chain(east_segments): return false
+	var east_bound := Terrain.EastInk.ORIGINAL_EDGE.x
+	if not east_segments.is_empty():
+		east_bound = float(east_segments.back().points.back()[0])
+	var paper_bounds := PaperSpace.saved_bounds(world.get("paper_space",{}),east_bound)
+	if not preload("res://scripts/ink_life_form.gd").valid_work(world.get("priest_work",{}),paper_bounds.end.x,paper_bounds.position.x): return false
 	var records=world.get("entities")
-	return validate_state(records) and (int(world.get("content_version",1))!=1 or records.size()<=96)
+	return validate_state(records,east_bound,world.has("paper_space")) and (int(world.get("content_version",1))!=1 or records.size()<=96)
 
 func _migrated_home(record: Dictionary) -> float:
 	var locations:Dictionary={"oak":[4.5,8.2,13.2,17.2],"pine":[90.6,93.0,98.0],"house":[22.5,28.5,34.5],"market":[43.0,47.0,51.0],"barrel":[20.0,38.0,41.0,48.8,66.0],"crate":[21.0,39.0,45.1,53.3,89.0],"villager":[25.5,31.5,37.0,55.0,64.0],"horse":[60.0],"wagon":[57.7],"driver":[58.15],"wall":[72.02,75.02,82.02,72.02,75.02,82.02],"tower":[69.4,84.64],"gate":[78.52],"dragon":[92.0]}
@@ -621,10 +858,13 @@ func _migrated_home(record: Dictionary) -> float:
 	if record.id!=record.kind+"-"+str(index) or index<0 or index>=homes.size(): return record.home_x
 	return homes[index]
 
-func restore_state(records: Array,source_terrain_version: int=Terrain.VERSION,source_content_version: int=CONTENT_VERSION,trial_state: Variant={}) -> bool:
+func restore_state(records: Array,source_terrain_version: int=Terrain.VERSION,source_content_version: int=CONTENT_VERSION,trial_state: Variant={}, east_segments: Variant=[], saved_paper:Variant=null) -> bool:
 	# Share this preflight with disk/network validation before any live state
 	# is cleared or an imported snapshot is persisted.
-	if not validate_snapshot({"entities":records,"terrain_version":source_terrain_version,"content_version":source_content_version,"bridge_trial":trial_state}):return false
+	var state:={"entities":records,"terrain_version":source_terrain_version,"content_version":source_content_version,"bridge_trial":trial_state,"east_segments":east_segments}
+	if saved_paper!=null:state.paper_space=saved_paper
+	if not validate_snapshot(state):return false
+	terrain.restore_east_segments(east_segments)
 	for entity in entities:
 		remove_child(entity)
 		entity.queue_free()
@@ -647,7 +887,7 @@ func restore_state(records: Array,source_terrain_version: int=Terrain.VERSION,so
 		var height:=terrain.travel_height(restored_x)
 		var restored_y:float=record.y
 		if source_terrain_version<Terrain.VERSION: restored_y=terrain.upgrade_position(Vector2(restored_x,restored_y),source_terrain_version).y
-		entity.setup(record.kind,Vector2(restored_x,restored_y),record.id,height)
+		entity.setup(record.kind,Vector2(restored_x,restored_y),record.id,height,single_player_ink())
 		entity.home_x = restored_home
 		Composition.configure_patrol(entity)
 		entity.home_x = restored_home
@@ -668,7 +908,7 @@ func restore_state(records: Array,source_terrain_version: int=Terrain.VERSION,so
 		entity.rebuild_geometry()
 		add_child(entity)
 		entities.append(entity)
-		if source_terrain_version<Terrain.VERSION or entity.kind in ["oak","pine","orchard_tree"]: _place_ground_prop(entity)
+		if source_terrain_version<Terrain.VERSION or entity.brush_art or entity.kind in ["oak","pine","orchard_tree"]: _place_ground_prop(entity)
 	if source_terrain_version<Terrain.VERSION:
 		for placement in authored.values():
 			if not placement.has("stack_on"):continue
@@ -677,5 +917,6 @@ func restore_state(records: Array,source_terrain_version: int=Terrain.VERSION,so
 				upper.position=lower.to_global(Vector2(0,lower.size.y))
 				upper.rotation=lower.rotation
 	if source_content_version<CONTENT_VERSION:_populate_expansion()
+	if survival != null: survival.index_entities()
 	if bridge_trial != null: bridge_trial.restore(trial_state)
 	return true

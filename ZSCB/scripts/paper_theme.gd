@@ -2,10 +2,10 @@ class_name PaperTheme
 extends RefCounted
 
 const INK := Color("263638")
-const MUTED := Color("687777")
+const MUTED := Color("687466")
 const MENU_MUTED := Color("4f6060")
 const TEAL := Color("386e70")
-const PAPER := Color("faf7ee")
+const PAPER := Color("faf5e7")
 const SHEET_PATH := "res://assets/ui/paper/sheet.png"
 const STRIP_PATH := "res://assets/ui/paper/strip.png"
 static var _textures: Dictionary = {}
@@ -34,19 +34,19 @@ static func paper_texture(path: String, color: Color = Color.WHITE, edge: int = 
 	return style
 
 static func panel(color: Color = PAPER, radius: int = 6) -> StyleBox:
-	var style := StyleBoxFlat.new()
+	var style := PaperCutStyle.new()
 	style.bg_color = color
-	style.border_color = Color("d3cfc2")
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(radius)
+	style.border_color = Color("d1cfb7")
 	style.set_content_margin_all(18)
-	style.shadow_color = Color(0.12, 0.15, 0.13, 0.09)
-	style.shadow_size = 4
-	style.shadow_offset = Vector2(0, 2)
+	style.depth = 4.0
 	return style
 
 static func scrap(color: Color = Color.WHITE) -> StyleBox:
-	return surface(PAPER if color == Color.WHITE else color, 9)
+	var style:=PaperCutStyle.new()
+	style.bg_color=PAPER if color==Color.WHITE else color
+	style.border_color=Color("c9ceba")
+	style.set_content_margin_all(9)
+	return style
 
 static func surface(color: Color = PAPER, padding: int = 10) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
@@ -55,6 +55,9 @@ static func surface(color: Color = PAPER, padding: int = 10) -> StyleBoxFlat:
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(6)
 	style.set_content_margin_all(padding)
+	style.shadow_color=Color(.22,.25,.17,.10)
+	style.shadow_size=2
+	style.shadow_offset=Vector2(0,2)
 	return style
 
 static func icon(name: String) -> Texture2D:
@@ -133,6 +136,10 @@ static func create_menu() -> Theme:
 	return result
 
 static func primary(button: Button) -> void:
+	if button is PaperSealButton:
+		button.filled = true
+		button.refresh_appearance()
+		return
 	for state in ["normal", "hover", "pressed"]:
 		var color := TEAL if state == "normal" else Color("498080") if state == "hover" else Color("295655")
 		var style := scrap(color)
@@ -142,6 +149,10 @@ static func primary(button: Button) -> void:
 		button.add_theme_color_override(state, PAPER)
 
 static func selected(button: Button, active: bool) -> void:
+	if button is PaperSealButton:
+		button.emphasized = active
+		button.refresh_appearance()
+		return
 	if active:
 		var style := surface(Color("e1eae3"), 9)
 		style.border_color = TEAL

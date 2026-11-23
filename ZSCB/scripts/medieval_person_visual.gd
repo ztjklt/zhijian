@@ -53,6 +53,9 @@ func actor_weapon() -> Dictionary: return {}
 func actor_state(): return null
 
 func _process(delta: float) -> void:
+	refresh_pose(delta)
+
+func refresh_pose(delta: float) -> void:
 	if game == null or not is_instance_valid(entity): return
 	visible = MedievalVisibility.entity_visible(game, entity)
 	if not visible: return

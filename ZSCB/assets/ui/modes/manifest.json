@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-18",
+  "tool": "Built-in image_gen",
+  "assets": [
+    {
+      "file": "sandbox.png",
+      "prompt": "Use case: stylized-concept. Asset type: production UI illustration for the Chinese indie game 纸间 mode selection. Create a single exquisite minimal paper-cut diorama on a genuinely transparent background. Subject: a rolling little mountain valley, an arched bridge, a few ink-outline trees, a tiny hilltop medieval castle, and one black stick figure drawing a bridge with a pencil. All contained in one wide asymmetric organic island silhouette, with spacious clean negative areas and no rectangular card border. Sophisticated warm ivory layered paper, restrained charcoal graphite outlines, muted sage teal accents, subtle embossed edges and soft cast shadows. Editorial craft, premium collectible paper sculpture, understated and calm, not childish. Front three-quarter view, horizontal composition roughly 3:2. Fine art but readable at 240px wide. No text, no letters, no UI labels, no logos, no watermark. Transparent outside the paper island, keep complete silhouette fully in frame with generous margin.",
+      "original": "exec-1ad96f07-cff3-43ad-802e-84aaac8d9527.png"
+    },
+    {
+      "file": "duel.png",
+      "prompt": "Use case: stylized-concept. Asset type: production UI illustration for the Chinese indie game 纸间 mode selection, matching a premium ivory paper-cut sandbox game. Create a single exquisite paper-cut diorama on a genuinely transparent background. Subject: two black ink stick figures facing each other on the two sides of an open notebook bridge, one holding a simple drawn sword, one holding a drawn spear, a tiny floating geometry triangle and a single elegant ink swoosh suggesting a duel. The notebook pages curl into an asymmetric organic paper island silhouette; no rectangular card border. Sophisticated warm ivory layered paper, restrained charcoal graphite outlines, muted terracotta-red accents and a touch of warm gold, subtle embossed edges and soft cast shadows. Editorial craft, premium collectible paper sculpture, very clean, no busy symbols. Front three-quarter view, horizontal composition roughly 3:2, matching a calm paper mountain diorama asset. Readable at 240px. No text, no letters, no UI labels, no logos, no watermark. Transparent outside the paper sculpture; complete silhouette fully in frame with generous margin.",
+      "original": "exec-3d1c82db-ce50-454e-b1d5-73b72a1e5c25.png"
+    },
+    {
+      "file": "seals.png",
+      "prompt": "Use case: stylized-concept. Asset type: one production game UI texture atlas, transparent background, for premium ivory-paper indie game 纸间. Produce precisely a 2 by 2 grid of four isolated unlabelled tactile paper seals, each centered in its equal square quadrant with generous consistent transparent gutters. Top left: a large softly irregular circular ivory wax-and-paper seal with a muted sage-teal inset ring and a fine graphite cross-swords emblem, used as the main attack button. Top right: a smaller folded-paper six-sided seal with a fine graphite pencil nib emblem and subtle sage-teal rim, drawing tool skill. Bottom left: a smaller organic three-lobed paper pebble seal with a fine graphite simple cube emblem, building skill. Bottom right: a smaller four-petal paper seal with a fine graphite geometric star emblem, sculpt skill. All have refined subtle paper fiber, crisp clean silhouettes, delicate embossing and very soft shadows. Premium, calm, coherent, spacious and readable at 52 to 80 pixels, not ornate, not mechanical, no glow, no fantasy jewels. No rectangular buttons or borders, no text or letters, no watermark. True transparent outside each seal, do not connect the seals. A clean square atlas viewed straight on.",
+      "original": "exec-bea5a534-3131-465b-a3ac-0a55b5059188.png"
+    }
+  ]
+}

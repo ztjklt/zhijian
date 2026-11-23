@@ -45,10 +45,11 @@ static func _cutter(cut: Dictionary, index: int) -> PackedVector2Array:
 static func _half(poly: PackedVector2Array, a: Vector2, b: Vector2, inside: bool) -> PackedVector2Array:
 	var result:=PackedVector2Array()
 	if poly.is_empty():return result
+	var edge:Vector2=(b-a).normalized()
 	var previous:Vector2=poly[-1]
-	var previous_side:float=(b-a).cross(previous-a)*(1 if inside else -1)
+	var previous_side:float=edge.cross(previous-a)*(1 if inside else -1)
 	for point in poly:
-		var side:float=(b-a).cross(point-a)*(1 if inside else -1)
+		var side:float=edge.cross(point-a)*(1 if inside else -1)
 		if (side>=-EPS)!=(previous_side>=-EPS):
 			var divisor:=previous_side-side
 			if absf(divisor)>EPS:result.append(previous.lerp(point,clampf(previous_side/divisor,0,1)))
@@ -61,7 +62,10 @@ static func _separated(a: PackedVector2Array,b: PackedVector2Array) -> bool:
 	# Convex fixtures and cutters are counterclockwise. A separating edge
 	# means no material intersects, so keep this fixture completely intact.
 	for i in a.size():
-		var edge:Vector2=a[(i+1)%a.size()]-a[i]
+		# EPS is a distance. A very short edge from an earlier cut must
+		# use the same perpendicular distance as a long edge.
+		var edge:Vector2=(a[(i+1)%a.size()]-a[i]).normalized()
+		if edge==Vector2.ZERO:continue
 		var outside:=true
 		for point in b:
 			if edge.cross(point-a[i])>EPS:
@@ -76,6 +80,7 @@ static func _subtract(poly: PackedVector2Array, cutter: PackedVector2Array) -> A
 	# Partition a convex polygon around each cutter half-plane. This supports
 	# interior holes without mistaking a hole contour for a solid polygon.
 	for i in cutter.size():
+		if cutter[i]==cutter[(i+1)%cutter.size()]:continue
 		var outside:=_half(remainder,cutter[i],cutter[(i+1)%cutter.size()],false)
 		if _usable(outside):result.append(outside)
 		remainder=_half(remainder,cutter[i],cutter[(i+1)%cutter.size()],true)

@@ -3,6 +3,7 @@ const Dialog:=preload("res://scripts/net/flow_dialog.gd")
 const Flow := preload("res://scripts/net/online_flow.gd")
 var session: PaperNetSession
 var panel: PanelContainer
+var column: VBoxContainer
 var heading: Label
 var connection: Label
 var peer: Label
@@ -11,6 +12,8 @@ var menu: VBoxContainer
 var retry_button: Button
 var dialog
 var dialog_action: Callable
+var room_button: PaperSealButton
+var room_dialog
 var invite_dialog
 var invite_field: LineEdit
 var copy_status: Label
@@ -25,7 +28,7 @@ var last_active := false
 func _ready()->void:
 	layer=6
 	panel=PanelContainer.new();panel.theme=PaperTheme.create();add_child(panel)
-	var column:=VBoxContainer.new();column.add_theme_constant_override("separation",5);panel.add_child(column)
+	column=VBoxContainer.new();column.add_theme_constant_override("separation",5);panel.add_child(column)
 	heading=_label(column,"",15);connection=_label(column,"",13);peer=_label(column,"",13)
 	var row:=HBoxContainer.new();column.add_child(row)
 	_button(row,"邀请朋友",show_invite)
@@ -41,11 +44,25 @@ func _ready()->void:
 	dialog=Dialog.new();add_child(dialog);dialog.get_cancel_button().text="继续游玩"
 	dialog.get_label().autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	dialog.confirmed.connect(_confirm);dialog.canceled.connect(_close_modal)
+	room_dialog = Dialog.new()
+	add_child(room_dialog)
+	room_dialog.title = "双人房间"
+	room_dialog.cancel_visible = false
+	room_dialog.get_ok_button().text = "返回游戏"
+	room_dialog.confirmed.connect(_close_modal)
+	room_dialog.canceled.connect(_close_modal)
+	room_button = PaperSealButton.new()
+	room_button.text = "房间"
+	room_button.add_theme_font_size_override("font_size", 14)
+	room_button.hide()
+	session.game.toolbar.add_child(room_button)
+	room_button.focus_mode = Control.FOCUS_NONE
+	room_button.pressed.connect(_show_room)
 	invite_dialog=Dialog.new();add_child(invite_dialog);invite_dialog.title="邀请朋友一起玩";invite_dialog.cancel_visible=false;invite_dialog.get_ok_button().text="关闭"
 	invite_dialog.confirmed.connect(_close_modal);invite_dialog.canceled.connect(_close_modal)
 	var invite_content:=VBoxContainer.new();invite_content.add_theme_constant_override("separation",12);invite_dialog.content.add_child(invite_content)
 	invite_intro=_label(invite_content,"把链接发给朋友：打开后确认昵称，点击加入即可。",15)
-	invite_field=LineEdit.new();invite_field.editable=false;invite_field.custom_minimum_size=Vector2(260,44);invite_content.add_child(invite_field)
+	invite_field=LineEdit.new();invite_field.editable=false;invite_field.custom_minimum_size=Vector2(0,44);invite_content.add_child(invite_field)
 	copy_button=_button(invite_content,"复制邀请链接",_copy_invite)
 	copy_status=_label(invite_content,"也可以选中链接，按 Ctrl/Cmd+C 手动复制。",13)
 	invite_details=_label(invite_content,"",14)
@@ -96,6 +113,7 @@ func _configure_works_menu()->void:
 
 func _show_dialog(title:String,text:String,ok_text:String,action:Callable)->void:
 	if dialog.visible or invite_dialog.visible:return
+	room_dialog.hide()
 	dialog.title=title;dialog.dialog_text=text;dialog.get_ok_button().text=ok_text;dialog_action=action
 	dialog.get_cancel_button().text="留在当前画面" if session.ended else "继续游玩"
 	session.set_meta("flow_modal",true)
@@ -106,6 +124,15 @@ func _confirm()->void:
 	_close_modal()
 	if dialog_action.is_valid():dialog_action.call()
 func _close_modal()->void:session.set_meta("flow_modal",false)
+
+func _show_room() -> void:
+	if room_dialog.visible or dialog.visible or invite_dialog.visible:
+		return
+	session.game.retain_active_stroke()
+	session.game.touch_controls.reset()
+	session.set_meta("flow_modal", true)
+	_popup(room_dialog, 440, 280)
+
 func request_exit(destination:String)->void:
 	if session.save_exit_pending or session.navigation_pending:return
 	if session.ended:
@@ -120,12 +147,13 @@ func request_import()->void:
 func show_invite()->void:
 	if dialog.visible or invite_dialog.visible:return
 	if session.ended:_notify("房间已结束，请回大厅重新打开作品并生成新邀请。",true);return
+	room_dialog.hide()
 	var custom:=session.address!=Flow.DEFAULT_ADDRESS
 	invite_field.text=session.code if custom else Flow.invite_url(session.code)
 	invite_intro.text="请朋友在高级连接设置填写同一服务器，再输入房间码。" if custom else "把链接发给朋友：打开后确认昵称，点击加入即可。"
 	copy_button.text="复制房间码" if custom else "复制邀请链接"
 	invite_details.text="服务器："+session.address if custom else "房间码："+session.code+"  ·  最多2人\n邀请里只有房间码，没有你的身份信息。"
-	copy_status.text="也可以选中链接，按 Ctrl/Cmd+C 手动复制。"
+	copy_status.text="也可以把房间码发给朋友。" if room_button.visible else "也可以选中链接，按 Ctrl/Cmd+C 手动复制。"
 	session.set_meta("flow_modal",true);_popup(invite_dialog,540,280)
 	invite_field.grab_focus();invite_field.select_all()
 func _copy_invite()->void:
@@ -139,13 +167,34 @@ func _copy_invite()->void:
 		if is_instance_valid(copy_status):copy_status.text="浏览器没有允许自动复制，请选中链接后手动复制。")
 	JavaScriptBridge.get_interface("navigator").clipboard.writeText(invite_field.text).then(copy_ok).catch(copy_failed)
 
-func _process(delta:float)->void:
-	if not is_instance_valid(session) or not is_instance_valid(session.game):return
-	var game:=session.game
-	if session.hud!=null:session.hud.hide()
-	if session.invite_button!=null:session.invite_button.hide()
-	panel.visible=not game.bag_open and not (game.experience!=null and game.experience.visible) and not ("weapon_lab_panel" in game and game.weapon_lab_panel!=null and game.weapon_lab_panel.visible) and not ("cooperation_panel" in game and game.cooperation_panel!=null and game.cooperation_panel.visible)
-	var size:=game.get_viewport_rect().size
+func _layout_room_controls(game) -> void:
+	var toolbar = game.toolbar
+	var mobile: bool = toolbar.has_method("mobile_landscape") and toolbar.mobile_landscape()
+	var parent: Control = room_dialog.content if mobile else panel
+	if column.get_parent() != parent:
+		if room_dialog.visible:
+			room_dialog.hide()
+			_close_modal()
+		column.reparent(parent, false)
+		for button in column.find_children("*", "Button", true, false):
+			button.custom_minimum_size.y = 44 if mobile else 36
+	var available: bool = not game.bag_open and not (game.experience!=null and game.experience.visible) and not ("weapon_lab_panel" in game and game.weapon_lab_panel!=null and game.weapon_lab_panel.visible) and not ("cooperation_panel" in game and game.cooperation_panel!=null and game.cooperation_panel.visible)
+	panel.visible = available and not mobile
+	room_button.visible = available and mobile and not toolbar.mobile_navigation_open()
+	if mobile:
+		if room_button.visible:
+			var title := "房间" if session.ready_to_play else "离线" if session.ended else "重连…"
+			if room_button.text != title:
+				room_button.text = title
+			room_button.size = Vector2(76, 44)
+			var vitals: Rect2 = toolbar.header.get_rect()
+			var actions: Rect2 = toolbar.top_actions.get_rect()
+			if toolbar.mode_group.is_visible_in_tree():
+				actions = actions.merge(toolbar.mode_group.get_rect())
+			var x := actions.position.x - room_button.size.x - 8
+			room_button.position = Vector2(x, vitals.position.y) if x >= vitals.end.x + 4 else Vector2(vitals.end.x + 8, maxf(vitals.end.y, actions.end.y) + 6)
+		return
+	var size: Vector2 = game.get_viewport_rect().size
 	var amount:=Flow.ui_scale(size)
 	var width:=minf(350,(size.x-24)/amount)
 	panel.scale=Vector2(amount,amount);panel.custom_minimum_size.x=width
@@ -156,6 +205,13 @@ func _process(delta:float)->void:
 		var controls=game.knowledge_world.controls if game.knowledge_world!=null else game.map_controls
 		if controls!=null and controls.panel.is_visible_in_tree():top=maxf(top,controls.panel.get_global_rect().end.y+12*amount)
 	panel.size=Vector2(width,0);panel.position=Vector2(size.x-width*amount-12*amount,top)
+
+func _process(delta:float)->void:
+	if not is_instance_valid(session) or not is_instance_valid(session.game):return
+	var game:=session.game
+	if session.hud!=null:session.hud.hide()
+	if session.invite_button!=null:session.invite_button.hide()
+	_layout_room_controls(game)
 	heading.text="房间 "+session.code+" · "+("房主" if session.is_owner else "客人")
 	connection.text=("已连接 · %dms" % session.round_trip_ms if session.round_trip_ms>=0 else "已连接") if session.ready_to_play else session.status
 	if session.ready_to_play:
@@ -172,4 +228,5 @@ func _process(delta:float)->void:
 		JavaScriptBridge.eval("window.paperOnlineActive = "+("true" if active else "false"),true)
 	last_active=active
 func _exit_tree()->void:
+	if is_instance_valid(room_button):room_button.queue_free()
 	if OS.has_feature("web"):JavaScriptBridge.eval("window.paperOnlineActive = false",true)

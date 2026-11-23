@@ -1,5 +1,7 @@
 class_name SaveStore
 
+const FunctionalPens := preload("res://scripts/functional_pens.gd")
+const Plans := preload("res://scripts/architecture/building_plans.gd")
 const SAVE_PATH := "user://paper_castle_v3.json"
 const MEDIEVAL_SAVE_PATH := "user://paper_castle_medieval_v1.json"
 const LEGACY_SAVE_PATH := "user://paper_castle_v1.json"
@@ -20,6 +22,7 @@ static func _valid_point(p: Variant) -> bool:
 static func _valid_path(path: Variant) -> bool:
 	if not path is Dictionary or not path.has("points"):
 		return false
+	if not path.points is Array or not FunctionalPens.Palette.valid(path.get("pigment","inherit")): return false
 	var points: Array = path.points
 	if points.size() < 2 or points.size() > DrawingRules.MAX_POINTS:
 		return false
@@ -45,6 +48,18 @@ static func _valid_object(obj: Variant) -> bool:
 		return false
 	if not obj.has("paths") or not obj.paths is Array:
 		return false
+	if obj.has("pen"):
+		var pen = obj.pen
+		if pen not in [FunctionalPens.SCENERY, FunctionalPens.TERRAIN, FunctionalPens.OBJECT] or not FunctionalPens.STYLES.has(obj.get("ink_style")): return false
+		if obj.get("dynamic") != (pen == "draw_object") or obj.paths.is_empty(): return false
+		for path in obj.paths:
+			if not path is Dictionary or path.get("collision") != (pen != "draw_scenery"): return false
+			if path.has("brush") and not FunctionalPens.Brush.BRUSHES.has(path.brush): return false
+	if obj.has("built_plan"):
+		var info = obj.built_plan
+		if not info is Dictionary or info.get("owner") not in ["player","companion"] or not Plans.pair(info.get("offset")) or not Plans.pair(info.get("origin")) or not Plans.valid_layout(info.get("layout"),obj.paths.size()): return false
+	if obj.has("stall_accounts"):
+		if not obj.has("built_plan") or not preload("res://scripts/architecture/stall_goods.gd").valid_accounts(obj.stall_accounts,obj.built_plan.layout.get("stations",[])):return false
 	if obj.paths.size() > 128:
 		return false
 	if obj.has("angle"):
@@ -85,12 +100,18 @@ static func _valid_bag(bag: Variant) -> bool:
 			return false
 		if entry.name.length() > 72:
 			return false
-		if entry.get("category", "") not in ["建筑", "地形", "武器"]:
+		if entry.get("category", "") not in ["建筑", "地形", "武器", "器具"]:
 			return false
 		if not entry.has("paths") or not entry.paths is Array:
 			return false
 		if entry.paths.size() > 128:
 			return false
+		if entry.has("pen"):
+			var as_object: Dictionary = entry.duplicate()
+			as_object.x = 0
+			as_object.y = 0
+			if not _valid_object(as_object): return false
+		if entry.has("layout") and (entry.get("pen")!="draw_scenery" or not Plans.valid_layout(entry.layout,entry.paths.size())): return false
 		ids[entry.id] = true
 		for path in entry.paths:
 			if not _valid_path(path):
@@ -125,7 +146,10 @@ static func _restore_vectors(data: Dictionary) -> void:
 			for point in path.get("points", []):
 				restored.append(Vector2(float(point.x), float(point.y)))
 			path.points = restored
-	for entry in data.get("bag", {}).get("entries", []):
+	restore_bag_vectors(data.get("bag",{}))
+
+static func restore_bag_vectors(bag: Dictionary) -> void:
+	for entry in bag.get("entries",[]):
 		if entry.has("grip"):
 			entry.grip = Vector2(float(entry.grip.x), float(entry.grip.y))
 		for path in entry.get("paths", []):
@@ -138,14 +162,17 @@ static func _valid_world(world: Variant) -> bool:
 	if not world is Dictionary or world.get("id", "") not in ["paper", "knowledge-v1", "medieval-v1", "nature-v1"]: return false
 	for key in ["player_y", "camera_y"]:
 		if not world.has(key) or not (world[key] is float or world[key] is int): return false
-		if not is_finite(float(world[key])) or absf(world[key]) > 1000000: return false
+		if not is_finite(float(world[key])) or (world.id!="medieval-v1" and absf(world[key]) > 1000000): return false
 	if world.id in ["knowledge-v1", "nature-v1"]:
 		if not _valid_point(world.get("checkpoint")): return false
 		if not world.get("bookmarks") is Array or world.bookmarks.size() > 6: return false
 		for id in world.bookmarks:
 			if not (id is float or id is int) or not is_finite(float(id)) or id != int(id) or id < 0 or id > 5: return false
 	if world.id == "medieval-v1":
+		var companion = world.get("companion",{})
+		if not companion is Dictionary or (companion.has("blueprints") and not _valid_bag(companion.blueprints)): return false
 		if not preload("res://scripts/medieval_world.gd").validate_snapshot(world): return false
+	if world.has("player_drawing") and not _valid_player_drawing(world.player_drawing): return false
 	if world.has("maps"):
 		if not world.maps is Dictionary or world.maps.size() > 4: return false
 		for id in world.maps:
@@ -153,14 +180,33 @@ static func _valid_world(world: Variant) -> bool:
 			if id not in ["paper", "knowledge-v1", "nature-v1", "medieval-v1"] or not slot is Dictionary: return false
 			if not slot.get("world") is Dictionary or slot.world.has("maps") or slot.world.get("id") != id or not _valid_world(slot.world): return false
 			for field in ["player_x", "camera_x"]:
-				if not (slot.get(field) is float or slot.get(field) is int) or not is_finite(float(slot[field])) or absf(slot[field]) > 1000000000: return false
+				if not (slot.get(field) is float or slot.get(field) is int) or not is_finite(float(slot[field])) or (id!="medieval-v1" and absf(slot[field]) > 1000000000): return false
 			if not slot.get("objects") is Array or slot.objects.size() > 600: return false
 			for object in slot.objects:
 				if not _valid_object(object) or not _valid_stats(object): return false
 			if not preload("res://scripts/structure_links.gd").valid_state(slot.world.get("connections", []), slot.objects): return false
 	return true
 
-static func save_game(paper: String, objects: Array, bag: Dictionary, camera_x: float, player_x: float, equipped_weapon: Dictionary = {}, world: Dictionary = {}) -> Dictionary:
+static func _valid_player_drawing(value: Variant) -> bool:
+	if not value is Dictionary or not value.get("drafts") is Dictionary or value.drafts.size()>8: return false
+	var tool = value.get("tool")
+	if not (tool is int or tool is float) or tool!=int(tool) or int(tool) not in [1,2,3,4,5,7,8,9]: return false
+	if not FunctionalPens.STYLES.has(value.get("style")) or not FunctionalPens.Palette.valid(value.get("pigment")): return false
+	var mode = value.get("paper_mode","legacy")
+	if mode!="legacy" and not preload("res://scripts/paper_world_pen.gd").MODES.has(mode): return false
+	if not preload("res://scripts/paper_world_pen.gd").ANCHORS.has(value.get("anchor_kind","free")): return false
+	for key in value.drafts:
+		if str(key) not in ["1","2","3","4","5","7","8","9"]: return false
+		var lines = value.drafts[key]
+		if not lines is Array or lines.size()>2048: return false
+		for line in lines:
+			if not line is Dictionary or not line.get("points") is Array or line.points.size()>DrawingRules.MAX_POINTS: return false
+			for pt in line.points:
+				if not pt is Dictionary or not (pt.get("x") is float or pt.get("x") is int) or not (pt.get("y") is float or pt.get("y") is int): return false
+				if not is_finite(pt.x) or not is_finite(pt.y) or absf(pt.x)>1e8 or absf(pt.y)>1e8: return false
+	return true
+
+static func encode_work(paper: String, objects: Array, bag: Dictionary, camera_x: float, player_x: float, equipped_weapon: Dictionary = {}, world: Dictionary = {}) -> Dictionary:
 	var world_data: Dictionary = _json_value(world)
 	if not world.is_empty() and not _valid_world(world_data):
 		return {"ok": false, "message": "地图存档状态无效，原作品已保留"}
@@ -177,7 +223,7 @@ static func save_game(paper: String, objects: Array, bag: Dictionary, camera_x: 
 	var encoded: Dictionary = _json_value(payload)
 	if paper not in ["draft", "textbook"] or objects.size() > 600 or not _valid_bag(encoded.bag):
 		return {"ok": false, "message": "作品数据无效，原作品已保留"}
-	if not is_finite(camera_x) or not is_finite(player_x) or absf(camera_x) > 1000000000 or absf(player_x) > 1000000000:
+	if not is_finite(camera_x) or not is_finite(player_x) or (world_data.get("id","")!="medieval-v1" and (absf(camera_x)>1000000000 or absf(player_x)>1000000000)):
 		return {"ok": false, "message": "作品位置无效，原作品已保留"}
 	for object in encoded.objects:
 		if not _valid_object(object) or not _valid_stats(object):
@@ -188,6 +234,12 @@ static func save_game(paper: String, objects: Array, bag: Dictionary, camera_x: 
 		if not _valid_stats(entry): return {"ok": false, "message": "图纸数据无效，原作品已保留"}
 	if not equipped_weapon.is_empty() and (encoded.equipped_weapon.get("role", "") != "weapon" or not _valid_object(encoded.equipped_weapon) or not _valid_stats(encoded.equipped_weapon)):
 		return {"ok": false, "message": "装备数据无效，原作品已保留"}
+	return {"ok":true,"data":encoded}
+
+static func save_game(paper: String, objects: Array, bag: Dictionary, camera_x: float, player_x: float, equipped_weapon: Dictionary = {}, world: Dictionary = {}) -> Dictionary:
+	var result := encode_work(paper,objects,bag,camera_x,player_x,equipped_weapon,world)
+	if not result.ok: return result
+	var encoded: Dictionary = result.data
 	var save_path := MEDIEVAL_SAVE_PATH if world.get("id", "") == "medieval-v1" else SAVE_PATH
 	var json := JSON.stringify(encoded)
 	var temporary := save_path + ".tmp"
@@ -208,6 +260,9 @@ static func save_game(paper: String, objects: Array, bag: Dictionary, camera_x: 
 
 static func load_game(expected_world_id: String = "") -> Dictionary:
 	var source := MEDIEVAL_SAVE_PATH if expected_world_id == "medieval-v1" else SAVE_PATH if FileAccess.file_exists(SAVE_PATH) else LEGACY_SAVE_PATH
+	return read_work(source, expected_world_id)
+
+static func read_work(source: String, expected_world_id: String) -> Dictionary:
 	if not FileAccess.file_exists(source):
 		return {"data": {}, "error": "还没有存档"}
 	var file := FileAccess.open(source, FileAccess.READ)
@@ -244,6 +299,7 @@ static func load_game(expected_world_id: String = "") -> Dictionary:
 	if data.version >= 2:
 		if not data.has("bag"):
 			data.bag = {"entries": [], "next_id": 1, "hotbar": [0, 0, 0, 0, 0, 0]}
+		if not data.bag is Dictionary or not data.bag.get("entries",[]) is Array: return {"data": {}, "error":"图纸包格式无效"}
 		if not data.bag.has("hotbar"):
 			data.bag.hotbar = [0, 0, 0, 0, 0, 0]
 			for i in range(min(6, data.bag.get("entries", []).size())):
@@ -255,7 +311,7 @@ static func load_game(expected_world_id: String = "") -> Dictionary:
 			return {"data": {}, "error": "存档中的位置无效"}
 		if not data.has("playerX") or not data.playerX is float and not data.playerX is int:
 			return {"data": {}, "error": "存档中的位置无效"}
-		if absf(data.cameraX) > 1000000000 or absf(data.playerX) > 1000000000:
+		if not is_finite(float(data.cameraX)) or not is_finite(float(data.playerX)) or (data.get("world",{}).get("id","")!="medieval-v1" and (absf(data.cameraX)>1000000000 or absf(data.playerX)>1000000000)):
 			return {"data": {}, "error": "存档中的位置无效"}
 	var weapon_data = data.get("equipped_weapon", {})
 	if not weapon_data is Dictionary or (not weapon_data.is_empty() and (weapon_data.get("role", "") != "weapon" or not _valid_object(weapon_data) or not _valid_stats(weapon_data))):

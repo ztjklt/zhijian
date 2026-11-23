@@ -4,7 +4,7 @@ const MAX_ENTRIES := 128
 const PAGE_SIZE := 12
 
 const NAMES := {
-	"wall": "城墙", "tower": "塔楼", "gate": "门洞", "ramp": "斜坡",
+	"ink_cup": "手绘墨杯", "wall": "城墙", "tower": "塔楼", "gate": "门洞", "ramp": "斜坡",
 	"platform": "平台", "ladder": "梯子", "freehand": "手绘建筑", "weapon": "手绘武器",
 	"circle": "圆形", "ellipse": "椭圆", "rectangle": "矩形", "triangle": "三角形", "line": "直线",
 }
@@ -52,7 +52,7 @@ static func add_entry(bag: Dictionary, object: Dictionary) -> Dictionary:
 		"paths": _copy(object.paths),
 		"favorite": false,
 	}
-	for key in ["role", "reach", "damage", "cooldown", "dynamic", "health", "max_health", "grip", "weapon_type", "model_fill"]:
+	for key in ["role", "reach", "damage", "cooldown", "dynamic", "health", "max_health", "grip", "weapon_type", "model_fill", "pen", "ink_style"]:
 		if object.has(key): entry[key] = object[key]
 	if object.get("role", "") == "weapon":
 		entry.category = "武器"
@@ -72,6 +72,9 @@ static func duplicate_entry(bag: Dictionary, id: int) -> Dictionary:
 		return {"entry": {}, "error": "图纸背包已满"}
 	var clone: Dictionary = _copy(source)
 	clone.id = bag.next_id
+	if clone.has("work_id"):
+		clone.source_work_id = clone.work_id
+		clone.work_id = "plan-"+Crypto.new().generate_random_bytes(12).hex_encode()
 	bag.next_id += 1
 	clone.name = source.name + " 副本"
 	if clone.name.length() > 72:
@@ -122,7 +125,7 @@ static func make_object(entry: Dictionary, x: float, y: float) -> Dictionary:
 		"blueprint_id": entry.id,
 	}
 
-	for key in ["role", "reach", "damage", "cooldown", "dynamic", "health", "max_health", "grip", "weapon_type", "model_fill"]:
+	for key in ["role", "reach", "damage", "cooldown", "dynamic", "health", "max_health", "grip", "weapon_type", "model_fill", "pen", "ink_style"]:
 		if entry.has(key): obj[key] = entry[key]
 	if obj.get("role", "") == "building": obj.health = obj.get("max_health", 120.0)
 	return obj

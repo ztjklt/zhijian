@@ -23,7 +23,7 @@ func _draw() -> void:
 	if toolbar == null or toolbar.game == null or toolbar.game.combat == null: return
 	var game = toolbar.game
 	var reserve = game.ink
-	var width := minf(204, maxf(160, size.x))
+	var width := clampf(size.x, 120, 204)
 	var font := get_theme_font("font")
 	var red := Color("a92337")
 	var black := Color("272932")

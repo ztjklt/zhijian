@@ -2,6 +2,8 @@ class_name BuildObject
 extends RigidBody2D
 
 var data: Dictionary = {}
+var scenery_mesh: ArrayMesh
+var pick_bounds := Rect2()
 var fill_contours: Array = []
 var damage_paths: Array = []
 var damage_prepared: Dictionary = {}
@@ -9,6 +11,9 @@ var damage_pending := false
 
 func setup(object_data: Dictionary) -> void:
 	data = object_data
+	var bounds := ShapeMatcher.bounds(data.get("paths",[]))
+	if not bounds.is_empty(): pick_bounds = Rect2(bounds.min_x,bounds.min_y,bounds.width,bounds.height)
+	_update_pen_mesh()
 	PaperObjectDamage.normalize(data)
 	damage_prepared=PaperObjectDamage.prepare(data)
 	damage_paths=damage_prepared.paths
@@ -16,10 +21,17 @@ func setup(object_data: Dictionary) -> void:
 	rotation = data.get("angle", 0.0)
 	collision_layer = 8 if data.get("kind", "") in ["gate", "ladder"] else 1
 	collision_mask = 1 | 8 | 64 | 128
+	if data.get("pen") == "draw_object": collision_mask |= 2
+	if data.get("pen")=="draw_object" and data.get("anchor",{}).get("kind") in ["ground","wall","hanging"]:
+		freeze = true
+		freeze_mode = FREEZE_MODE_STATIC
 	if not data.get("dynamic", true):
 		freeze = true
 		freeze_mode = FREEZE_MODE_STATIC
-		_build_fixed(damage_paths)
+		if data.get("pen") == "draw_scenery":
+			collision_layer = 0
+			collision_mask = 0
+		else: _build_fixed(damage_paths)
 		return
 	linear_damp = 0.08
 	angular_damp = 0.12
@@ -80,7 +92,14 @@ func sync_to_data() -> void:
 	data.y = position.y
 	data.angle = rotation
 
+func _update_pen_mesh() -> void:
+	if not data.has("pen") or not data.paths.any(func(path): return path.has("brush") or path.has("pigment")): return
+	var pens := preload("res://scripts/functional_pens.gd")
+	var visible_paths := pens.Brush.after_damage(data.paths,data.get("damage_cuts",[]))
+	scenery_mesh = pens.Brush.mesh_for(visible_paths,pens.STYLES[data.ink_style])
+
 func rebuild_damage() -> void:
+	_update_pen_mesh()
 	damage_prepared=PaperObjectDamage.prepare(data)
 	damage_paths=damage_prepared.paths
 	fill_contours=damage_prepared.fills if data.get("dynamic",true) else []

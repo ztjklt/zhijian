@@ -167,10 +167,13 @@ static func _add_batch(state:Dictionary,batch:Array)->void:
 static func _soil(a:Vector2,b:Vector2)->PackedVector2Array:
 	return _hull(PackedVector2Array([a,b,Vector2(b.x,DEEP),Vector2(a.x,DEEP)]))
 
-static func _world_geometry(game)->Dictionary:
+static func _world_geometry(game,footprint:Rect2)->Dictionary:
 	var result:Dictionary={"left":-INF,"right":INF,"polygons":[]}
 	var world=game.get("medieval_world")
 	if world!=null:
+		if world.get("paper_space")!=null:
+			result.polygons=world.paper_geometry(footprint.grow(DrawingRules.BUILD_RANGE*2))
+			return result
 		var profile:PackedVector2Array=world.terrain.profile
 		result.left=profile[0].x;result.right=profile[-1].x
 		for i in range(1,profile.size()):result.polygons.append(_soil(profile[i-1],profile[i]))
@@ -221,7 +224,7 @@ static func resolve(game,node:RigidBody2D,object:Dictionary)->Dictionary:
 			footprint=footprint.merge(bounds) if has_bounds else bounds;has_bounds=true
 			moving.append({"polygon":polygon,"bounds":bounds})
 	if moving.is_empty():return {"valid":false}
-	var geometry:=_world_geometry(game)
+	var geometry:=_world_geometry(game,footprint)
 	var min_x:float=geometry.left-footprint.position.x
 	var max_x:float=geometry.right-footprint.end.x
 	if min_x>max_x:return {"valid":false,"reason":"shape_wider_than_world"}

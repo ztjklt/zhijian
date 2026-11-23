@@ -288,9 +288,9 @@ func run() -> void:
 	game.set_draw_mode(3)
 	check(not game.selecting_weapon_grip, "grip selection cannot hijack the next drawing mode")
 
-	# Compact layouts must remain touchable and fit both phone orientations.
+	# Phone gameplay and text editing stay in landscape, including short screens.
 	root.content_scale_size = Vector2i.ZERO
-	for viewport_size in [Vector2i(844, 390), Vector2i(390, 844)]:
+	for viewport_size in [Vector2i(844, 390), Vector2i(568, 320)]:
 		root.size = viewport_size
 		game.touch_controls.force_visible = true
 		await process_frame
@@ -348,7 +348,10 @@ func run() -> void:
 		if game.bag_open: game.toggle_bag()
 		if game.toolbar.get("mode_buttons") != null:
 			for button in game.toolbar.mode_buttons:
+				if not button.is_visible_in_tree():continue
 				check(button.size.y >= 40 and button.get_global_rect().end.x <= viewport_size.x + 0.1, "phone mode button has a visible touch target")
+		for skill in game.touch_controls.skill_rects.values():
+			check(skill.size.y>=44 and Rect2(Vector2.ZERO,Vector2(viewport_size)).encloses(skill),"visible MOBA skill replaces the hidden toolbar mode target")
 	var invalid_equipment := {"x": 0, "y": 0, "paths": [{"points": [Vector2.ZERO, Vector2.RIGHT]}]}
 	var rejected_save := SaveStore.save_game("draft", [], BlueprintBag.new_bag(), 0, 0, invalid_equipment)
 	check(not rejected_save.ok, "non-weapon equipment is rejected before overwriting the saved work")

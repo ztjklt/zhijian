@@ -21,6 +21,8 @@ var patrol_turn_cooldown := 0.0
 var patrol_half_width := 3.0
 var home_x := 0.0
 var ground_y := -2.8
+const BuildingBook := preload("res://scripts/architecture/building_book.gd")
+var brush_art := false
 var texture: Texture2D
 var companion_id := ""
 var reaction_texture: Texture2D
@@ -75,7 +77,7 @@ static func initial_health(category: String) -> float:
 		"dragon": return 180.0
 	return 80.0
 
-func setup(category: String, at: Vector2, stable_id: String, floor_y: float) -> void:
+func setup(category: String, at: Vector2, stable_id: String, floor_y: float, use_pen_art := false) -> void:
 	kind = category
 	patrol_half_width = 1.1 if kind in ["king","queen"] else 3.0
 	entity_id = stable_id
@@ -105,7 +107,19 @@ func setup(category: String, at: Vector2, stable_id: String, floor_y: float) -> 
 	contact_monitor = true
 	max_contacts_reported = 8
 	var asset: String = Catalog.definition(kind).get("path","res://assets/medieval/" + kind + ".png")
-	if kind == "castle_piece" and not castle_descriptor.is_empty():
+	var book_key := BuildingBook.key_for(kind) if use_pen_art else ""
+	if not book_key.is_empty():
+		brush_art = true
+		texture = load(BuildingBook.BAKED + book_key + ".png")
+		source_rect = Rect2(Vector2.ZERO,texture.get_size())
+		if kind == "castle_piece":
+			# The new sheet occupies exactly the reference castle's occupied bounds.
+			var original: Rect2 = castle_descriptor.source_uv
+			var pixel_at := original.position * CastleLayout.REFERENCE_SIZE
+			var pixel_size := original.size * CastleLayout.REFERENCE_SIZE
+			var ratio := texture.get_size() / CastleLayout.SOURCE_BOUNDS.size
+			source_rect = Rect2((pixel_at-CastleLayout.SOURCE_BOUNDS.position)*ratio, pixel_size*ratio)
+	elif kind == "castle_piece" and not castle_descriptor.is_empty():
 		texture = load(CastleLayout.ATLAS_PATH)
 		var source_uv: Rect2 = castle_descriptor.source_uv
 		source_rect = Rect2(source_uv.position*Vector2(texture.get_size()),source_uv.size*Vector2(texture.get_size()))
@@ -176,6 +190,8 @@ func ensure_person_visual(context) -> void:
 		return
 	person_visual = PersonScene.instantiate()
 	person_visual.set_script(PersonVisual)
+	if get_parent().has_method("single_player_ink") and get_parent().single_player_ink():
+		person_visual.z_index = 3
 	person_visual.entity = self
 	person_visual.game = context
 	person_visual.name = "PersonVisual_"+entity_id
@@ -480,6 +496,8 @@ func draw_entity(canvas: Node2D, game) -> void:
 	if texture == null or (not alive and not is_actor() and not is_foliage()): return
 	var screen_scale: float = game.PIXELS_PER_UNIT
 	var tint := Color(1,1,1,0.45 if hurt_timer > 0 and int(age*18)%2 == 0 else 1.0)
+	if (is_foliage() or kind in ["oak","pine","orchard_tree"]) and get_parent() != null and get_parent().has_method("single_player_ink") and get_parent().single_player_ink():
+		tint.a *= .57 if is_foliage() else .71
 	if is_actor():
 		var frame := frame_index()
 		if kind in ["horse","dragon"] or Fauna.has_kind(kind):

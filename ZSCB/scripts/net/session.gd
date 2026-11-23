@@ -485,14 +485,14 @@ func tick(delta: float) -> void:
 	_input_keys()
 	var focus:=game.get_viewport().gui_get_focus_owner()
 	var blocked:bool=not focus_active or focus is LineEdit or focus is TextEdit or game.bag_open or (game.knowledge_world!=null and game.knowledge_world.overview) or (game.experience!=null and game.experience.visible) or game.lab_open() or game.cooperation_open()
-	jump_queued=false if blocked else jump_queued or Input.is_action_just_pressed("jump")
+	jump_queued=false if blocked else jump_queued or Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("touch_jump")
 	send_clock+=delta; preview_clock+=delta
 	profile_clock+=delta
 	if profile_clock>=10: profile_clock=0; _save_profile()
 	var combat_blocked:bool = blocked or game.selecting_weapon_grip
 	combat_intent.step(game,delta,combat_blocked)
 	var stick:Vector2=game.touch_controls.movement_vector() if game.touch_controls!=null else Vector2.ZERO
-	var controls:={"blocked":blocked,"combat_blocked":combat_blocked,"left":not blocked and (Input.is_action_pressed("move_left") or stick.x<-.25),"right":not blocked and (Input.is_action_pressed("move_right") or stick.x>.25),"up":not blocked and (Input.is_action_pressed("move_up") or stick.y<-.5),"down":not blocked and (Input.is_action_pressed("move_down") or stick.y>.5),"jump":not blocked and (Input.is_action_pressed("jump") or jump_queued)}
+	var controls:={"blocked":blocked,"combat_blocked":combat_blocked,"left":not blocked and (Input.is_action_pressed("move_left") or stick.x<-.25),"right":not blocked and (Input.is_action_pressed("move_right") or stick.x>.25),"up":not blocked and (Input.is_action_pressed("move_up") or stick.y<-.5),"down":not blocked and (Input.is_action_pressed("move_down") or stick.y>.5),"jump":not blocked and (Input.is_action_pressed("jump") or Input.is_action_pressed("touch_jump") or jump_queued)}
 	prediction.step(game,delta,controls,true,Time.get_ticks_msec())
 	if send_clock>=.05 or controls!=last_controls:
 		last_blocked=blocked;last_combat_blocked=combat_blocked
@@ -605,6 +605,7 @@ func import_local() -> void:
 	var data:Dictionary=result.data
 	var world:Dictionary=data.get("world",{"id":"paper"})
 	if world.get("id","paper")!=game.world_kind: game.message("请在相同地图的房间导入旧作品"); return
+	if world.has("east_segments"): game.message("东侧续画作品目前只可在单人沙盒中继续"); return
 	var text:=Codec.encode({"objects":data.objects,"world":world})
 	if text=="": game.message("旧作品数据超过容量，原世界未改变"); return
 	var count:=ceili(float(text.length())/12000)

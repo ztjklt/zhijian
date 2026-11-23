@@ -77,7 +77,7 @@ func run() -> void:
 		game.toolbar.works.show_popup()
 		await process_frame
 		check(game.toolbar.works.get_popup().visible, "native works popup opens " + str(dimensions))
-		check(game.toolbar.works.get_popup().get_theme_font_size("font_size") == roundi(16 * factor), "popup typography scales outside Control transform " + str(dimensions))
+		check(is_equal_approx(game.toolbar.works.get_popup().get_theme_font_size("font_size")*game.toolbar.works.get_popup().content_scale_factor,16*factor), "popup typography scales exactly once " + str(dimensions))
 		game.toolbar.works.get_popup().hide()
 		await settle()
 		game.activate_draw_mode(1)
@@ -105,7 +105,7 @@ func run() -> void:
 		game.touch_controls.force_visible = true
 		game.touch_controls._layout()
 		check(bounds.encloses(game.touch_controls.attack_rect) and bounds.encloses(game.touch_controls.generate_rect), "touch controls within viewport " + str(dimensions))
-		check(is_equal_approx(game.touch_controls.attack_rect.size.x, 72 * factor), "touch target scales " + str(dimensions))
+		check(is_equal_approx(game.touch_controls.attack_rect.size.x, 78 * factor), "dominant attack target scales " + str(dimensions))
 		game.touch_controls.force_visible = false
 		game.camera_y = game.camera_target_y()
 		var player_pixel: Vector2 = game.world_to_screen(game.player.position)

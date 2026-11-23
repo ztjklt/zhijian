@@ -41,7 +41,7 @@ func start(distance:float)->Dictionary:
 	if distance not in DISTANCES:return {"ok":false,"error":"请选择1.2、2.5或5米试靶"}
 	var point:Vector2=game.player.position+Vector2(game.facing*distance,.2)
 	if game.knowledge_world!=null and (point.x<game.knowledge_world.LEFT or point.x>game.knowledge_world.RIGHT):return {"ok":false,"error":"试靶需要位于当前地图内"}
-	if game.medieval_world!=null and (point.x<0 or point.x>game.medieval_world.LENGTH):return {"ok":false,"error":"试靶需要位于当前地图内"}
+	if game.medieval_world!=null and (point.x<0 or point.x>game.medieval_world.east_walk_limit()):return {"ok":false,"error":"试靶需要位于当前地图内"}
 	var query:=PhysicsShapeQueryParameters2D.new();var shape:=CircleShape2D.new();shape.radius=.3
 	query.shape=shape;query.transform=Transform2D(0,point);query.collision_mask=1|8|2|64|128;query.exclude=[game.player.get_rid()]
 	if not game.get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():return {"ok":false,"error":"这里有地形或部件，请在空处换方向布靶"}

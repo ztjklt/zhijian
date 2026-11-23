@@ -1,0 +1,15 @@
+{
+  "scope": "UI only",
+  "assets": [
+    {
+      "file": "hills.png",
+      "size": [
+        2172,
+        724
+      ],
+      "mode": "RGB",
+      "sha256": "1c9c73aa232ceb772593890e2d5cc6edf9f1a93b63fb2bb15151f3c03024f178",
+      "role": "UI illustration only"
+    }
+  ]
+}

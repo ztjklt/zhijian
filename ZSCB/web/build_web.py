@@ -117,8 +117,9 @@ vram_texture_compression/for_mobile=true
 html/export_icon=false
 html/custom_html_shell="res://web_shell.html"
 html/head_include=""
-html/canvas_resize_policy=2
+html/canvas_resize_policy=0
 html/focus_canvas_on_start=true
+html/experimental_virtual_keyboard=true
 progressive_web_app/enabled=false
 ''')
     return project, site

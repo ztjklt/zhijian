@@ -29,10 +29,10 @@ func run() -> void:
 	await click(menu.buttons.practice)
 	check(current_scene.scene_file_path=="res://scenes/map_select.tscn","real mouse click enters solo maps")
 	var selector=current_scene
-	var start: Button=selector.cards.get_child(1).find_children("*","Button",true,false)[0]
+	var start: Button=selector.mode_buttons.sandbox
 	await click(start)
 	var game=current_scene
-	check(game is PaperCastleMain and game.world_kind=="knowledge-v1","real map button starts current game")
+	check(game is PaperCastleMain and game.world_kind=="medieval-v1","sandbox portal starts the real mountain world")
 	game.onboarding.persist=false; game.onboarding.dismiss(); game.combat.set_natives(false)
 	game.set_physics_process(false); game.player.freeze=true
 	await click(game.toolbar.mode_buttons[1])
@@ -63,11 +63,11 @@ func run() -> void:
 	game.combat.attack(Vector2.RIGHT)
 	check(game.combat.swing>0,"equipped sword actually attacks")
 	# A real file-open failure must keep the player in the game.
-	DirAccess.make_dir_absolute(SaveStore.SAVE_PATH + ".tmp")
+	DirAccess.make_dir_absolute(SaveStore.MEDIEVAL_SAVE_PATH + ".tmp")
 	game.save_and_return_to_title()
 	await frames()
 	check(current_scene==game and game.toolbar.status_text.contains("无法打开"),"save failure stays in game and reports failure")
-	DirAccess.remove_absolute(SaveStore.SAVE_PATH + ".tmp")
+	DirAccess.remove_absolute(SaveStore.MEDIEVAL_SAVE_PATH + ".tmp")
 	game.draft=[{"points":[p,p+Vector2(1,1)]}]
 	game.mode_drafts[3]=game.draft
 	var popup: PopupMenu=game.toolbar.works.get_popup()
@@ -77,11 +77,11 @@ func run() -> void:
 	popup.id_pressed.emit(9)
 	await frames()
 	check(current_scene.scene_file_path=="res://scenes/title_menu.tscn","save and return reaches cover")
-	check(SaveStore.load_game().error.is_empty(),"save and return writes a valid world")
+	check(SaveStore.load_game("medieval-v1").error.is_empty(),"save and return writes a valid world")
 	check(is_instance_valid(game) and game.draft.size()==1 and not game.is_processing(),"return preserves unfinished draft in dormant session")
 	check(not game.get_node("VisualQuality").visible,"dormant world's shader stays hidden on cover")
 	await click(current_scene.buttons.practice)
-	await click(current_scene.continue_buttons["knowledge-v1"])
+	await click(current_scene.continue_buttons["medieval-v1"])
 	check(current_scene==game and game.objects.size()==1 and game.draft.size()==1,"continue restores exact world and draft")
 	check(game.get_node("VisualQuality").visible,"continue reapplies saved world quality")
 	game.toolbar.works.get_popup().id_pressed.emit(8)
@@ -90,7 +90,7 @@ func run() -> void:
 	# Simulate a fresh process by releasing dormant memory, then read from disk.
 	root.get_node("MapSessions").free()
 	await click(current_scene.buttons.practice)
-	await click(current_scene.continue_buttons["knowledge-v1"])
+	await click(current_scene.continue_buttons["medieval-v1"])
 	game=current_scene
 	check(game is PaperCastleMain and game.objects.size()==1 and not game.equipped_weapon.is_empty(),"disk reload restores building and equipped weapon")
 	game.free()

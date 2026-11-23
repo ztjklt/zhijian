@@ -19,13 +19,27 @@ func run() -> void:
 	var menu = load("res://scenes/title_menu.tscn").instantiate()
 	root.add_child(menu); current_scene = menu
 	await frames()
-	for window_size in [Vector2i(1280,720),Vector2i(960,540),Vector2i(844,390),Vector2i(390,844)]:
+	for item:Dictionary in menu.layout.layers:
+		var node:Control=menu.layers[item.id]
+		var texture:Texture2D=node.texture_normal if node is TextureButton else node.texture
+		if texture is AtlasTexture:
+			var crop:Array=item.crop
+			check(texture.region==Rect2(crop[0],crop[1],crop[2],crop[3]),"original cover crop retained: "+item.id)
+			texture=texture.atlas
+		check(texture.resource_path=="res://assets/cover/"+item.file,"original artwork retained: "+item.id)
+	check(menu.layers["title-paper"] is TextureRect and menu.layers["title-between"] is TextureRect,"original title lettering remains artwork")
+	for window_size in [Vector2i(1280,720),Vector2i(3840,2160),Vector2i(960,540),Vector2i(844,390),Vector2i(390,844)]:
 		root.size = window_size
 		await frames()
 		for key in ["practice","multiplayer","settings"]:
 			var action: BaseButton = menu.buttons[key]
 			check(Rect2(Vector2.ZERO,Vector2(window_size)).encloses(action.get_global_rect()), key+" fits "+str(window_size))
 			check(action.pressed.get_connections().size()>0, key+" has an action")
+			check(action is TextureButton and action.ignore_texture_size and action.stretch_mode==TextureButton.STRETCH_KEEP_ASPECT_CENTERED,key+" keeps its original image and aspect ratio "+str(window_size))
+		if window_size.x>=960:
+			check(menu.layers["school-left"].visible and menu.layers["school-right"].visible,"desktop retains original side illustrations")
+			for item:Dictionary in menu.layout.layers:
+				check(is_equal_approx(menu.layers[item.id].rotation_degrees,item.get("rotation",0.0)),"original desktop tilt: "+item.id)
 	menu.buttons.settings.pressed.emit()
 	await frames()
 	check(menu.settings_panel.visible,"settings opens from cover")

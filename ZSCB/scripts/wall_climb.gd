@@ -47,6 +47,7 @@ func step(actor: RigidBody2D, direction: int, delta: float, enabled: bool = true
 	for height in [0.1,0.0,-0.16]:
 		var start := actor.global_position+Vector2(0,height)
 		var hit := _ray(actor,start,start+Vector2(direction*0.5,0))
+		if not hit.is_empty() and hit.collider is BuildObject and hit.collider.data.get("pen") == "draw_object": continue
 		if not hit.is_empty() and hit.normal.x*direction < -0.7 and absf(hit.normal.y) < 0.45:
 			wall = hit
 			break

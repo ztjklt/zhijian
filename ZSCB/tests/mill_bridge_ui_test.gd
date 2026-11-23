@@ -20,9 +20,11 @@ func run()->void:
 		game.toolbar.navigation_open=true;controls._process(0)
 		controls.trial_entry.pressed.emit()
 		check(absf(game.player.position.x-134)<2 and game.draft.size()==1,"actual event entry moves to mill and retains unfinished drawing")
-		for size in [Vector2i(1280,800),Vector2i(844,390),Vector2i(390,844),Vector2i(2560,1440)]:
+		for size in [Vector2i(1280,800),Vector2i(844,390),Vector2i(812,375),Vector2i(568,320),Vector2i(2560,1440)]:
 			root.size=size
 			game.touch_controls.force_visible=true
+			game.toolbar._layout();game.touch_controls._layout()
+			game.toolbar.navigation_open=true
 			for i in 4:await process_frame
 			controls._process(0)
 			if size==Vector2i(844,390):print("MILL UI RECT panel=",controls.panel.get_global_rect()," tools=",game.toolbar.bottom.get_global_rect())
@@ -33,12 +35,17 @@ func run()->void:
 				if tool.is_visible_in_tree() and controls.panel.get_global_rect().intersects(tool.get_global_rect()):overlaps_tool=true
 			check(not overlaps_tool,"event panel does not overlap any actual tool button at "+str(size))
 			if size==Vector2i(844,390):
+				game.toolbar.navigation_open=false
+				for i in 4:await process_frame
+				check(not controls.panel.visible,"phone event card stays inside map navigation while playing")
 				game.camera_x=133.5;game.camera_y=game.camera_target_y()
 				var bridge_point:Vector2=game.world_to_screen(Vector2(133.5,5.2))
 				var bridge_hidden:=false
 				for tool in game.toolbar.bottom.find_children("*","BaseButton",true,false):
 					if tool.is_visible_in_tree() and tool.get_global_rect().grow(4).has_point(bridge_point):bridge_hidden=true
 				check(not bridge_hidden and Rect2(Vector2.ZERO,Vector2(size)).has_point(bridge_point),"narrow framing leaves the bridge itself visible below the tools")
+				game.toolbar.navigation_open=true
+				for i in 4:await process_frame
 			for target in [controls.trial_entry,button]:
 				var owned:=InputEventScreenTouch.new();owned.index=72;owned.pressed=true;owned.position=target.get_global_rect().get_center()
 				game.touch_controls.handle_touch(owned)
@@ -60,7 +67,7 @@ func run()->void:
 			game.toolbar.navigation_open=false
 		root.size=Vector2i(1280,800)
 		for i in 4:await process_frame
-		var touch=game.touch_controls;touch.force_visible=true;controls._process(0)
+		var touch=game.touch_controls;touch.force_visible=true;game.toolbar.navigation_open=true;controls._process(0)
 		var press:=InputEventScreenTouch.new();press.index=57;press.pressed=true;press.position=button.get_global_rect().get_center()
 		touch.handle_touch(press)
 		check(touch.owners.get(57,"")=="ui" and game.active_stroke==null,"touch on event action is owned by UI rather than painting")

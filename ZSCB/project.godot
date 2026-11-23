@@ -10,17 +10,27 @@ config_version=5
 
 [application]
 
-config/name="纸上城堡 · 火柴人沙盒"
+config/name="ZhijianTeamWorlds"
 run/main_scene="res://scenes/title_menu.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
+
+[autoload]
+
+ModelConnections="*res://scripts/model_connections.gd"
 
 [display]
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
+window/handheld/orientation=4
 
 [input]
+
+touch_jump={
+"deadzone": 0.5,
+"events": []
+}
 
 toggle_bow={
 "deadzone": 0.5,

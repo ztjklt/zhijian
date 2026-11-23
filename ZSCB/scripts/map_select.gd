@@ -1,5 +1,6 @@
 extends Control
 
+var team_panel: Control
 var content: VBoxContainer
 var cards: GridContainer
 var status: Label
@@ -9,101 +10,101 @@ var previews: Array[Control] = []
 var preview_textures: Dictionary = {}
 var legacy_nature_button: Button
 
+var mode_buttons: Dictionary = {}
+var brand: Label
+var heading: Label
+var tagline: Label
+var back_button: Button
+var landscape_guard: PaperLandscapeGuard
+
 func _ready() -> void:
-	get_window().title = "纸间 · 选择一张纸上的世界"
+	get_window().title = "纸间 · 选择模式"
 	get_window().content_scale_size = Vector2i.ZERO
 	theme = PaperTheme.create_menu()
 	scroll = ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
 	add_child(scroll)
 	content = VBoxContainer.new()
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	content.add_theme_constant_override("separation", 12)
+	content.add_theme_constant_override("separation",12)
 	scroll.add_child(content)
-	_label(content, "P A P E R   C A S T L E", 13, Color("5f574d"))
-	_label(content, "在纸上，选一个世界。", 32)
-	_label(content, "画出造物，走进笔迹。每张地图都有独立的作品存档。", 15, Color("5f574d"))
+	brand = _label(content,"纸 间   /   PLAY",13,Color("708174"))
+	heading = _label(content,"选一种，开始。",34)
+	tagline = _label(content,"把想象画成世界，或与朋友一决高下。",15,Color("65746a"))
 	cards = GridContainer.new()
-	cards.add_theme_constant_override("h_separation", 22)
-	cards.add_theme_constant_override("v_separation", 18)
+	cards.columns = 2
+	cards.add_theme_constant_override("h_separation",16)
 	content.add_child(cards)
-	_card("medieval-v1", "01  /  INK FRONTIER", "墨线边境 · 纸上山野", "山河中世纪 · 火柴人的世界", "走过丘陵树林、山脚村庄与河边集市，跨河登上城堡山。\n六种火柴人、马车与飞龙生活在同一张纸面，宏伟城堡可以逐段砸毁。", true)
-	_card("knowledge-v1", "02  /  THE NOTEBOOK", "课本漫游", "六章知识 · 保留原来的地图", "在完整诗文、公式与图形之间穿行。\n二连跳、攀墙、画建筑搭桥，沿着课本的页边探索。", false)
+	_portal("sandbox","沙盒模式","纸上山野 · 自由创造","进入沙盒","01",Color("376f65"),"res://assets/ui/modes/sandbox.png",func(): start_map("medieval-v1"))
+	_portal("duel","双人对战","课本世界 · 好友同场","邀请朋友","02",Color("9b6151"),"res://assets/ui/modes/duel.png",open_duel)
+	team_panel = preload("res://scripts/team_worlds_panel.gd").new()
+	add_child(team_panel)
+	var continuations := HFlowContainer.new()
+	continuations.alignment = FlowContainer.ALIGNMENT_CENTER
+	content.add_child(continuations)
+	var teams := PaperSealButton.new()
+	teams.text = "队伍与世界存档"
+	teams.pressed.connect(team_panel.open)
+	continuations.add_child(teams)
+	for id in ["medieval-v1","knowledge-v1"]:
+		var resume := PaperSealButton.new()
+		resume.text = "继续沙盒作品" if id == "medieval-v1" else "继续旧课本作品"
+		resume.custom_minimum_size = Vector2(150,44)
+		resume.disabled = _cached_game(id) == null and not _has_saved_map(id)
+		resume.visible = not resume.disabled
+		resume.pressed.connect(func(): start_map(id,true))
+		continuations.add_child(resume)
+		continue_buttons[id] = resume
 	if _cached_game("nature-v1") != null or _has_saved_map("nature-v1"):
-		legacy_nature_button = Button.new()
+		legacy_nature_button = PaperSealButton.new()
 		legacy_nature_button.text = "继续旧版山野作品"
-		legacy_nature_button.custom_minimum_size.y = 36
+		legacy_nature_button.custom_minimum_size = Vector2(170,44)
 		legacy_nature_button.pressed.connect(func(): start_map("nature-v1",true))
-		content.add_child(legacy_nature_button)
-	status = _label(content, "1–5 选择工具 · 同键确认造物 · 6 图纸 · R 使用武器 · 3 选择武器类型", 13, Color("5f574d"))
-	var online := Button.new()
-	online.text = "双人联机 · 创建 / 加入房间"
-	online.custom_minimum_size.y = 44
-	online.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/network_lobby.tscn"))
-	content.add_child(online)
-	var back := Button.new()
-	back.text = "返回封面"
-	back.custom_minimum_size.y = 44
-	back.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/title_menu.tscn"))
-	content.add_child(back)
+		continuations.add_child(legacy_nature_button)
+	continuations.visible = continuations.get_children().any(func(node): return node.visible)
+	status = _label(content,"沙盒随心画 · 对战与朋友共用一张纸",13,Color("708174"))
+	back_button = PaperSealButton.new()
+	back_button.text = "返回封面"
+	back_button.custom_minimum_size = Vector2(136,44)
+	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	back_button.pressed.connect(func(): get_tree().change_scene_to_file.call_deferred("res://scenes/title_menu.tscn"))
+	content.add_child(back_button)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
+	mode_buttons.sandbox.grab_focus()
+	landscape_guard = PaperLandscapeGuard.install(self)
+
+func open_duel() -> void:
+	get_tree().set_meta("paper_entry_map","knowledge-v1")
+	get_tree().change_scene_to_file.call_deferred("res://scenes/network_lobby.tscn")
 
 func _unhandled_input(event: InputEvent) -> void:
+	if team_panel != null and team_panel.visible: return
 	if event.is_action_pressed("cancel"):
 		get_viewport().set_input_as_handled()
-		get_tree().change_scene_to_file("res://scenes/title_menu.tscn")
+		get_tree().change_scene_to_file.call_deferred("res://scenes/title_menu.tscn")
 
-func _label(parent: Node, text: String, font_size: int, color: Color = Color("26231f")) -> Label:
+func _label(parent: Node,value: String,font_size: int,ink: Color = Color("283d35")) -> Label:
 	var label := Label.new()
-	label.text = text
+	label.text = value
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size", PaperTheme.menu_font_size(font_size))
-	label.add_theme_color_override("font_color", color)
+	label.add_theme_font_size_override("font_size",font_size)
+	label.add_theme_color_override("font_color",ink)
 	parent.add_child(label)
 	return label
 
-func _card(id: String, eyebrow: String, title: String, subtitle: String, description: String, medieval: bool) -> void:
-	var panel := PanelContainer.new()
-	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var style := PaperTheme.panel()
-	style.set_content_margin_all(20)
-	panel.add_theme_stylebox_override("panel", style)
-	cards.add_child(panel)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 10)
-	panel.add_child(column)
-	_label(column, eyebrow, 11, Color("5f574d"))
-	_label(column, title, 28)
-	_label(column, subtitle, 14)
-	var preview := Control.new()
-	preview.custom_minimum_size.y = 128
-	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if medieval:
-		var ink_material := ShaderMaterial.new()
-		ink_material.shader = preload("res://scripts/medieval_castle_ink.gdshader")
-		preview.material = ink_material
-	preview.draw.connect(func(): _draw_preview(preview, medieval, id == "nature-v1"))
-	column.add_child(preview)
-	previews.append(preview)
-	_label(column, description, 14)
-	var actions := HBoxContainer.new()
-	column.add_child(actions)
-	var new_button := Button.new()
-	new_button.text = "进入新地图"
-	new_button.custom_minimum_size = Vector2(110, 41)
-	new_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	new_button.pressed.connect(func(): start_map(id, false))
-	actions.add_child(new_button)
-	PaperTheme.primary(new_button)
-	var resume := Button.new()
-	resume.text = "继续游玩" if _cached_game(id) != null else "读取作品"
-	resume.custom_minimum_size = Vector2(100, 41)
-	resume.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	resume.disabled = _cached_game(id) == null and not _has_saved_map(id)
-	resume.pressed.connect(func(): start_map(id, true))
-	actions.add_child(resume)
-	continue_buttons[id] = resume
+func _portal(id: String,title: String,detail: String,action: String,number: String,accent: Color,art: String,callback: Callable) -> void:
+	var portal := PaperModePortal.new()
+	portal.heading = title; portal.detail = detail; portal.action_label = action
+	portal.number = number; portal.accent = accent
+	portal.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if ResourceLoader.exists(art): portal.artwork = load(art)
+	portal.pressed.connect(callback)
+	portal.tooltip_text = title + " · " + detail
+	cards.add_child(portal)
+	mode_buttons[id] = portal
 
 func _cached_game(id: String):
 	var holder := get_tree().root.get_node_or_null("MapSessions")
@@ -150,6 +151,7 @@ func _reset_cached_map(id: String) -> void:
 		cached.map_workspaces.erase(id)
 
 func _has_saved_map(id: String) -> bool:
+	if id == "medieval-v1" and not preload("res://scripts/team_worlds.gd").slots().is_empty(): return true
 	var result := SaveStore.load_game("medieval-v1" if id == "medieval-v1" else "")
 	if not result.error.is_empty(): return false
 	var world: Dictionary = result.data.get("world", {"id": "paper"})
@@ -171,6 +173,9 @@ func start_map(id: String, resume: bool = false) -> void:
 		tree.current_scene = cached
 		queue_free()
 		return
+	if resume and id == "medieval-v1" and not ProjectSettings.get_setting("paper/divine_demo",false):
+		team_panel.open()
+		return
 	if resume:
 		var result := SaveStore.load_game("medieval-v1" if id == "medieval-v1" else "")
 		if not result.error.is_empty():
@@ -189,69 +194,27 @@ func start_map(id: String, resume: bool = false) -> void:
 	queue_free()
 
 func _layout() -> void:
-	var size := PaperGuiScale.apply(self)
-	var narrow := size.x < 760
-	cards.columns = 1 if narrow else 2
-	var width := minf(1040, size.x - (32 if narrow else 88))
-	# Reduce the child minimum before sizing this uncontained scroll viewport.
-	# Otherwise a desktop minimum clamps size during a narrow-window resize.
-	content.custom_minimum_size.x = maxf(260, width - 14)
+	var viewport := PaperGuiScale.apply(self)
+	var bounds := PaperGuiScale.safe_rect(self)
+	var short := bounds.size.y < 500
+	var width := minf(960,bounds.size.x-24)
+	brand.visible = not short
+	tagline.visible = not short
+	status.visible = not short
+	heading.add_theme_font_size_override("font_size",24 if short else 30 if bounds.size.x < 600 else 38)
+	cards.add_theme_constant_override("h_separation",12 if bounds.size.x < 600 else 28)
+	for portal in mode_buttons.values():
+		portal.custom_minimum_size = Vector2(0, maxf(170,bounds.size.y-120) if short else minf(420 if bounds.size.x > 760 else 340,maxf(250,bounds.size.y-260)))
+		portal.queue_redraw()
+	content.custom_minimum_size.x = width-12
 	scroll.reset_size()
-	scroll.position = Vector2((size.x - width) * 0.5, 28 if narrow else 42)
-	scroll.size = Vector2(width, size.y - scroll.position.y - 20)
-	for preview in previews: preview.queue_redraw()
+	scroll.position = bounds.position+Vector2((bounds.size.x-width)*.5,8 if short else 24)
+	scroll.size = Vector2(width,bounds.size.y-(16 if short else 48))
 	queue_redraw()
 
 func _draw() -> void:
-	var size := PaperGuiScale.apply(self)
-	draw_rect(Rect2(Vector2.ZERO, size), Color("f7f2e3"))
-	for y in range(0, int(size.y), 26): draw_line(Vector2(0, y), Vector2(size.x, y), Color(0.43, 0.47, 0.46, 0.12), 1)
-	for x in range(0, int(size.x), 26): draw_line(Vector2(x, 0), Vector2(x, size.y), Color(0.43, 0.47, 0.46, 0.09), 1)
-	draw_line(Vector2(48, 0), Vector2(48, size.y), Color(0.57, 0.31, 0.27, 0.2), 1)
-
-func _draw_preview(control: Control, medieval: bool, nature: bool = false) -> void:
-	var ink := Color("373028")
-	var width := control.size.x
-	var base := 116.0
-	if not medieval: control.draw_line(Vector2(0, base), Vector2(width, base), ink, 1.6, true)
-	if nature:
-		control.draw_polyline(PackedVector2Array([Vector2(0,base),Vector2(width*.26,72),Vector2(width*.42,85),Vector2(width*.68,36),Vector2(width,base)]), ink, 1.8, true)
-		for i in range(3):
-			var x := width * (.16 + i*.3)
-			control.draw_line(Vector2(x,100), Vector2(x,58), ink, 2, true)
-			control.draw_arc(Vector2(x,51), 17, 0, TAU, 24, ink, 1.5, true)
-	elif medieval:
-		control.draw_polyline(PackedVector2Array([Vector2(0,base),Vector2(width*.14,98),Vector2(width*.36,98),Vector2(width*.47,120),Vector2(width*.57,120),Vector2(width*.70,70),Vector2(width*.87,70),Vector2(width,94)]),ink,1.6,true)
-		control.draw_line(Vector2(width*.39,100),Vector2(width*.61,100),ink,1.5,true)
-		for y in [109.0,115.0]:
-			control.draw_line(Vector2(width*.44,y),Vector2(width*.56,y),Color(0.18,0.2,0.2,.5),1,true)
-		_draw_medieval_asset(control, "house", Rect2(4, 14, width * 0.37, 84))
-		_draw_medieval_asset(control, "castle_v2/castle_master", Rect2(width * 0.56, 0, width * 0.40, 70))
-		_draw_medieval_asset(control, "dragon", Rect2(width * 0.80, 1, width * 0.20, 49))
-	else:
-		for i in range(3):
-			var x := width * (0.04 + i * 0.32)
-			var y := 95.0 - i * 28
-			control.draw_line(Vector2(x, y), Vector2(x + width * 0.27, y), ink, 1.5, true)
-			control.draw_string(ThemeDB.fallback_font, Vector2(x, y - 10), ["a² + b² = c²", "山河入纸", "f(x) = x²"][i], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, ink)
-
-func _medieval_preview_texture(name: String) -> Texture2D:
-	if preview_textures.has(name): return preview_textures[name]
-	var texture: Texture2D = load("res://assets/medieval/" + name + ".png")
-	var image := texture.get_image()
-	var cell := Rect2i(Vector2i.ZERO, image.get_size())
-	if name == "dragon": cell.size /= Vector2i(4, 2)
-	var used := image.get_region(cell).get_used_rect()
-	if not used.has_area(): used = cell
-	var atlas := AtlasTexture.new()
-	atlas.atlas = texture
-	atlas.region = Rect2(used)
-	preview_textures[name] = atlas
-	return atlas
-
-func _draw_medieval_asset(control: Control, name: String, box: Rect2) -> void:
-	var texture := _medieval_preview_texture(name)
-	var size := texture.get_size()
-	size *= minf(box.size.x / size.x, box.size.y / size.y)
-	var at := box.position + Vector2((box.size.x - size.x) * 0.5, box.size.y - size.y)
-	control.draw_texture_rect(texture, Rect2(at, size), false)
+	var viewport := PaperGuiScale.logical_size(self)
+	PaperUIArt.background(self,viewport,true)
+	# Wide quiet margins, a few dotted registration marks instead of a grid.
+	for x in [24.0,viewport.x-24]:
+		for y in range(28,int(viewport.y),28): draw_circle(Vector2(x,y),.65,Color(.26,.37,.30,.12))

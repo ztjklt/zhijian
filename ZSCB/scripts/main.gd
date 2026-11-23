@@ -11,6 +11,7 @@ var map_workspaces: Dictionary = {}
 var knowledge_world: Node2D = null
 var medieval_world: Node2D = null
 var map_controls: Control = null
+var survival_panel
 var camera_y := 0.0
 
 # Game state
@@ -27,6 +28,8 @@ var object_nodes: Array = []
 var bag := BlueprintBag.new_bag()
 var selected_blueprint_id := -1
 var placing_blueprint_id := -1
+var plan_site_preview := {}
+const BuildingPlans := preload("res://scripts/architecture/building_plans.gd")
 var bag_open := false
 var draft: Array = []
 var active_stroke = null
@@ -66,6 +69,13 @@ var draw_cursor = null
 var artist_world = null
 var last_player_x := -5.6
 var has_played := true
+const FunctionalPens := preload("res://scripts/functional_pens.gd")
+const WorldPen := preload("res://scripts/paper_world_pen.gd")
+var paper_pen_mode := "legacy"
+var pen_anchor_kind := "free"
+var pen_style := "ink"
+var scenery_brush := "bold"
+var pen_pigment := "inherit"
 var draw_mode := 1
 var sculpt_return_mode := 1
 var mode_drafts := {}
@@ -89,6 +99,7 @@ var ink = preload("res://scripts/ink_reserve.gd").new()
 var vitals_hud: Control
 var feedback: PaperCreationFeedback = null
 var touch_controls = null
+var landscape_guard: PaperLandscapeGuard
 var jump_was_down := false
 var jumps_used := 0
 var down_was_down := false
@@ -99,6 +110,7 @@ const DOWN_DOUBLE_TAP_WINDOW := 0.28
 var player: RigidBody2D = null
 var camera: Camera2D = null
 var canvas_node: Node2D = null
+var pen_selection: Node2D
 var toolbar: Control = null
 var backpack_panel: Control = null
 var backpack_ui = null
@@ -117,6 +129,17 @@ var weapon_lab
 var weapon_lab_panel: Control
 var cooperation:Dictionary={"shared":[],"locks":{}}
 var cooperation_version:=-1
+const TeamWorlds := preload("res://scripts/team_worlds.gd")
+const WorldSession := preload("res://scripts/world_session.gd")
+var team_slot: Dictionary = {}
+var background_world := false
+var _owned_slot := ""
+var manuscript_preview := false
+var _closing_world := false
+var team_panel: Control
+var divine_panel: Control
+var observed_camera := Vector2.INF
+var sandbox_settings: Control
 var cooperation_panel:Control
 var refine_weapon_type := ""
 var refine_model_fill: Variant = null
@@ -126,6 +149,18 @@ var connection_source: Dictionary = {}
 var build_object_scene := preload("res://scenes/build_object.tscn")
 
 func _ready() -> void:
+	if not manuscript_preview and team_slot.is_empty() and world_kind == "medieval-v1" and network_session == null and not network_headless:
+		team_slot = TeamWorlds.new_slot("我的队伍")
+	if not manuscript_preview and world_kind == "medieval-v1" and network_session == null and not network_headless and not ProjectSettings.get_setting("paper/divine_demo",false):
+		var acquired := WorldSession.claim(team_slot.slot_id)
+		if not acquired.ok:
+			push_warning(acquired.get("message","不能接管此队伍。"))
+			process_mode = Node.PROCESS_MODE_DISABLED
+			return
+		_owned_slot = team_slot.slot_id
+		WorldSession.restore_limits(_owned_slot,ModelConnections)
+		if WorldSession.tracked.get(_owned_slot,false) and not background_world:
+			get_tree().auto_accept_quit = false
 	weapon_lab = preload("res://scripts/weapon_lab.gd").new(self)
 	structure_links = preload("res://scripts/structure_links.gd").new()
 	structure_links.game = self
@@ -143,6 +178,10 @@ func _ready() -> void:
 	canvas_node.set_script(preload("res://scripts/paper_canvas.gd"))
 	canvas_node.game = self
 	add_child(canvas_node)
+	pen_selection = preload("res://scripts/pen_selection.gd").new()
+	pen_selection.game = self
+	pen_selection.z_index = 18
+	add_child(pen_selection)
 	character_visual = preload("res://scenes/character.tscn").instantiate()
 	add_child(character_visual)
 	character_visual.game = self
@@ -197,6 +236,8 @@ func _ready() -> void:
 	touch_controls = PaperTouchControls.new()
 	touch_controls.game = self
 	ui_layer.add_child(touch_controls)
+	landscape_guard = PaperLandscapeGuard.install(self)
+	landscape_guard.mobile_override = func(): return touch_controls != null and touch_controls.enabled()
 	select_world(world_kind)
 	_update_world_chunks()
 	var combat_visual := PaperCombatVisual.new()
@@ -229,6 +270,10 @@ func _ready() -> void:
 	map_controls = preload("res://scripts/medieval_controls.gd").new()
 	map_controls.game = self
 	ui_layer.add_child(map_controls)
+	survival_panel = preload("res://scripts/village_survival_panel.gd").new()
+	survival_panel.game = self
+	lab_layer.add_child(survival_panel)
+	survival_panel.refresh()
 	_resize_world()
 	if "--experience" in OS.get_cmdline_user_args(): experience.open()
 	if "--clean-ui" in OS.get_cmdline_user_args():
@@ -238,21 +283,25 @@ func _ready() -> void:
 		get_window().title = "纸间 · " + PaperExperience.VERSION + " · 最新 UI 整合版"
 	print("Paper Castle sandbox started")
 
+func view_camera() -> Vector2:
+	return observed_camera if observed_camera.is_finite() else Vector2(camera_x, camera_y)
+
 func world_to_screen(pos: Vector2) -> Vector2:
 	if knowledge_world != null and knowledge_world.overview:
 		return knowledge_world.overview_point(pos)
 	var viewport_size := get_viewport().get_visible_rect().size
+	var view := view_camera()
 	var shake: Vector2 = feedback.screen_offset if feedback != null else Vector2.ZERO
 	return shake + Vector2(
-		viewport_size.x * 0.5 + (pos.x - camera_x) * PIXELS_PER_UNIT,
-		viewport_size.y - _ground_margin() + (GROUND_Y + camera_y - pos.y) * PIXELS_PER_UNIT
+		viewport_size.x * 0.5 + (pos.x - view.x) * PIXELS_PER_UNIT,
+		viewport_size.y - _ground_margin() + (GROUND_Y + view.y - pos.y) * PIXELS_PER_UNIT
 	)
 
 func lab_open() -> bool:
 	return weapon_lab_panel != null and weapon_lab_panel.visible
 
 func personal_overlay_open() -> bool:
-	return next_steps_open() or cooperation_open() or lab_open() or (experience != null and experience.visible)
+	return (team_panel != null and team_panel.visible) or (divine_panel != null and divine_panel.visible) or (sandbox_settings!=null and sandbox_settings.visible) or (survival_panel != null and survival_panel.opened) or (landscape_guard != null and landscape_guard.is_active()) or (toolbar != null and toolbar.mobile_navigation_open()) or next_steps_open() or cooperation_open() or lab_open() or (experience != null and experience.visible)
 
 func next_steps_open()->bool:return next_steps!=null and next_steps.visible
 func open_next_steps()->void:
@@ -307,7 +356,50 @@ func receive_cooperation(state:Dictionary)->void:
 		# Cancelling a revoked drag must never send _finish_drag's move request.
 		drag=null;selected=-1;connection_source.clear();message("协作许可或编辑者已变化，请重新选择部件")
 
+func open_team_worlds() -> void:
+	if not FunctionalPens.available(self) or ProjectSettings.get_setting("paper/divine_demo",false): return
+	retain_active_stroke()
+	if team_panel == null:
+		team_panel = preload("res://scripts/team_worlds_panel.gd").new()
+		team_panel.game = self
+		weapon_lab_panel.get_parent().add_child(team_panel)
+	team_panel.open()
+
+func open_divine_status() -> void:
+	if not FunctionalPens.available(self): return
+	if divine_panel == null:
+		divine_panel = preload("res://scripts/divine_status_panel.gd").new()
+		divine_panel.game = self
+		weapon_lab_panel.get_parent().add_child(divine_panel)
+	toolbar.navigation_open = false
+	divine_panel.open()
+
+func open_sandbox_settings(role := "") -> void:
+	if medieval_world == null or network_session != null: return
+	if sandbox_settings == null:
+		sandbox_settings=preload("res://scripts/settings_panel.gd").new()
+		sandbox_settings.game=self
+		weapon_lab_panel.get_parent().add_child(sandbox_settings)
+	toolbar.navigation_open=false
+	sandbox_settings.show()
+	sandbox_settings.show_page(true)
+	if not role.is_empty() and ModelConnections.role_status(role).code=="needs_key":
+		sandbox_settings.ai.open_key_field(role)
+
 func close_personal_overlay() -> void:
+	if team_panel != null and team_panel.visible:
+		team_panel.hide()
+		return
+	if divine_panel != null and divine_panel.visible:
+		divine_panel.close()
+		return
+	if sandbox_settings!=null and sandbox_settings.visible:
+		# The settings control handles Escape, including cancelling an edit.
+		return
+	if survival_panel != null and survival_panel.opened: survival_panel.close()
+	if toolbar != null and toolbar.mobile_navigation_open():
+		toolbar.navigation_open = false
+		refresh_buttons()
 	if next_steps_open():next_steps.close()
 	elif cooperation_open():cooperation_panel.close()
 	elif lab_open(): weapon_lab_panel.close()
@@ -378,14 +470,18 @@ func screen_to_world(screen_pos: Vector2) -> Vector2:
 	if knowledge_world != null and knowledge_world.overview:
 		return knowledge_world.overview_to_world(screen_pos)
 	var viewport_size := get_viewport().get_visible_rect().size
+	var view := view_camera()
 	if feedback != null: screen_pos -= feedback.screen_offset
 	return Vector2(
-		camera_x + (screen_pos.x - viewport_size.x * 0.5) / PIXELS_PER_UNIT,
-		(viewport_size.y - _ground_margin() + GROUND_Y * PIXELS_PER_UNIT - screen_pos.y) / PIXELS_PER_UNIT + camera_y
+		view.x + (screen_pos.x - viewport_size.x * 0.5) / PIXELS_PER_UNIT,
+		(viewport_size.y - _ground_margin() + GROUND_Y * PIXELS_PER_UNIT - screen_pos.y) / PIXELS_PER_UNIT + view.y
 	)
 
 func select_world(kind: String) -> void:
 	if kind not in ["paper", "knowledge-v1", "medieval-v1", "nature-v1"]: return
+	if divine_panel != null and divine_panel.visible: divine_panel.close()
+	if survival_panel != null and survival_panel.opened: survival_panel.close()
+	if kind != "medieval-v1" and FunctionalPens.TOOLS.has(draw_mode): set_draw_mode(1)
 	if weapon_lab != null: weapon_lab.stop()
 	if structure_links != null: structure_links.clear()
 	if medieval_world != null:
@@ -399,6 +495,8 @@ func select_world(kind: String) -> void:
 	for body in ground_chunks.values(): body.queue_free()
 	ground_chunks.clear()
 	world_kind = kind
+	if is_instance_valid(character_visual):
+		character_visual.z_index = 4 if kind == "medieval-v1" and network_session == null and not network_headless else 0
 	camera_y = 0
 	if kind in ["knowledge-v1", "nature-v1"]:
 		knowledge_world = preload("res://scripts/nature_world.gd").new() if kind == "nature-v1" else preload("res://scripts/knowledge_world.gd").new()
@@ -409,6 +507,13 @@ func select_world(kind: String) -> void:
 		medieval_world = preload("res://scripts/medieval_world.gd").new()
 		medieval_world.game = self
 		add_child(medieval_world)
+		if network_session == null and not network_headless and (DisplayServer.get_name() != "headless" or background_world or WorldSession.tracked.get(_owned_slot,false)):
+			medieval_world.add_child(load("res://scripts/sandbox_companion.gd").new())
+			if OS.get_name() in ["macOS","Windows","Linux"]:
+				medieval_world.add_child(load("res://scripts/sandbox_adventurer.gd").new())
+				medieval_world.add_child(load("res://scripts/sandbox_priest.gd").new())
+				if ProjectSettings.get_setting("paper/war_god_enabled", true):
+					medieval_world.add_child(load("res://scripts/sandbox_war_god.gd").new())
 		paper = "draft"
 		camera_x = 3
 		player.reset_movement()
@@ -449,7 +554,7 @@ func change_map(kind: String) -> void:
 	structure_links.restore(saved.get("world", {}).get("connections", []))
 	if not saved.is_empty():
 		if knowledge_world != null: knowledge_world.restore_state(saved.world)
-		if medieval_world != null: medieval_world.restore_state(saved.world.get("entities", []),int(saved.world.get("terrain_version",1)),int(saved.world.get("content_version",1)),saved.world.get("bridge_trial",{}))
+		if medieval_world != null: _restore_medieval_state(saved.world)
 		player.position = Vector2(saved.player_x, saved.world.player_y)
 		if medieval_world != null and int(saved.world.get("terrain_version",1)) < medieval_world.terrain.VERSION:
 			migrate_medieval_objects(objects, int(saved.world.get("terrain_version",1)))
@@ -486,7 +591,10 @@ func respawn_medieval() -> void:
 	retain_active_stroke()
 	cancel_pointer()
 	player.reset_movement()
-	player.position=medieval_world.safe_spawn_position(player.position.x)
+	var last_foot:Vector2=medieval_world.last_paper_foot
+	if medieval_world.paper_space!=null and last_foot.is_finite():
+		player.position=medieval_world.safe_spawn_position(last_foot.x,last_foot.y)
+	else:player.position=medieval_world.safe_spawn_position(player.position.x)
 	player.linear_velocity=Vector2.ZERO
 	PhysicsServer2D.body_set_state(player.get_rid(),PhysicsServer2D.BODY_STATE_TRANSFORM,Transform2D(0,player.position))
 	camera_x=player.position.x
@@ -505,12 +613,19 @@ func camera_target_y() -> float:
 	var logical := size / amount
 	var compact := logical.x < 600 or logical.y < 500
 	# Camera framing uses the same physical rectangles that receive GUI input.
-	var top: float = toolbar.bottom.get_global_rect().end.y if compact else toolbar.header.get_global_rect().end.y
+	var top: float = toolbar.bottom.get_global_rect().end.y if compact and not toolbar.mobile_landscape() else toolbar.header.get_global_rect().end.y
 	if knowledge_world != null and knowledge_world.controls != null and knowledge_world.controls.panel.is_visible_in_tree():
 		top = maxf(top, knowledge_world.controls.panel.get_global_rect().end.y)
 	elif map_controls != null and map_controls.panel != null and map_controls.panel.is_visible_in_tree() and not (compact and logical.y < 500 and not toolbar.navigation_open):
 		top = maxf(top, map_controls.panel.get_global_rect().end.y)
 	var bottom: float = size.y - 100 * amount if compact else toolbar.bottom.get_global_rect().position.y
+	if compact and toolbar.tray_toggle != null and toolbar.tray_toggle.visible:
+		# The desktop palette sits below the road. Keep the actor between
+		# the top controls and the palette in both its open and folded states.
+		top = toolbar.header.get_global_rect().end.y
+		if toolbar.divine_button.is_visible_in_tree():
+			top = maxf(top, toolbar.divine_button.get_global_rect().end.y)
+		bottom = toolbar.bottom.get_global_rect().position.y
 	if touch_controls != null and touch_controls.enabled():
 		bottom = minf(bottom, touch_controls.attack_rect.position.y - 8 * amount)
 	var playable := maxf(30 * amount, bottom - top)
@@ -531,7 +646,7 @@ func terrain_spawn(x: float) -> Vector2:
 func terrain_hit(a: Vector2, b: Vector2) -> Dictionary:
 	if medieval_world != null:
 		var nearest:Dictionary={}
-		for polygon in medieval_world.terrain.collision_geometry:
+		for polygon in medieval_world.paper_geometry(Rect2(a,Vector2.ZERO).expand(b)):
 			var hit:Dictionary=medieval_world._polygon_segment(a,b,polygon)
 			if not hit.is_empty() and hit.time<nearest.get("time",INF): nearest=hit
 		return nearest
@@ -551,6 +666,31 @@ func world_save_state() -> Dictionary:
 	state.maps.erase(world_kind)
 	return state
 
+func _restore_medieval_state(state: Dictionary) -> void:
+	medieval_world.chronicle.restore(state.get("chronicle",[]))
+	medieval_world.restore_state(state.get("entities", []), int(state.get("terrain_version", 1)),
+		int(state.get("content_version", 1)), state.get("bridge_trial", {}), preload("res://scripts/east_paper_pages.gd").joined(state),state.get("paper_space"))
+	if medieval_world.paper_space!=null:
+		medieval_world.paper_space.restore(state.get("paper_space",{}))
+		medieval_world.paper_space.refresh_legacy()
+		medieval_world.last_paper_foot=Vector2.INF
+	var buddy = medieval_world.get_node_or_null("SandboxCompanion")
+	if medieval_world.survival != null: medieval_world.survival.restore(state.get("survival",{}))
+	var companion_save: Dictionary = state.get("companion",{}).duplicate(true)
+	medieval_world.companion_blueprints = companion_save.get("blueprints",BlueprintBag.new_bag())
+	SaveStore.restore_bag_vectors(medieval_world.companion_blueprints)
+	companion_save.erase("blueprints")
+	if buddy != null: buddy.restore_data = companion_save
+	medieval_world.adventurer_state = state.get("adventurer",{}).duplicate(true)
+	var traveller = medieval_world.get_node_or_null("SandboxAdventurer")
+	if traveller != null: traveller.restore(medieval_world.adventurer_state)
+	medieval_world.priest_work = state.get("priest_work",{}).duplicate(true)
+	var priest = medieval_world.get_node_or_null("SandboxPriest")
+	if priest != null: priest.restore(medieval_world.priest_work)
+	medieval_world.war_god_state=state.get("war_god",{}).duplicate(true)
+	var war=medieval_world.get_node_or_null("SandboxWarGod")
+	if war!=null:war.restore(medieval_world.war_god_state)
+
 func _world_details() -> Dictionary:
 	var state := {"id": world_kind, "player_y": player.position.y, "camera_y": camera_y}
 	state.connections = structure_links.snapshot() if structure_links != null else []
@@ -558,10 +698,30 @@ func _world_details() -> Dictionary:
 		state.checkpoint = knowledge_world.checkpoint
 		state.bookmarks = knowledge_world.collected.keys()
 	if medieval_world != null:
+		var events: Array = medieval_world.chronicle.snapshot()
+		if not events.is_empty(): state.chronicle = events
+		if medieval_world.survival != null: state.survival = medieval_world.survival.snapshot()
+		if medieval_world.paper_space!=null:state.paper_space={"version":1,"works":medieval_world.paper_strokes_snapshot()}
 		state.entities = medieval_world.save_state()
 		state.terrain_version = medieval_world.terrain.VERSION
 		state.content_version = medieval_world.CONTENT_VERSION
 		state.bridge_trial = medieval_world.bridge_trial.snapshot()
+		var segments: Array = medieval_world.east_segments_snapshot()
+		state.merge(preload("res://scripts/east_paper_pages.gd").split(segments))
+		var buddy = medieval_world.get_node_or_null("SandboxCompanion")
+		if buddy != null: state.companion = buddy.snapshot()
+		if medieval_world.companion_blueprints.next_id>1:
+			if not state.has("companion"): state.companion={}
+			state.companion.blueprints=medieval_world.companion_blueprints.duplicate(true)
+		var traveller = medieval_world.get_node_or_null("SandboxAdventurer")
+		var expedition: Dictionary = traveller.snapshot() if traveller != null else medieval_world.adventurer_state
+		if not expedition.is_empty(): state.adventurer = expedition
+		var priest = medieval_world.get_node_or_null("SandboxPriest")
+		var work: Dictionary = priest.snapshot() if priest != null else medieval_world.priest_work
+		if not work.is_empty(): state.priest_work = work.duplicate(true)
+		var war=medieval_world.get_node_or_null("SandboxWarGod")
+		var guard:Dictionary=war.snapshot() if war!=null else medieval_world.war_god_state
+		if not guard.is_empty(): state.war_god=guard
 	return state
 
 func object_point(obj: Dictionary, p: Vector2) -> Vector2:
@@ -591,14 +751,26 @@ func message(text: String) -> void:
 func creation_ink_allowed(object: Dictionary) -> bool:
 	if network_session != null: return true # Authority validates and commits the price.
 	var price: float = PaperInkReserve.cost(object)
-	if ink.can_spend(price): return true
-	message("墨水不足，需要%d，当前%d；图形与旧武器已保留" % [price, ink.amount])
+	var extra := _creation_cup_ink(object)
+	if ink.can_spend(maxf(0,price-extra)): return true
+	message("墨水不足，需要%d，当前%d；图形与旧武器已保留" % [price, ink.amount+extra])
 	return false
 
 func charge_creation_ink(object: Dictionary) -> void:
-	if network_session == null: ink.spend(PaperInkReserve.cost(object))
+	if network_session != null: return
+	var cost := int(PaperInkReserve.cost(object))
+	if _creation_cup_ink(object) > 0:
+		medieval_world.survival.pay_creation(cost)
+	else: ink.spend(cost)
+
+func _creation_cup_ink(object: Dictionary) -> int:
+	if medieval_world == null or medieval_world.survival == null or object.get("artist","player") != "player": return 0
+	return medieval_world.survival.cup_ink()
 
 func celebrate_creation(object: Dictionary, label: String = "CREATED!", from_drawing:bool=true) -> void:
+	if medieval_world != null and object.get("artist") == "painter":
+		medieval_world.chronicle.record_object(object)
+		return
 	if from_drawing and first_work!=null:first_work.note_created(object)
 	if feedback != null:
 		feedback.emit_event("create", object_bounds(object).get_center(), label)
@@ -653,10 +825,12 @@ func restore(snap: Dictionary) -> void:
 		return
 	if saved_world.id != world_kind: carry_controller.clear()
 	map_workspaces = _clone(saved_world.get("maps", {}))
+	if saved_world.id==world_kind and medieval_world!=null and medieval_world.paper_space!=null:
+		medieval_world.paper_space.restore(saved_world.get("paper_space",{}))
 	if saved_world.id != world_kind:
 		select_world(saved_world.id)
 		if knowledge_world != null: knowledge_world.restore_state(saved_world)
-		if medieval_world != null: medieval_world.restore_state(saved_world.get("entities", []),int(saved_world.get("terrain_version",1)),int(saved_world.get("content_version",1)),saved_world.get("bridge_trial",{}))
+		if medieval_world != null: _restore_medieval_state(saved_world)
 		player.position = snap.get("player_position", terrain_spawn(camera_x))
 		if medieval_world != null and int(saved_world.get("terrain_version",1)) < medieval_world.terrain.VERSION:
 			player.position = medieval_world.terrain.upgrade_position(player.position, int(saved_world.get("terrain_version",1)))
@@ -800,6 +974,16 @@ func equip_blueprint() -> void:
 	if entry.is_empty():
 		message("先选择图纸")
 		return
+	if entry.kind == "ink_cup":
+		if medieval_world == null or medieval_world.survival == null:
+			message("请在单人墨线边境制作墨杯")
+			return
+		var result: Dictionary = medieval_world.survival.make_cup(entry.paths,false)
+		if result.get("ok",false):
+			bag_open = false
+			backpack_panel.hide()
+		message(result.get("message",result.get("error","")))
+		return
 	var chosen_weapon := BlueprintBag.make_object(entry, 0, 0) if entry.get("role", "") == "weapon" else {}
 	if not chosen_weapon.is_empty() and equipped_weapon != chosen_weapon and not creation_ink_allowed(chosen_weapon): return
 	cancel_weapon_grip(false)
@@ -812,11 +996,12 @@ func equip_blueprint() -> void:
 		combat.bow_equipped = false
 		combat.cancel_draw()
 		feedback.emit_event("grip", player.position + Vector2(facing * 0.25, 0.1))
-		message("已装备「" + entry.name + "」：右键攻击")
+		message("已装备「" + entry.name + ("」：点右下角攻击" if touch_controls != null and touch_controls.enabled() else "」：右键攻击"))
 		return
 	set_draw_mode(3 if entry.get("role", "") == "building" else 1)
 	placing_blueprint_id = entry.id
-	message("已拿起「" + entry.name + "」：左键点击纸面放置，Esc 取消")
+	plan_site_preview.clear()
+	message("已拿起「" + entry.name + "」：点纸面放置；切换工具取消" if touch_controls != null and touch_controls.enabled() else "已拿起「" + entry.name + "」：左键点击纸面放置，Esc 取消")
 
 func bind_hotbar(slot: int) -> void:
 	if selected_blueprint_id < 0:
@@ -835,7 +1020,7 @@ func equip_hotbar(slot: int) -> void:
 		return
 	selected_blueprint_id = id
 	equip_blueprint()
-	message("快捷格 " + str(slot + 1) + "：左键点击纸面摆放「" + entry.name + "」")
+	if entry.kind != "ink_cup": message("快捷格 " + str(slot + 1) + "：左键点击纸面摆放「" + entry.name + "」")
 
 func place_blueprint(x: float, y: float) -> void:
 	var entry := BlueprintBag.find_entry(bag, placing_blueprint_id)
@@ -845,7 +1030,37 @@ func place_blueprint(x: float, y: float) -> void:
 	if objects.size() >= MAX_OBJECTS:
 		message("纸面实体已达上限，请先删除一些")
 		return
+	if entry.has("layout"):
+		var origin := Vector2(x,y)
+		var site := BuildingPlans.preview(self,"player",entry.id,origin,true)
+		if not site.ok:
+			plan_site_preview=site
+			message(site.error)
+			return
+		var command := BuildingPlans.command_at(self,"player",entry.id,origin)
+		var result := FunctionalPens.submit(self,command,"player",entry.id)
+		if result.get("ok",false):
+			selected=objects.size()-1
+			placing_blueprint_id=-1
+			plan_site_preview.clear()
+			message("已按图纸摆放「"+entry.name+"」")
+		else:
+			if result.has("conflicts"): plan_site_preview=result
+			message(result.error)
+		return
 	var object := BlueprintBag.make_object(entry, x, y)
+	if entry.has("pen"):
+		var slot: int = {FunctionalPens.SCENERY:7, FunctionalPens.TERRAIN:8, FunctionalPens.OBJECT:9}[entry.pen]
+		for path in object.paths:
+			for i in path.points.size(): path.points[i] += Vector2(x,y)
+		var cmd := FunctionalPens.from_draft(slot,entry.ink_style,object.paths)
+		var result := FunctionalPens.submit(self,cmd,"player",entry.id)
+		if result.get("ok",false):
+			selected = objects.size()-1
+			placing_blueprint_id = -1
+			message("已按图纸摆放「" + entry.name + "」")
+		else: message(result.error)
+		return
 	var body := _drop_candidate(object)
 	if body == null: return
 	record()
@@ -881,12 +1096,13 @@ func _attach_body(node: RigidBody2D, object: Dictionary) -> RigidBody2D:
 		node.add_collision_exception_with(player)
 	return node
 
-func _drop_candidate(object: Dictionary) -> RigidBody2D:
+func _drop_candidate(object: Dictionary, builder = null) -> RigidBody2D:
 	if network_session != null: return network_session.spawn_candidate(object)
-	if not creation_ink_allowed(object): return null
+	if builder == null and not creation_ink_allowed(object): return null
 	var node: RigidBody2D = build_object_scene.instantiate()
 	node.setup(object)
-	if Vector2(object.x, object.y).distance_to(player.position) > DrawingRules.BUILD_RANGE:
+	var reach_from: Vector2 = builder.player.position if builder!=null else player.position
+	if Vector2(object.x, object.y).distance_to(reach_from) > DrawingRules.BUILD_RANGE:
 		node.free()
 		message("离角色太远，请在 12 米内生成；草稿和图纸选择已保留")
 		return null
@@ -900,6 +1116,10 @@ func _drop_candidate(object: Dictionary) -> RigidBody2D:
 		message("未找到合法落点，图形已保留；请检查作品范围或轮廓")
 		return null
 	var offset: Vector2 = clearance.offset
+	if medieval_world!=null and medieval_world.paper_space!=null and (node.position+offset).distance_to(reach_from)>DrawingRules.BUILD_RANGE:
+		node.free()
+		message("这一层附近没有可放下的空位，请换一处落笔")
+		return null
 	object.x += offset.x
 	object.y += offset.y
 	node.position += offset
@@ -919,6 +1139,7 @@ func sync_objects() -> bool:
 func _update_world_chunks() -> void:
 	if medieval_world != null:
 		_update_object_activity()
+		medieval_world.update_paper_activity()
 		return
 	if knowledge_world != null:
 		knowledge_world._update_chunks()
@@ -963,7 +1184,8 @@ func _update_object_activity() -> void:
 			if object.get("dynamic", true):
 				var far := not active.has(object.get("structure_id", ""))
 				if object_nodes[i] is RigidBody2D:
-					object_nodes[i].freeze = far or (drag != null and selected == i) or carried == i
+					var fixed_support:bool=object.get("pen")=="draw_object" and object.get("anchor",{}).get("kind","free")!="free"
+					object_nodes[i].freeze = fixed_support or far or (drag != null and selected == i) or carried == i
 
 func _rebuild_objects() -> void:
 	if structure_links != null:
@@ -1045,7 +1267,7 @@ func delete_selected() -> void:
 	_rebuild_objects()
 	message("部件已删除")
 
-func pointer_down(screen_pos: Vector2) -> void:
+func pointer_down(screen_pos: Vector2, edit_scenery := false) -> void:
 	if network_session != null and network_session.local_dead_time > 0: return
 	if personal_overlay_open(): return
 	if map_controls != null and map_controls.blocks_canvas(screen_pos): return
@@ -1057,6 +1279,7 @@ func pointer_down(screen_pos: Vector2) -> void:
 		return
 	var p := screen_to_world(screen_pos)
 	aim_world = p
+	if map_controls != null and map_controls.place_pattern(p): return
 	if draw_mode == 4 and connection_tool != "move":
 		connection_pointer(p)
 		return
@@ -1077,43 +1300,60 @@ func pointer_down(screen_pos: Vector2) -> void:
 		building_wait = -1
 		creation_context += 1
 		active_stroke = {"points": [p]}
+		if FunctionalPens.TOOLS.has(draw_mode):
+			if draw_mode == 7 or scenery_brush != "bold": active_stroke.brush = scenery_brush
+			if pen_pigment != "inherit": active_stroke.pigment = pen_pigment
 		draw_cursor = screen_pos
 		pose = "draw"
 		selected = -1
 		clear_candidate()
 	else:
 		selected = -1
-		for index in range(objects.size() - 1, -1, -1):
-			var object: Dictionary = objects[index]
-			var bounds := object_bounds(object)
-			var margin := 0.18
-			if p.x >= bounds.position.x - margin and p.x <= bounds.end.x + margin \
-				and p.y >= bounds.position.y - margin and p.y <= bounds.end.y + margin:
-				if not can_cooperate(object):
-					message("请作者先在双人协作中开放部件，或等朋友结束编辑")
-					return
-				selected = index
-				if structure_links.linked(object.get("structure_id", "")):
-					message("部件已有连接，先解除连接再移动；仍可拆除")
-					return
-				if network_session != null: network_session.send_op("lock", {"id":object.id,"version":object.version})
-				drag = {
-					"start": p,
-					"origin_x": object.x,
-					"origin_y": object.y,
-					"before": snapshot(),
-					"moved": false,
-				}
-				var node: RigidBody2D = object_nodes[index]
-				if node:
-					node.freeze = true
-					node.linear_velocity = Vector2.ZERO
-				node.angular_velocity = 0
-				message("已选中部件；拖动移动，或点击删除")
-				break
+		if medieval_world != null and network_session == null:
+			selected = pen_selection.pick(screen_pos,edit_scenery or Input.is_key_pressed(KEY_ALT))
+		else:
+			for index in range(objects.size()-1,-1,-1):
+				var bounds := object_bounds(objects[index]).grow(0.18)
+				if p.x >= bounds.position.x and p.x <= bounds.end.x and p.y >= bounds.position.y and p.y <= bounds.end.y:
+					selected = index
+					break
+		if selected < 0: return
+		var index := selected
+		var object: Dictionary = objects[index]
+		if not can_cooperate(object):
+			selected = -1
+			message("请作者先在双人协作中开放部件，或等朋友结束编辑")
+			return
+		if structure_links.linked(object.get("structure_id", "")):
+			message("部件已有连接，先解除连接再移动；仍可拆除")
+			return
+		if network_session != null: network_session.send_op("lock", {"id":object.id,"version":object.version})
+		drag = {
+			"start": p,
+			"origin_x": object.x,
+			"origin_y": object.y,
+			"before": snapshot(),
+			"moved": false,
+		}
+		var node: RigidBody2D = object_nodes[index]
+		if node:
+			node.freeze = true
+			node.linear_velocity = Vector2.ZERO
+			node.angular_velocity = 0
+		message("已选中部件；拖动移动，或点击删除")
+
+func point_preview_changed(point: Vector2) -> bool:
+	return not plan_site_preview.has("origin") or BuildingPlans.point(plan_site_preview.origin).distance_to(point)>0.09
 
 func pointer_move(screen_pos: Vector2) -> void:
 	var p := screen_to_world(screen_pos)
+	if placing_blueprint_id>=0 and medieval_world!=null:
+		var entry := BlueprintBag.find_entry(bag,placing_blueprint_id)
+		if entry.has("layout"):
+			if plan_site_preview.is_empty() or point_preview_changed(p): plan_site_preview=BuildingPlans.preview(self,"player",entry.id,p,true)
+			return
+	elif map_controls!=null and map_controls.pending_pattern>=0:
+		map_controls.preview_pattern_site(p)
 	aim_world = p
 	if selecting_weapon_grip:
 		grip_hover = p
@@ -1125,11 +1365,11 @@ func pointer_move(screen_pos: Vector2) -> void:
 	if active_stroke:
 		draw_cursor = screen_pos
 		var pts: Array = active_stroke.points
-		_append_ink_point(pts, p, 0.06)
+		_append_ink_point(pts, p, 0.018 if draw_mode == 7 else 0.06)
 	elif drag and selected >= 0:
 		var object: Dictionary = objects[selected]
 		var desired: Vector2 = Vector2(drag.origin_x, drag.origin_y) + p - drag.start
-		if object.get("role", "") == "building" and not object.get("dynamic", true):
+		if object.get("role", "") == "building" and not object.get("dynamic", true) and object.get("pen") != FunctionalPens.TERRAIN:
 			var others: Array = objects.duplicate()
 			others.remove_at(selected)
 			var placed := DrawingRules.placement(object, desired, others, player.position)
@@ -1137,6 +1377,9 @@ func pointer_move(screen_pos: Vector2) -> void:
 			desired = Vector2(placed.object.x, placed.object.y)
 		object.x = desired.x
 		object.y = desired.y
+		if object.has("built_plan"):
+			var site_at := object_point(object,BuildingPlans.point(object.built_plan.offset))
+			if point_preview_changed(site_at): plan_site_preview=BuildingPlans.preview_layout(self,object.built_plan.layout,site_at,object.structure_id)
 		var node: Node2D = object_nodes[selected]
 		if node:
 			node.position = Vector2(object.x, object.y)
@@ -1152,12 +1395,37 @@ func _finish_drag() -> void:
 			network_session.send_op("move", {"id":online_object.id,"version":online_object.version,"position":Vector2(online_object.x,online_object.y)})
 		drag = null
 		return
+	var node: RigidBody2D = object_nodes[selected] if selected >= 0 and selected < object_nodes.size() else null
+	var object: Dictionary = objects[selected] if selected >= 0 and selected < objects.size() else {}
+	if drag.moved and node and object.has("built_plan"):
+		var anchor := object_point(object,BuildingPlans.point(object.built_plan.offset))
+		var site := BuildingPlans.preview_layout(self,object.built_plan.layout,anchor,object.structure_id)
+		if site.ok: object.built_plan.origin=BuildingPlans.coords(anchor)
+		else:
+			node.position=Vector2(drag.origin_x,drag.origin_y)
+			object.x=node.position.x
+			object.y=node.position.y
+			drag.moved=false
+			message(site.error)
+		plan_site_preview.clear()
+	if drag.moved and node and object.get("pen") == FunctionalPens.TERRAIN:
+		var origin := Vector2(drag.origin_x, drag.origin_y)
+		var clearance := PaperSpawnClearance.resolve(self, node, object) if node.position.distance_to(player.position) <= DrawingRules.BUILD_RANGE else {}
+		if clearance.get("valid", false):
+			node.position += Vector2(clearance.offset)
+		else:
+			node.position = origin
+			drag.moved = false
+			message("这里无法放置地形，已放回原位")
+		object.x = node.position.x
+		object.y = node.position.y
 	if drag.moved:
 		record(drag.before)
 		if first_work!=null and selected>=0 and selected<objects.size():first_work.note_moved(objects[selected],Vector2(drag.origin_x,drag.origin_y),Vector2(objects[selected].x,objects[selected].y))
-	var node: RigidBody2D = object_nodes[selected] if selected >= 0 and selected < object_nodes.size() else null
-	var object: Dictionary = objects[selected] if selected >= 0 and selected < objects.size() else {}
 	if node and not object.is_empty():
+		# Commit the frozen edit to the physics server before resuming simulation.
+		# Otherwise unfreezing restores the body's pre-drag simulation transform.
+		PhysicsServer2D.body_set_state(node.get_rid(), PhysicsServer2D.BODY_STATE_TRANSFORM, node.global_transform)
 		node.freeze = not object.get("dynamic", true)
 		node.linear_velocity = Vector2.ZERO
 		node.angular_velocity = 0
@@ -1177,9 +1445,9 @@ func pointer_up(screen_pos: Vector2) -> void:
 		var length := 0.0
 		for i in range(1, pts.size()):
 			length += pts[i - 1].distance_to(pts[i])
-		if length < 0.25:
+		if length < (FunctionalPens.Brush.MIN_LENGTH if draw_mode == 7 else 0.25):
 			message("笔画太短，请画长一点")
-		elif pts.size() >= 4 and pts[0].distance_to(pts[pts.size() - 1]) < 0.18:
+		elif pts.size() >= 4 and pts[0].distance_to(pts[-1]) < (0.065 if draw_mode == 7 else 0.18):
 			record()
 			pts.append(pts[0])
 			draft.append(active_stroke)
@@ -1200,14 +1468,14 @@ func pointer_up(screen_pos: Vector2) -> void:
 		pose = "idle"
 		if draw_mode == 3 and not draft.is_empty():
 			building_wait = -1
-			message("可继续多笔补画 · 再按 2 确认生成")
+			message("可继续多笔补画 · 点「生成」确认" if touch_controls != null and touch_controls.enabled() else "可继续多笔补画 · 再按 2 确认生成")
 		if draw_mode == 5:
-			message("自动塑形 · 已画 %d 笔 · 可继续补画，再按 5 确认" % draft.size())
+			message(("自动塑形 · 已画 %d 笔 · 可继续补画，点「塑形」确认" if touch_controls != null and touch_controls.enabled() else "自动塑形 · 已画 %d 笔 · 可继续补画，再按 5 确认") % draft.size())
 	elif drag:
 		_finish_drag()
 
 func solidify(screen_pos: Vector2) -> void:
-	if draw_mode in [2, 3, 5]:
+	if draw_mode in [2, 3, 5] or FunctionalPens.TOOLS.has(draw_mode):
 		if active_stroke: pointer_up(screen_pos)
 		generate()
 		return
@@ -1275,10 +1543,10 @@ func generate() -> void:
 			selecting_weapon_type = true
 			weapon_type_wheel.show()
 			combat.cancel_draw()
-			message("选择剑、锤、弓、长枪或火枪 · 再按 3 确认装备")
+			message("选择武器类型，再点「装备」" if touch_controls != null and touch_controls.enabled() else "选择剑、锤、弓、长枪或火枪 · 再按 3 确认装备")
 			refresh_buttons()
 		else:
-			message("先点击武器笔迹上的握持位置，再按 3 确认；Esc 返回绘画")
+			message("在线条附近点选或滑动调整握点，再点「选择类型」" if touch_controls != null and touch_controls.enabled() else "先点击武器笔迹上的握持位置，再按 3 确认；Esc 返回绘画")
 		return
 	if active_stroke: pointer_up(draw_cursor if draw_cursor != null else get_viewport().get_mouse_position())
 	if not pending_building.is_empty():
@@ -1293,8 +1561,38 @@ func generate() -> void:
 	if point_count > DrawingRules.MAX_POINTS:
 		message("这件作品笔迹过多，请拆成多件生成；完整草稿已保留")
 		return
+	if draw_mode == 9 and medieval_world != null and medieval_world.survival != null and medieval_world.survival.cup_drawing:
+		var cup: Dictionary = medieval_world.survival.make_cup(draft,true)
+		if cup.get("ok",false):
+			draft = []
+			mode_drafts[9] = []
+			backpack_ui.refresh()
+		message(cup.get("message",cup.get("error","")))
+		return
+	if draw_mode == 8 and paper_pen_mode != "legacy":
+		var strokes := WorldPen.from_draft(draft,paper_pen_mode,pen_anchor_kind)
+		var applied := WorldPen.submit(self,strokes,"player")
+		if applied.ok:
+			draft.clear()
+			mode_drafts[8] = []
+			message("已画下%s · 用墨 %d" % [WorldPen.MODES[paper_pen_mode],int(applied.get("ink_spent",0))])
+			refresh_buttons()
+		else: message(applied.error)
+		return
 	if objects.size() >= MAX_OBJECTS:
 		message("纸面实体已达上限，请先删除一些")
+		return
+	if FunctionalPens.TOOLS.has(draw_mode):
+		var command := FunctionalPens.from_draft(draw_mode, pen_style, draft)
+		if draw_mode in [7,9] and not command.has("plan") and not draft[0].points.is_empty():
+			var at: Vector2 = draft[0].points[0]
+			command.anchor = {"kind":pen_anchor_kind,"at":[at.x,at.y]}
+		var result := FunctionalPens.submit(self, command, "player")
+		if result.get("ok", false):
+			draft = []
+			mode_drafts[draw_mode] = []
+			message(FunctionalPens.TOOLS[draw_mode].label + "已落笔" + (" · 已收入图纸" if result.collected else "") + (" · 已调整到最近安全空位" if result.adjusted else ""))
+		else: message(result.error)
 		return
 	if draw_mode == 2:
 		create_weapon()
@@ -1400,10 +1698,37 @@ func confirm_candidate() -> void:
 	celebrate_creation(object)
 	message(_spawn_notice(body, "已实体化「" + candidate.label + "」；图纸已收入背包"))
 
+func capture_team_work() -> Dictionary:
+	retain_active_stroke()
+	sync_objects()
+	var state := world_save_state()
+	var drafts := mode_drafts.duplicate(true)
+	drafts[draw_mode] = draft.duplicate(true)
+	state.player_drawing = {"tool":draw_mode,"drafts":drafts,"style":pen_style,"pigment":pen_pigment,"paper_mode":paper_pen_mode,"anchor_kind":pen_anchor_kind}
+	return SaveStore.encode_work(paper,objects,bag,camera_x,player.position.x,equipped_weapon,state)
+
+func save_team_as(slot: Dictionary) -> Dictionary:
+	var captured := capture_team_work()
+	if not captured.ok: return captured
+	return TeamWorlds.commit(slot,captured.data,background_world)
+
 func save_game() -> bool:
+	if manuscript_preview: return false
 	if network_session != null:
 		network_session.request_save()
 		return false # Success is shown only after the server confirms.
+	if world_kind == "medieval-v1" and not ProjectSettings.get_setting("paper/divine_demo",false) and not network_headless:
+		if team_slot.is_empty(): team_slot = TeamWorlds.new_slot("我的队伍")
+		if not WorldSession.save_limits(team_slot.slot_id,ModelConnections):
+			message("无法保存本次模型连接的暂停状态，请检查磁盘。")
+			return false
+		var saved := save_team_as(team_slot)
+		if saved.ok:
+			if int(team_slot.revision) == 0 and not background_world: TeamWorlds.mark_played(team_slot.slot_id)
+			team_slot = saved.card
+		message(saved.message)
+		if first_work != null: first_work.note_saved(saved.ok)
+		return saved.ok
 	sync_objects()
 	var player_x: float = player.position.x if player else -5.6
 	var result := SaveStore.save_game(paper, objects, bag, camera_x, player_x, equipped_weapon, world_save_state())
@@ -1411,14 +1736,28 @@ func save_game() -> bool:
 	if first_work!=null:first_work.note_saved(result.ok)
 	return result.ok
 
-func load_game() -> void:
+func load_game(manuscript: String = "") -> bool:
 	if network_session != null:
 		network_session.import_local()
-		return
-	var result := SaveStore.load_game("medieval-v1" if world_kind == "medieval-v1" else "")
+		return false
+	var result: Dictionary
+	if not manuscript.is_empty():
+		if not ProjectSettings.get_setting("paper/divine_demo", false) or manuscript not in ["companion", "priest"]: return false
+		result = SaveStore.read_work("res://assets/manuscripts/%s.json" % manuscript, "medieval-v1")
+	elif world_kind=="medieval-v1" and not team_slot.is_empty() and not ProjectSettings.get_setting("paper/divine_demo",false):
+		if int(team_slot.revision) == 0:
+			open_team_worlds()
+			return false
+		result = TeamWorlds.load_slot(team_slot.slot_id)
+	else:
+		result = SaveStore.load_game("medieval-v1" if world_kind == "medieval-v1" else "")
 	if result.error:
 		message(result.error)
-		return
+		return false
+	return apply_team_work(result)
+
+func apply_team_work(result: Dictionary) -> bool:
+	if result.has("card"): team_slot = result.card
 	selecting_weapon_type = false
 	if weapon_type_wheel != null: weapon_type_wheel.hide()
 	selecting_weapon_grip = false
@@ -1435,7 +1774,9 @@ func load_game() -> void:
 	map_workspaces = _clone(loaded_world.get("maps", {}))
 	select_world(loaded_world.id)
 	if knowledge_world != null: knowledge_world.restore_state(loaded_world)
-	if medieval_world != null: medieval_world.restore_state(loaded_world.get("entities", []),int(loaded_world.get("terrain_version",1)),int(loaded_world.get("content_version",1)),loaded_world.get("bridge_trial",{}))
+	if medieval_world != null:
+		_restore_medieval_state(loaded_world)
+		if not background_world: medieval_world.chronicle.note_player_return()
 	player.reset_movement()
 	player.linear_velocity = Vector2.ZERO
 	player.gravity_scale = 1.0
@@ -1468,11 +1809,28 @@ func load_game() -> void:
 	structure_links.restore(loaded_world.get("connections", []))
 	backpack_ui.refresh()
 	refresh_buttons()
+	if loaded_world.has("player_drawing"):
+		var saved_ink: Dictionary = loaded_world.player_drawing
+		draw_mode = int(saved_ink.tool)
+		tool = "move" if draw_mode == 4 else "draw"
+		pen_style = saved_ink.style
+		pen_pigment = saved_ink.pigment
+		paper_pen_mode = str(saved_ink.get("paper_mode","legacy"))
+		pen_anchor_kind = str(saved_ink.get("anchor_kind","free"))
+		for key in saved_ink.drafts:
+			var paths: Array = saved_ink.drafts[key].duplicate(true)
+			for path in paths:
+				for n in path.points.size():
+					var pt = path.points[n]
+					path.points[n] = Vector2(pt.x,pt.y)
+			mode_drafts[int(key)] = paths
+		draft = mode_drafts.get(draw_mode,[]).duplicate(true)
 	if not objects.is_empty(): onboarding.note_built()
 	if first_work!=null:first_work.world_changed()
 	message("已读取城堡：" + str(objects.size()) + " 个实体、" + str(bag.entries.size()) + " 张图纸")
+	return true
 
-func _assist_slope(direction: int) -> void:
+func _assist_slope(direction: int, supports: Array[Dictionary], delta: float) -> void:
 	if direction == 0 or not player:
 		return
 	var ahead_x := player.position.x + float(direction) * 0.34
@@ -1488,11 +1846,42 @@ func _assist_slope(direction: int) -> void:
 	var hit := get_world_2d().direct_space_state.intersect_ray(query)
 	if hit.is_empty():
 		return
+	if hit.collider is BuildObject and hit.collider.data.get("pen") == "draw_object": return
+	# The base ground and east extension share a continuous height profile.
+	# On its slopes, move tangentially instead of lifting to the next step.
+	var profile_id: int = hit.collider.get_meta("terrain_profile", 0)
+	if profile_id != 0:
+		var normal := _profile_support_normal(profile_id, hit.normal, supports)
+		if normal != Vector2.ZERO:
+			player.linear_velocity = Vector2(normal.y, -normal.x) * player.linear_velocity.x
+		if crouching and player.foot_bodies.any(func(body): return body.get_meta("terrain_profile", 0) == profile_id):
+			var step_x := player.linear_velocity.x * delta
+			var height: float = player.profile_height_for_step(profile_id, step_x)
+			if is_finite(height):
+				player.linear_velocity.y = (height - player.global_position.y) / delta
+			return
+		if normal != Vector2.ZERO:
+			return
 	var target_y: float = float(hit.position.y) + 0.31
 	var rise := target_y - player.position.y
 	if rise > 0.015 and rise <= 0.42:
 		player.position.y = target_y
 		player.linear_velocity = Vector2(player.linear_velocity.x, maxf(0.0, player.linear_velocity.y))
+
+func _profile_support_normal(profile_id: int, ahead: Vector2, supports: Array[Dictionary]) -> Vector2:
+	var best_gap := INF
+	var best := Vector2.ZERO
+	for hit in supports:
+		if not player.foot_bodies.has(hit.collider) or hit.collider.get_meta("terrain_profile", 0) != profile_id:
+			continue
+		var normal: Vector2 = hit.normal
+		if absf(normal.x) < 0.015 and absf(ahead.x) < 0.015:
+			continue
+		var gap := absf(normal.dot(player.global_position - hit.position) - StickmanPlayer.BODY_RADIUS)
+		if gap <= 0.035 and gap < best_gap:
+			best = normal
+			best_gap = gap
+	return best
 
 func _physics_process(delta: float) -> void:
 	if network_session != null:
@@ -1593,7 +1982,7 @@ func _physics_process(delta: float) -> void:
 		"right": Input.is_action_pressed("move_right") or stick.x > 0.25,
 		"up": Input.is_action_pressed("move_up") or stick.y < -0.5,
 		"down": Input.is_action_pressed("move_down") or stick.y > 0.5,
-		"jump_pressed": Input.is_action_just_pressed("jump"),
+		"jump_pressed": Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("touch_jump"),
 	})
 
 	var player_x := player.position.x
@@ -1601,16 +1990,27 @@ func _physics_process(delta: float) -> void:
 	walk_phase = fmod(walk_phase + absf(player_x - last_player_x) * PIXELS_PER_UNIT / 68.0, 1.0)
 	last_player_x = player_x
 	if active_stroke == null and drag == null and not selecting_weapon_grip:
-		camera_x += (player_x - camera_x) * min(1.0, delta * 4.5)
+		var target_x := player_x
+		if medieval_world != null and medieval_world.east_painting() and absf(medieval_world.east_walk_limit() - player_x) < 16.0:
+			# Keep the player and the moving pencil on the same sheet of paper.
+			target_x += get_viewport_rect().size.x / PIXELS_PER_UNIT * 0.18
+		camera_x += (target_x - camera_x) * min(1.0, delta * 4.5)
 		if knowledge_world != null or medieval_world != null:
 			camera_y += (camera_target_y() - camera_y) * minf(1.0, delta * 3.5)
 	_track_page()
 	_update_world_chunks()
 
-	if medieval_world != null:
-		player.position.x = clampf(player.position.x, -4, medieval_world.LENGTH+4)
-	if medieval_world != null and player.position.y < -10:
-		respawn_medieval()
+	if medieval_world!=null and medieval_world.paper_space!=null:
+		var foot:Vector2=medieval_world.last_paper_foot
+		if on_ground and not player.support_bodies().is_empty():
+			medieval_world.last_paper_foot=player.position
+		elif not foot.is_finite():
+			medieval_world.last_paper_foot=player.position
+		elif player.position.y<foot.y-12 and not medieval_world.paper_has_floor_below(player.position) and not medieval_world.terrain.in_water(player.position):
+			respawn_medieval()
+	elif medieval_world!=null:
+		player.position.x=clampf(player.position.x,-4,medieval_world.east_walk_limit())
+		if player.position.y < -10:respawn_medieval()
 	elif knowledge_world != null and player.position.y < GROUND_Y - 4:
 		knowledge_world.respawn()
 	elif medieval_world == null and player.position.y < GROUND_Y - 4:
@@ -1627,7 +2027,10 @@ func step_locomotion(delta: float, controls: Dictionary) -> void:
 	var down := bool(controls.get("down", false))
 	var down_tapped := down and not down_was_down
 	down_was_down = down
-	var supported: bool = on_ground and not player.support_bodies().is_empty()
+	var supports: Array[Dictionary] = []
+	if on_ground:
+		supports = player.support_hits()
+	var supported := not supports.is_empty()
 	if supported and player.linear_velocity.y <= 0.5:
 		jumps_used = 0
 	var dropped := false
@@ -1671,7 +2074,7 @@ func step_locomotion(delta: float, controls: Dictionary) -> void:
 		player.gravity_scale = 1
 		player.linear_velocity = Vector2(direction * (2.3 if crouching else 4.6) + combat.player_push, velocity.y)
 		if on_ground:
-			_assist_slope(direction)
+			_assist_slope(direction, supports, delta)
 
 	if jump_requested and not dropped and (supported or climbing or wall_climb.active or jumps_used < 2):
 		var from_wall: bool = wall_climb.active
@@ -1718,6 +2121,10 @@ func network_centers() -> Array:
 	var result: Array = [camera_x]
 	for body in network_players:
 		if is_instance_valid(body) and not body.freeze: result.append(body.position.x)
+	if medieval_world!=null and network_session==null and not network_headless:
+		for name in ["SandboxCompanion","SandboxAdventurer","SandboxWarGod"]:
+			var role = medieval_world.get_node_or_null(name)
+			if role!=null and is_instance_valid(role.actor): result.append(role.actor.player.position.x)
 	return result
 
 func physics_centers() -> Array:
@@ -1744,8 +2151,12 @@ func _find_ladder() -> Dictionary:
 	return {}
 
 func set_draw_mode(slot: int) -> void:
-	if slot < 1 or slot > 5 or bag_open: return
+	if bag_open or (slot not in range(1, 6) and not (FunctionalPens.TOOLS.has(slot) and FunctionalPens.available(self))): return
 	if slot == draw_mode: return
+	if medieval_world != null and medieval_world.survival != null: medieval_world.survival.cup_drawing = false
+	if map_controls != null:
+		map_controls.pending_pattern = -1
+		if map_controls.painter_folio != null: map_controls.painter_folio.pending_id = -1
 	creation_context += 1
 	if slot == 5: sculpt_return_mode = draw_mode
 	selecting_weapon_type = false
@@ -1764,7 +2175,14 @@ func set_draw_mode(slot: int) -> void:
 	placement_preview = {}
 	clear_candidate()
 	selected = -1
-	message(["", "自由造物：多笔画轮廓，再按 1 生成", "武器：画轮廓 → 3 选握点 → 3 选类型 → 3 装备", "建筑：多笔补画，再按 2 生成并落下，碰到文字会自动避让", "移动／拆除：按住已有造物拖动；选中后点拆除或按 Delete", "自动塑形：可画多笔，再按 5 规整并生成 · Esc 返回"][slot])
+	var instructions := ["", "自由造物：多笔画轮廓，再按 1 生成", "武器：画轮廓 → 3 选握点 → 3 选类型 → 3 装备", "建筑：多笔补画，再按 2 生成并落下，碰到文字会自动避让", "移动／拆除：按住已有造物拖动；选中后点拆除或按 Delete", "自动塑形：可画多笔，再按 5 规整并生成 · Esc 返回"]
+	if touch_controls != null and touch_controls.enabled():
+		instructions = ["", "多笔画轮廓 · 点生成确认", "画好 → 点「选择握点」→ 在线条上选握点 → 选类型 → 装备", "多笔补画 · 点生成后真实下落", "按住物件拖动 · 选中后可拿起或拆除", "多笔画轮廓 · 点塑形完成"]
+	if slot == 4 and FunctionalPens.available(self) and not touch_controls.enabled():
+		instructions[4] = "拖动实体 · V 切换重叠目标 · 按住 Option / Alt 编辑景物"
+	if FunctionalPens.TOOLS.has(slot):
+		message(FunctionalPens.TOOLS[slot].hint + " · 再按 %d 确认" % slot)
+	else: message(instructions[slot])
 	refresh_buttons()
 
 func activate_draw_mode(slot: int) -> void:
@@ -1810,7 +2228,9 @@ func confirm_sculpt() -> void:
 	backpack_ui.refresh()
 	set_draw_mode(sculpt_return_mode)
 	celebrate_creation(object, "SHAPED!")
-	message(_spawn_notice(body, "已塑形成「%s」并收入图纸 · 5 再画一件 · 4 移动部件" % AutoSculpt.label(object.kind)))
+	var notice := "已塑形成「%s」并收入图纸 · 5 再画一件 · 4 移动部件"
+	if touch_controls != null and touch_controls.enabled(): notice = "已塑形成「%s」并收入图纸 · 点塑形再画一件 · 点移动可搬动"
+	message(_spawn_notice(body, notice % AutoSculpt.label(object.kind)))
 
 func cancel_pointer() -> void:
 	connection_source.clear()
@@ -1871,7 +2291,7 @@ func connection_action(data: Dictionary) -> bool:
 
 func retain_active_stroke() -> void:
 	# Modal UI and focus loss finish valid ink as a draft, never as a world object.
-	if active_stroke == null or active_stroke.points.is_empty(): return
+	if active_stroke == null or active_stroke.get("points", []).is_empty(): return
 	pointer_up(world_to_screen(active_stroke.points.back()))
 
 func select_weapon_type(kind: String) -> void:
@@ -1891,7 +2311,7 @@ func create_weapon() -> void:
 	refine_weapon_type = ""
 	selected_weapon_grip = null
 	grip_hover = draft[0].points[0]
-	message("点击真实笔迹上的握持位置，再按 3 确认 · Esc 返回绘画")
+	message("在线条附近点选或滑动调整握点，再点「选择类型」；可返回绘画" if touch_controls != null and touch_controls.enabled() else "点击真实笔迹上的握持位置，再按 3 确认 · Esc 返回绘画")
 	refresh_buttons()
 
 func select_weapon_grip(point: Vector2) -> void:
@@ -1904,7 +2324,7 @@ func select_weapon_grip(point: Vector2) -> void:
 	creation_context += 1
 	grip_hover = snapped
 	if feedback != null: feedback.emit_event("grip", snapped)
-	message("握持点已选中 · 可重新点选 · 3 选择武器类型")
+	message("握点已贴到笔迹 · 可滑动调整 · 点「选择类型」继续" if touch_controls != null and touch_controls.enabled() else "握持点已选中 · 可重新点选 · 3 选择武器类型")
 	refresh_buttons()
 
 func cancel_weapon_grip(show_message: bool = true) -> void:
@@ -1951,7 +2371,7 @@ func equip_weapon_at(point: Vector2) -> void:
 	backpack_ui.refresh()
 	refresh_buttons()
 	if feedback != null: feedback.emit_event("create", player.position + Vector2(facing * 0.25, 0.1), "FORGED!")
-	message(PaperWeaponTypes.label(weapon) + "已装备 · 图纸已保存 · 右键 / R 攻击")
+	message(PaperWeaponTypes.label(weapon) + ("已装备 · 图纸已保存 · 点右下角攻击" if touch_controls != null and touch_controls.enabled() else "已装备 · 图纸已保存 · 右键 / R 攻击"))
 
 func prepare_building() -> void:
 	creation_context += 1
@@ -2016,7 +2436,37 @@ func attack() -> void:
 		return
 	if combat != null: combat.attack(aim_world - origin)
 
+func _exit_tree() -> void:
+	if not _owned_slot.is_empty():
+		if WorldSession.tracked.get(_owned_slot,false) and not background_world and get_tree() != null:
+			get_tree().auto_accept_quit = true
+		WorldSession.release(_owned_slot)
+
+func hand_over_world(close_window := false) -> void:
+	if _closing_world or _owned_slot.is_empty(): return
+	_closing_world = true
+	WorldSession.draining[_owned_slot] = true
+	message("正在收存本队已发出的角色回合…")
+	while WorldSession.has_requests(self):
+		await get_tree().create_timer(.2).timeout
+	if not save_game():
+		_closing_world = false
+		WorldSession.draining.erase(_owned_slot)
+		return
+	var started := WorldSession.start_background(_owned_slot)
+	if not started.ok:
+		message(started.get("message","后台世界未能启动。"))
+		_closing_world = false
+		WorldSession.draining.erase(_owned_slot)
+		return
+	process_mode = Node.PROCESS_MODE_DISABLED
+	if close_window: get_tree().quit()
+	else: get_tree().change_scene_to_file("res://scenes/title_menu.tscn")
+
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST and not background_world and WorldSession.tracked.get(_owned_slot,false):
+		hand_over_world(true)
+		return
 	if what in [NOTIFICATION_APPLICATION_FOCUS_IN, NOTIFICATION_WM_WINDOW_FOCUS_IN] and network_session != null: network_session.focus_active = true
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
 		if network_session != null: network_session.focus_active = false
@@ -2042,24 +2492,26 @@ func _ground_margin() -> float:
 	return margin * amount
 
 func _resize_world() -> void:
+	retain_active_stroke()
 	cancel_pointer()
 	var amount := PaperGuiScale.factor(get_viewport_rect().size)
+	var logical_height := get_viewport_rect().size.y / amount
 	# Settle UI transforms before computing the physical camera exclusion bounds.
 	if toolbar != null: toolbar._layout()
 	if backpack_panel != null: backpack_panel._layout()
 	if experience != null: experience._layout()
 	if touch_controls != null: touch_controls._layout()
 	if knowledge_world != null:
-		knowledge_world.normal_ppu = (58.0 if get_viewport_rect().size.y < 500 else 60.0) * amount
+		knowledge_world.normal_ppu = (58.0 if logical_height < 500 else 60.0) * amount
 		if knowledge_world.overview: knowledge_world.resize_overview()
 		else: PIXELS_PER_UNIT = knowledge_world.normal_ppu
 		if player != null and not knowledge_world.overview: camera_y = camera_target_y()
 		return
 	if medieval_world != null:
-		PIXELS_PER_UNIT = (48.0 if get_viewport_rect().size.y < 500 else 60.0) * amount
+		PIXELS_PER_UNIT = (48.0 if logical_height < 500 else 60.0) * amount
 		if player != null and toolbar != null: camera_y = camera_target_y()
 		return
-	PIXELS_PER_UNIT = (58.0 if get_viewport().get_visible_rect().size.y < 500 else 78.0) * amount
+	PIXELS_PER_UNIT = (58.0 if logical_height < 500 else 78.0) * amount
 
 func release_building() -> void:
 	building_wait = -1
@@ -2112,11 +2564,16 @@ func return_to_map_select(destination: String = "res://scenes/map_select.tscn") 
 func save_and_return_to_title() -> void:
 	if network_session != null:
 		network_session.save_and_return_to_selector("res://scenes/title_menu.tscn")
+	elif world_kind == "medieval-v1" and not team_slot.is_empty() and not ProjectSettings.get_setting("paper/divine_demo",false):
+		return_to_map_select("res://scenes/title_menu.tscn")
 	elif save_game():
 		return_to_map_select("res://scenes/title_menu.tscn")
 
 func _return_to_selector(destination: String = "res://scenes/map_select.tscn") -> void:
 	var tree := get_tree()
+	if world_kind == "medieval-v1" and not team_slot.is_empty() and not ProjectSettings.get_setting("paper/divine_demo",false):
+		if save_game(): tree.change_scene_to_file(destination)
+		return
 	var holder := tree.root.get_node_or_null("MapSessions")
 	if holder == null:
 		holder = Node.new()

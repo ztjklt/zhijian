@@ -118,11 +118,9 @@ func check_selector_bounds(selector, label: String) -> void:
 	for card in selector.cards.get_children():
 		var bounds: Rect2 = card.get_global_rect()
 		check(bounds.position.x >= 0 and bounds.end.x <= viewport_width, label + " card stays within screen")
-		var column = card.get_child(0)
-		var actions = column.get_child(column.get_child_count() - 1)
-		for button in actions.get_children():
-			var button_bounds: Rect2 = button.get_global_rect()
-			check(button_bounds.position.x >= bounds.position.x and button_bounds.end.x <= minf(bounds.end.x, viewport_width), label + " both actions fit card")
+		# A portal is now one live organic button, rather than a stack of old cards.
+		check(card is PaperModePortal and card.pressed.get_connections().size()>0,label+" mode portal has its real action")
+		check(card._has_point(card.size*.5) and not card._has_point(Vector2.ZERO),label+" visible portal silhouette matches its hit target")
 
 func clear_cached_sessions() -> void:
 	var holder := root.get_node_or_null("MapSessions")

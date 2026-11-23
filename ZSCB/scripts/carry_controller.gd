@@ -74,6 +74,9 @@ func toggle() -> bool:
 func pick(at: int) -> bool:
 	if at < 0 or at >= game.objects.size() or at >= game.object_nodes.size(): return false
 	var object: Dictionary = game.objects[at]
+	if object.get("pen") == "draw_scenery":
+		game.message("景物可以用 4 拖动，请选择实体拿起")
+		return false
 	if not game.can_cooperate(object): game.message("没有权限拿起这个部件"); return false
 	if game.structure_links != null and game.structure_links.linked(object.get("structure_id", "")):
 		game.message("部件已连接，请先解除连接再拿起"); return false
@@ -86,7 +89,7 @@ func pick(at: int) -> bool:
 	reapply()
 	game.selected = at
 	step()
-	game.message("已拿起部件 · G 放下 · 可继续移动")
+	game.message("已拿起部件 · 点「放下」落地 · 可继续移动" if game.touch_controls != null and game.touch_controls.enabled() else "已拿起部件 · G 放下 · 可继续移动")
 	return true
 
 func step() -> void:

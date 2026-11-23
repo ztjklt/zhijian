@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "date": "2026-11-18",
+  "tool": "built-in image_gen.imagegen",
+  "reference": "../../ui/modes/sandbox.png (approved user reference)",
+  "transparent_background": false,
+  "generation_note": "AI generated for this project. Original outputs retained; copied unchanged. No external stock assets. Existing mode assets and their provenance remain in assets/ui/modes/manifest.json.",
+  "assets": [
+    {
+      "id": "hills",
+      "file": "hills.png",
+      "source": "Generated source image",
+      "prompt": "Create a NEW production game backdrop inspired by the attached approved layered paper-cut illustration, for a 2D side-view paper diorama. Wide landscape, panoramic. Warm ivory cotton paper, pale sage green and soft ochre cut-paper distant hills across the bottom 30 percent, two or three embossed layers, short soft paper shadows, upper 70 percent quiet ivory sky with a few small folded cream clouds. Calm premium handcrafted style, subtle paper fibers, much lower contrast than foreground game objects. No characters, no buildings, no foreground trees, no platforms, no text, no labels, no user interface. Whole background opaque.",
+      "role": "UI background illustration only; never used by game-world rendering",
+      "size": [
+        2172,
+        724
+      ]
+    }
+  ],
+  "scope": "Mode selection and lobby UI only. Original cover-v10 and cover buttons are excluded."
+}

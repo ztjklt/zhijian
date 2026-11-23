@@ -3,6 +3,7 @@
 Thumbs.db
 .godot/
 __pycache__/
+node_modules/
 *.py[cod]
 .vscode/
 .idea/

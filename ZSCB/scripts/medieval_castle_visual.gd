@@ -12,7 +12,7 @@ func _ready() -> void:
 	if shared_ink_material == null:
 		shared_ink_material = ShaderMaterial.new()
 		shared_ink_material.shader = InkShader
-	material = shared_ink_material
+	if not entity.brush_art: material = shared_ink_material
 	z_index = 1
 
 func _process(_delta: float) -> void:

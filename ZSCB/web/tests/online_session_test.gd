@@ -57,6 +57,20 @@ func run()->void:
 		check(not touch.handle_touch(press) and touch.owners.get(45,"")=="native","invite modal routes touches to GUI")
 		release.index=45;release.position=press.position;touch.handle_touch(release)
 		panel.invite_dialog.confirmed.emit();panel.invite_dialog.hide()
+		if game.toolbar.has_method("mobile_landscape"):
+			root.size = Vector2i(568, 320)
+			for i in 4: await process_frame
+			check(panel.room_button.visible and not panel.panel.visible, "short mobile landscape starts with a collapsed room panel")
+			check(not panel.blocks_canvas(touch.attack_rect.get_center()), "room controls leave the attack button clear during play")
+			check(not panel.room_button.get_global_rect().intersects(game.toolbar.mode_group.get_global_rect()), "the room button leaves the mobile tool buttons clear")
+			press.index = 46
+			press.position = panel.room_button.get_global_rect().get_center()
+			touch.handle_touch(press)
+			release.index = press.index; release.position = press.position
+			touch.handle_touch(release)
+			check(panel.room_dialog.visible and game.active_stroke == null, "tapping the mobile room button opens the room without drawing")
+			panel.room_dialog.get_ok_button().pressed.emit()
+			check(not panel.room_dialog.visible and not bool(session.get_meta("flow_modal", false)), "returning to the game releases modal input capture")
 		game.combat.health=75;session.local_protection=1
 		panel._process(0)
 		check(panel.connection.text.contains("75") and panel.connection.text.contains("保护"),"room HUD retains local health and protection")

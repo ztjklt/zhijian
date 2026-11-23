@@ -42,7 +42,7 @@ func _process(delta: float) -> void:
 			if candidate.length_squared() > tip.length_squared(): tip = candidate
 	var wrist_axis := -anchor.global_transform.y.normalized()
 	if PaperWeaponTypes.ranged(weapon) and battle != null:
-		var direction: Vector2 = battle.bow_direction if battle.bow_charge > 0 or battle.shot_recoil > 0 else (game.aim_world - game.player.position).normalized()
+		var direction: Vector2 = battle.visible_ranged_direction() if battle is PaperCombat else battle.bow_direction if battle.bow_charge > 0 or battle.shot_recoil > 0 else (game.aim_world - game.player.position).normalized()
 		if direction.length_squared()<.01: direction = Vector2(facing,0)
 		wrist_axis = Vector2(direction.x,-direction.y)
 		if PaperWeaponTypes.kind(weapon)=="bow": wrist_axis = wrist_axis.rotated(-PI*.5)
@@ -51,7 +51,7 @@ func _process(delta: float) -> void:
 	var held_transform := Transform2D(turn, anchor.global_position)
 	held_transform.x *= facing
 	global_transform = held_transform
-	edge_light = battle != null and battle.blade_active() and not PaperWeaponTypes.ranged(weapon)
+	edge_light = battle != null and not PaperWeaponTypes.ranged(weapon) and (battle.visible_blade_active() if battle is PaperCombat else battle.blade_active())
 	if delta > 0:
 		_update_trace(delta,game,facing)
 	queue_redraw()

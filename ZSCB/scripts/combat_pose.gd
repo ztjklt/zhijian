@@ -12,7 +12,8 @@ func _process(_delta: float) -> void:
 	var game = character.game
 	var battle = character.actor_state()
 	if battle == null: return
-	if character.native == null and game.active_stroke != null and battle.swing <= 0:
+	var swing: float = battle.visible_swing() if battle is PaperCombat else battle.swing
+	if character.native == null and game.active_stroke != null and swing <= 0:
 		_release_overlay()
 		return
 	var facing: int = character.actor_facing()
@@ -24,10 +25,10 @@ func _process(_delta: float) -> void:
 	var firearm: bool = battle.is_firearm() if battle.has_method("is_firearm") else false
 	if bow or firearm:
 		var charge: float = 1.0 - battle.bow_charge / 0.42 if battle.bow_charge > 0 else 0.0
-		var kick: float = battle.shot_recoil / 0.22
+		var kick: float = (battle.visible_shot_recoil() if battle is PaperCombat else battle.shot_recoil) / PaperCombat.SHOT_RECOIL_DURATION
 		torso.rotation = -0.12 - charge * 0.12 + kick * 0.30
 		head.rotation = -torso.rotation * 0.65
-		var aim: Vector2 = battle.bow_direction if battle.bow_charge > 0 or battle.shot_recoil > 0 else (game.aim_world - game.player.position).normalized()
+		var aim: Vector2 = battle.visible_ranged_direction() if battle is PaperCombat else battle.bow_direction if battle.bow_charge > 0 or battle.shot_recoil > 0 else (game.aim_world - game.player.position).normalized()
 		var angle := Vector2(aim.x * facing, -aim.y).angle()
 		angle = clampf(angle, -1.1, 1.1)
 		var center := Vector2(0, -34)
@@ -42,13 +43,18 @@ func _process(_delta: float) -> void:
 		var blade_angle := hold.z
 		var lean := hold.w
 		var rear_grip := hold_rear(kind)
-		if battle.swing > 0:
-			var p: float = 1.0 - battle.swing / (battle.swing_duration() if battle.has_method("swing_duration") else battle.SWING_DURATION)
-			var pose := PaperWeaponMotion.pose(battle.motion_index, p)
+		if swing > 0:
+			var p: float = 1.0 - swing / (battle.swing_duration() if battle.has_method("swing_duration") else battle.SWING_DURATION)
+			var motion: int = battle.visible_motion() if battle is PaperCombat else battle.motion_index
+			var pose := PaperWeaponMotion.pose(motion, p)
 			grip = Vector2(pose.x, pose.y)
 			blade_angle = pose.z
 			lean = pose.w
-			rear_grip = PaperWeaponMotion.rear_hand(battle.motion_index, p)
+			rear_grip = PaperWeaponMotion.rear_hand(motion, p)
+			if battle is PaperCombat and battle.melee_grip_lowering>0:
+				var lowered:float=battle.melee_grip_lowering*smoothstep(.06,.43,p)*(1.0-smoothstep(.77,1.0,p))
+				grip.y+=lowered
+				blade_angle+=lowered*.009
 		if battle.recoil > 0 and battle.impact_hold <= 0:
 			var bounce: float = minf(1.0, battle.recoil / 0.18)
 			grip = grip.lerp(Vector2(15, -31), bounce)

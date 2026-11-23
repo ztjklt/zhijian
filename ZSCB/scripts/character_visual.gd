@@ -31,7 +31,12 @@ func actor_body():
 	return native if native != null else game.player
 
 func actor_facing() -> int:
-	return native.facing if native != null else game.facing
+	if native != null: return native.facing
+	if game.network_session != null:
+		var intent = game.network_session.combat_intent
+		if intent.showing("melee") or intent.showing("firearm"):
+			return 1 if intent.direction.x >= 0 else -1
+	return game.facing
 
 func actor_weapon() -> Dictionary:
 	return native.weapon_model if native != null else game.equipped_weapon

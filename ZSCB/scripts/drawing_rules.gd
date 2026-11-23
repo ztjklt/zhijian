@@ -6,6 +6,9 @@ const BUILD_RANGE := 12.0
 const MAX_POINTS := 8192
 const BUILD_KINDS := ["auto", "freehand", "platform", "wall", "ladder", "ramp", "tower", "gate"]
 
+static func paper_ink_cost(length: float) -> float:
+	return clampf(ceilf(4.0 + 1.25 * length), 6.0, 80.0)
+
 static func weapon(strokes: Array) -> Dictionary:
 	var b := ShapeMatcher.bounds(strokes)
 	if b.is_empty() or maxf(b.width, b.height) < 0.25:

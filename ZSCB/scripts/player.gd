@@ -1,9 +1,12 @@
 class_name StickmanPlayer
 extends RigidBody2D
 
+const BODY_RADIUS := 0.29
+const WALK_CONTACT_BIAS := 0.004
 const CollisionLifetime := preload("res://scripts/collision_lifetime.gd")
 
 var game = null
+var body_circle := CircleShape2D.new()
 var foot_sensor: Area2D
 var foot_bodies: Array[Node2D] = []
 var dropping_bodies: Array[PhysicsBody2D] = []
@@ -74,16 +77,29 @@ func update_owned_surfaces() -> void:
 			if body.has_meta("walk_edge_a") and _surface_clearance(body) >= -0.035:
 				_foot_entered(body)
 
+# A sensor can overlap a one-way platform during ascent. The solver can
+# land on it later without emitting a second Area2D body_entered signal.
+func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	if not game or not is_instance_valid(foot_sensor): return
+	for index in state.get_contact_count():
+		var normal := state.get_contact_local_normal(index)
+		if normal.y <= .35: continue
+		var support := state.get_contact_collider_object(index) as PhysicsBody2D
+		if not support or foot_bodies.has(support) or not foot_sensor.overlaps_body(support): continue
+		# A body following a slope can gain height while it is still supported.
+		var relative_velocity := state.linear_velocity-state.get_contact_collider_velocity_at_position(index)
+		if relative_velocity.dot(normal) <= .5: _foot_entered(support,true)
+
 func _ready() -> void:
+	max_contacts_reported = 8
 	lock_rotation = true
 	linear_damp = 0.0
 	collision_layer = 2
 	# Ground/freehand objects use layer 1; gates and ladders use layer 8.
 	collision_mask = 9
 	var body_shape := CollisionShape2D.new()
-	var circle := CircleShape2D.new()
-	circle.radius = 0.29
-	body_shape.shape = circle
+	body_circle.radius = BODY_RADIUS
+	body_shape.shape = body_circle
 	add_child(body_shape)
 	foot_sensor = Area2D.new()
 	foot_sensor.collision_layer = 4
@@ -98,8 +114,8 @@ func _ready() -> void:
 	foot_sensor.body_entered.connect(_foot_entered)
 	foot_sensor.body_exited.connect(_foot_exited)
 
-func _foot_entered(body: Node) -> void:
-	if dropping_bodies.has(body) or passing_surfaces.has(body) or linear_velocity.y > 0.5 or foot_bodies.has(body): return
+func _foot_entered(body: Node, solver_support := false) -> void:
+	if dropping_bodies.has(body) or passing_surfaces.has(body) or (not solver_support and linear_velocity.y > 0.5) or foot_bodies.has(body): return
 	if body.has_meta("walk_edge_a") and _surface_clearance(body) < -0.035: return
 	if body is BuildObject and body.data.get("kind", "") == "ladder": return
 	foot_bodies.append(body)
@@ -122,8 +138,38 @@ func clear_foot_contacts() -> void:
 		game.on_ground = false
 		game.ground_contacts = 0
 
-func support_bodies() -> Array[PhysicsBody2D]:
-	var supports: Array[PhysicsBody2D] = []
+# Sweep the body's own circle at the next slow walking step. A ramp crest
+# can change both its normal and its collision body before a foot ray does.
+func profile_height_for_step(profile_id: int, step_x: float) -> float:
+	var span := absf(step_x) * 1.5 + 0.06
+	var center := global_position + Vector2(step_x, span)
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = body_circle
+	query.transform = Transform2D(0, center)
+	query.collision_mask = 1
+	var excluded: Array[RID] = [get_rid()]
+	for body in get_collision_exceptions():
+		if is_instance_valid(body):
+			excluded.append(body.get_rid())
+	query.exclude = excluded
+	query.motion = Vector2(0, -2.0 * span)
+	var space := get_world_2d().direct_space_state
+	var sweep := space.cast_motion(query)
+	if sweep.size() != 2 or sweep[1] >= 1.0:
+		return INF
+	var height := center.y + query.motion.y * sweep[1]
+	query.transform.origin = Vector2(center.x, height - 0.003)
+	query.motion = Vector2.ZERO
+	var contact := space.get_rest_info(query)
+	if contact.is_empty() or contact.normal.y <= 0.35:
+		return INF
+	var support := instance_from_id(contact.collider_id)
+	if not is_instance_valid(support) or support.get_meta("terrain_profile", 0) != profile_id:
+		return INF
+	return height - WALK_CONTACT_BIAS
+
+func support_hits() -> Array[Dictionary]:
+	var hits: Array[Dictionary] = []
 	var excluded: Array[RID] = [get_rid()]
 	for body in get_collision_exceptions():
 		if is_instance_valid(body): excluded.append(body.get_rid())
@@ -138,7 +184,14 @@ func support_bodies() -> Array[PhysicsBody2D]:
 			excluded.append(hit.collider.get_rid())
 			query.exclude = excluded
 			hit = get_world_2d().direct_space_state.intersect_ray(query)
-		if not hit.is_empty() and hit.normal.y > 0.35 and not supports.has(hit.collider):
+		if not hit.is_empty() and hit.normal.y > 0.35:
+			hits.append(hit)
+	return hits
+
+func support_bodies() -> Array[PhysicsBody2D]:
+	var supports: Array[PhysicsBody2D] = []
+	for hit in support_hits():
+		if not supports.has(hit.collider):
 			supports.append(hit.collider)
 	return supports
 

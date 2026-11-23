@@ -99,7 +99,18 @@ func _disconnected() -> void:''')
     session.write_text(text)
     touch=project/'scripts/touch_controls.gd'
     text=touch.read_text()
-    text=replace_once(text,'if game.experience != null and game.experience.visible:', 'if (game.experience != null and game.experience.visible) or (game.network_session!=null and game.network_session.get_meta("flow_modal",false)):')
+    text=replace_once(text,'\t\tif not native_mouse_active:', '\t\tif game.network_session!=null and game.network_session.get_meta("flow_modal",false): native_mouse_active=true\n\t\tif not native_mouse_active:')
+    if 'var modal: Control = null' in text:
+        text=replace_once(text,'\tif modal != null:', '''\tif game.network_session!=null and game.network_session.get_meta("flow_modal",false):
+\t\tif event is InputEventScreenTouch:
+\t\t\tif event.canceled: _release(event.index,true); return true
+\t\t\tif event.pressed: owners[event.index]="native"
+\t\t\telse: _release(event.index,false,event.position)
+\t\tnative_mouse_active=true
+\t\treturn false
+\tif modal != null:''')
+    else:
+        text=replace_once(text,'if game.experience != null and game.experience.visible:', 'if (game.experience != null and game.experience.visible) or (game.network_session!=null and game.network_session.get_meta("flow_modal",false)):')
     text=replace_once(text,'\t\tif not game.bag_open and event.position.distance_to(stick_center)', '\t\tvar flow=game.network_session.flow_ui if game.network_session!=null else null\n\t\tif flow!=null and flow.blocks_canvas(event.position):\n\t\t\tvar flow_button:=_button_at(flow.panel,event.position)\n\t\t\tif flow_button!=null:\n\t\t\t\towners[event.index]="ui"; pressed_button[event.index]=weakref(flow_button)\n\t\t\telse:\n\t\t\t\towners[event.index]="native"; native_mouse_active=true; return false\n\t\telif not game.bag_open and event.position.distance_to(stick_center)')
     text=replace_once(text,'if not game.toolbar.blocks_canvas(event.position): game.pointer_move(event.position)', 'if not game.toolbar.blocks_canvas(event.position) and not (game.network_session!=null and game.network_session.flow_ui!=null and game.network_session.flow_ui.blocks_canvas(event.position)): game.pointer_move(event.position)')
     touch.write_text(text)

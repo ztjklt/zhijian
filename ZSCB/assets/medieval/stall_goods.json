@@ -1,0 +1,7 @@
+{
+  "fruit": {"name":"朱果","price":1},
+  "paper_lantern": {"name":"纸灯","price":2},
+  "reed_leaf": {"name":"苇叶","price":1},
+  "forage": {"name":"牧草","price":1},
+  "red": {"name":"朱红颜料","price":2}
+}

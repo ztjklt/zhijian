@@ -24,19 +24,21 @@ static func authored(entity) -> Array:
 		"castle_piece": return castle_edges(entity)
 		"wall","gate","barrel","crate","wagon": edges = [[Vector2(-w*.48,h),Vector2(w*.48,h)]]
 	return edges
-static func castle_edges(entity) -> Array:
-	var result: Array = []
+static func castle_routes() -> Array:
 	# These lines trace the master concept's base mouldings, window sills,
 	# balconies, battlements and roofs; no tile seam becomes an invisible floor.
-	var routes := [
+	return [
 		[22,854,305,854],[39,720,291,720],[48,622,291,622],[48,496,291,496],[32,420,313,420],[31,329,313,329],[48,310,275,310],
 		[1230,854,1510,854],[1245,720,1498,720],[1245,622,1494,622],[1245,496,1481,496],[1217,420,1503,420],[1217,329,1503,329],[1255,311,1486,311],
 		[282,836,533,836],[999,836,1253,836],[291,668,535,668],[1000,668,1245,668],[291,590,535,590],[1000,591,1245,591],
 		[535,800,650,800],[885,800,1000,800],[535,666,650,666],[885,666,1000,666],[518,559,1017,559],[519,513,1017,513],
 		[583,466,952,466],[584,420,952,420],[584,402,659,402],[875,402,952,402],[578,316,667,316],[870,315,961,315],
 		[678,302,858,302],[698,257,768,96],[768,96,839,257],[578,316,622,215],[622,215,667,316],[870,315,915,215],[915,215,961,317]]
+
+static func castle_edges(entity) -> Array:
+	var result: Array = []
 	var bounds := Rect2(Vector2(-entity.size.x*.5,0),entity.size)
-	for route in routes:
+	for route in castle_routes():
 		var a: Vector2 = Castle.project_pixel(Vector2(route[0],route[1]))-entity.position
 		var b: Vector2 = Castle.project_pixel(Vector2(route[2],route[3]))-entity.position
 		var delta := b-a
@@ -72,7 +74,7 @@ static func remaining(entity) -> Array:
 			var removed := false
 			for cut in entity.cuts:
 				if Geometry2D.is_point_in_polygon((start+end)*.5,entity._cut_polygon(cut)): removed = true; break
-			if not removed: result.append([start,end])
+			if not removed: result.append([entity.art_to_local(start),entity.art_to_local(end)])
 	return result
 static func rebuild(entity) -> void:
 	for child in entity.get_children():

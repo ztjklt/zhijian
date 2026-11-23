@@ -69,5 +69,4 @@ func _layout()->void:
 	if panel==null:return
 	var viewport:=PaperGuiScale.apply(self)
 	actions.columns=2 if viewport.x<600 else 3;comparison.columns=1 if viewport.x<600 else 2
-	panel.position=Vector2(12,12);panel.size=Vector2(minf(820,viewport.x-24),minf(600,viewport.y-24))
-	panel.position=(viewport-panel.size)*.5
+	PaperGuiScale.fit_panel(panel,Vector2(820,600))

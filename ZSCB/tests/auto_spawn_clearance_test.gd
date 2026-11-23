@@ -112,11 +112,19 @@ func run()->void:
 	await physics_frame;game.onboarding.dismiss();game.set_physics_process(false);game.player.freeze=true
 	var facade:=evaluate(square(Vector2(78,7),Vector2(3,3),.18),"real castle facade")
 	if facade.valid:check(facade.offset.length()<12,"castle escapes via nearby silhouette boundary")
+	var extension:=evaluate(square(Vector2(184,30),Vector2(8,2)),"old east seam in a four-way sandbox")
+	if extension.valid:check(extension.offset.is_zero_approx(),"overhanging the old east page keeps the requested placement")
+	var lower:=evaluate(square(Vector2(179,-12),Vector2(2,2)),"underside of original rock slab")
+	if lower.valid:check(-12+lower.offset.y+1 <= -14.0,"open pages below the old slab can accept the drawing")
+	# Other modes retain the finite-profile clearance contract.
+	var signed_pages=game.medieval_world.paper_space
+	game.medieval_world.paper_space=null
 	var edge:=evaluate(square(Vector2(184,30),Vector2(8,2)),"wide body at map edge")
 	if edge.valid:check(184+edge.offset.x+4<=185.001 and 184+edge.offset.x-4>=-5,"whole rotated footprint remains within finite world")
 	if edge.valid:check(edge.offset.distance_to(Vector2(-3,0))<.02,"finite-world constraint selects exact nearest lateral translation")
 	var buried:=evaluate(square(Vector2(179,-12),Vector2(2,2)),"buried near finite terrain bottom")
 	if buried.valid:check(-12+buried.offset.y-1>=2.39,"escape never chooses false empty space under terrain")
+	game.medieval_world.paper_space=signed_pages
 	game.queue_free();await process_frame
 	game=load("res://scenes/main.tscn").instantiate();game.world_kind="nature-v1";game.onboarding.persist=false;root.add_child(game)
 	await physics_frame;game.onboarding.dismiss();game.set_physics_process(false);game.player.freeze=true

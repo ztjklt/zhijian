@@ -501,6 +501,7 @@ func _import_world(actor, data: Variant) -> Dictionary:
 	if actor.player_id!=owner_id: return _failure("只有创建者能导入作品")
 	if not data is Dictionary or not data.get("objects") is Array or data.objects.size()>600 or not data.get("world") is Dictionary: return _failure("作品无效，原世界未改变")
 	if data.world.get("id", "paper") != map_id: return _failure("请在相同地图的房间导入作品，原世界未改变")
+	if data.world.has("east_segments"): return _failure("东侧续画作品目前只可在单人沙盒中继续")
 	var imported: Array=[]
 	var points:=0
 	var pending_next:=next_id

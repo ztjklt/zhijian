@@ -1,0 +1,7 @@
+{
+  "name": "zhijian-harness-runtime",
+  "private": true,
+  "dependencies": {
+    "@deepseek-ai/dsh-llm-deepseek": "0.1.7-rc.2"
+  }
+}

@@ -10,7 +10,7 @@ var feet := PackedFloat32Array()
 var soil := PackedFloat32Array()
 var columns: Array[int] = []
 
-func _init(entity, terrain) -> void:
+func _init(entity, terrain, on_road := false) -> void:
 	size = entity.size
 	var source: Rect2 = entity.source_rect
 	var key: String = entity.texture.resource_path+str(source)
@@ -21,7 +21,8 @@ func _init(entity, terrain) -> void:
 	for column in normalized.size():
 		var x := (float(column)/(normalized.size()-1)-.5)*size.x
 		feet.append(normalized[column]*size.y)
-		var ground: float = terrain.surface_height(entity.position.x+x)-entity.position.y
+		var surface: float = terrain.travel_height(entity.position.x+x) if on_road else terrain.surface_height(entity.position.x+x)
+		var ground: float = surface-entity.position.y
 		soil.append(ground)
 		# Keep the mapping monotone even on a crest or for a scaled-up tree.
 		band = maxf(band,ground+.15)
@@ -102,7 +103,7 @@ func fit_polygon(polygon: PackedVector2Array) -> PackedVector2Array:
 
 func _append_cell(entity, cell: PackedVector2Array, vertices: PackedVector3Array, uvs: PackedVector2Array) -> void:
 	var pieces: Array = [cell]
-	if not entity.cuts.is_empty():
+	if not entity.cuts.is_empty() or not entity.alive:
 		pieces = []
 		for remaining in entity.render_polygons:
 			pieces.append_array(Geometry2D.intersect_polygons(cell,remaining))

@@ -2,13 +2,21 @@ extends "res://scripts/net/actor.gd"
 var display_game = null
 var target_position := Vector2.ZERO
 var received_position := false
+var smooth_motion := bool(ProjectSettings.get_setting("paper/network/smooth_remote_motion", false))
+var last_movement_reset := -1
 func _ready() -> void:
 	super._ready()
 	var visual := PaperCombatVisual.new()
 	visual.game = self
 	add_child(visual)
 func _process(delta: float) -> void:
-	player.position = player.position.lerp(target_position, minf(1,delta*24))
+	var step := (target_position - player.position) * minf(1, delta * 24)
+	if smooth_motion:
+		# Batches of late snapshots can move the target several normal steps at once.
+		# Bound the displayed catch-up without waiting for future packets or overshooting the server.
+		var catch_up_speed := maxf(8.0, player.linear_velocity.length() * 1.25)
+		step = step.limit_length(catch_up_speed * delta)
+	player.position += step
 	if display_game != null: PIXELS_PER_UNIT = display_game.PIXELS_PER_UNIT
 	queue_redraw()
 func world_to_screen(pos: Vector2) -> Vector2:
@@ -17,7 +25,10 @@ func screen_to_world(pos: Vector2) -> Vector2:
 	return display_game.screen_to_world(pos)
 func apply(state: Dictionary) -> void:
 	target_position = state.position
-	if not received_position or player.position.distance_to(target_position)>5:
+	var reset := int(state.get("movement_reset", -1))
+	var relocated := smooth_motion and reset >= 0 and last_movement_reset >= 0 and reset != last_movement_reset
+	last_movement_reset = reset
+	if not received_position or relocated or player.position.distance_to(target_position)>5:
 		player.position=target_position
 		received_position=true
 	player.linear_velocity = state.get("velocity",Vector2.ZERO)
