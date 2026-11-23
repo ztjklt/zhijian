@@ -4,6 +4,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      full_regression:
+        description: Run the full native, Web and multiplayer suites
+        type: boolean
+        default: false
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
@@ -27,12 +32,16 @@ jobs:
           unzip -q /tmp/godot.zip -d /tmp/godot
           chmod +x /tmp/godot/Godot_v4.6.3-stable_linux.x86_64
           echo 'GODOT_BIN=/tmp/godot/Godot_v4.6.3-stable_linux.x86_64' >> "$GITHUB_ENV"
+      - name: Open the desktop showcase from a clean checkout
+        run: python3 ZSCB/tests/run_isolated.py --script res://tests/desktop_smoke.gd
       - name: Native, Python and adapted Web checks
+        if: github.event_name == 'workflow_dispatch' && inputs.full_regression
         run: python3 ZSCB/tests/run_checks.py --logs /tmp/zhijian-checks
       - name: Native and Web cooperation at 600ms RTT
+        if: github.event_name == 'workflow_dispatch' && inputs.full_regression
         run: python3 ZSCB/tests/run_checks.py --stages cooperation --logs /tmp/zhijian-checks
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && github.event_name == 'workflow_dispatch' && inputs.full_regression
         with:
           name: check-logs
           path: /tmp/zhijian-checks

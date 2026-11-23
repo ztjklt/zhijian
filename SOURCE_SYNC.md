@@ -1,40 +1,29 @@
-# 从源码运行《纸间》
+# 模型连接、本机联机与开发
 
-GitHub 于 2026-11-23 同步了桌面单人沙盒常规试玩版 `bfe84bc10c6435e2`。运行源码和游戏资源来自 11 月 22 日的冻结构建。工程使用 Godot 4.6.3。
-
-## 桌面试玩
-
-1. 克隆仓库。在 Godot 项目管理器导入 `ZSCB/project.godot`，等待首次资源导入。
-2. 按 F5 打开封面。「试玩世界 → 三道新岸」可直接查看示范世界。「队伍与世界存档」可新建或切换队伍。
-3. 进入游戏后，从顶栏「角色交谈」查看画家阿靛、牧师和战神。从「画具」打开玩家自己的画笔。
-
-也可从仓库根目录运行：
-
-```sh
-godot --editor --path ZSCB
-godot --path ZSCB
-```
+桌面试玩的下载和启动方式见[首页](README.md)。
 
 ## AI 角色
 
-不配置模型也可游玩和浏览试玩世界。安装 Node.js 后，在仓库根目录安装模型运行依赖：
+使用自己的模型时，先安装 Node.js，在仓库根目录运行：
 
 ```sh
 npm ci --prefix ZSCB/tools --ignore-scripts --no-bin-links
 ```
 
-在封面「设置 → AI 角色」添加自有服务商连接、模型与 API Key，再绑定角色。模型调用计入该 Key 所对应的账户。支持 DeepSeek 官方连接，亦可填写兼容服务。macOS 钥匙串助手随源码提供固定版本的可执行文件及对应源码。
+在封面「设置 → AI 角色」添加服务商、模型与 API Key，再绑定游戏角色。支持 DeepSeek 官方地址和兼容服务，调用计入该 Key 对应的账户。
 
 ## 本机联机
 
-使用同一份源码启动服务器和两个客户端。通过大厅的本机测试服务器选项创建或加入房间。
+用同一份仓库启动客户端和权威服务器。在仓库根目录运行：
 
 ```sh
 python3 ZSCB/server/start_local.py
 ```
 
-服务器支持 `GODOT_BIN` 环境变量。本机 WebSocket 缺省地址是 `ws://127.0.0.1:9080/ws`。当前公网网页版沿用已有 r7／协议 6，需配套使用对应的公网客户端。详见[服务器运行说明](ZSCB/server/README.md)。
+服务器缺省地址为 `ws://127.0.0.1:9080/ws`。服务器和客户端的设置见[联机说明](ZSCB/server/README.md)。
 
-## 同步内容
+## 维护
 
-[源码校验清单](SOURCE_FILES.sha256)收录仓库内的 `ZSCB/` 文件。锁文件固定 Harness 依赖，克隆后用 npm 安装。内置试玩世界随工程提供，玩家队伍、连接凭据、缓存和原始开发记录留在本地。
+发布时以本地常规试玩入口的冻结版为来源，一并更新 [README 的构建号](README.md)。每次推送到 `main` 都会从干净检出检查封面、内置试玩和队伍存档。完整原生、Web 和联机回归可在 [GitHub Actions](https://github.com/ztjklt/zhijian/actions/workflows/checks.yml) 手动运行。
+
+[早期海报、美术底稿与历史启动器](https://github.com/ztjklt/zhijian/tree/d0d3b6f7c3d97be1bff7335f120671953e8c765f)
